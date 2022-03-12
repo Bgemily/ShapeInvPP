@@ -1,0 +1,48 @@
+---
+title: "EDA"
+author: "Zitong Zhang"
+date: "3/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+rm(list=ls())
+file_path = "../Functions"
+file.sources = list.files(path = file_path, pattern = "*.R$", full.names = TRUE)
+sapply(file.sources, source)
+```
+
+```{r}
+# Load one session
+ID=1;new.path='../../Data/Main/'
+dat = readRDS(paste(new.path,"session",ID,".rds",sep=''))
+```
+
+```{r}
+which(dat$scenario_num==1 & dat$reaction_type==1)->id_trials
+hist(-dat$stim_onset[id_trials,1]+dat$reaction_time[id_trials], breaks = 20)
+
+spks_time_mlist = dat$spks_pp[,id_trials]
+dat$reaction_time[id_trials]->reaction_time_vec
+dat$stim_onset[id_trials,1]->stim_onset_vec
+v0 = 0.2
+v1 = 0.1
+t_vec=seq(0, max(reaction_time_vec-stim_onset_vec+v0), by=0.01)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
