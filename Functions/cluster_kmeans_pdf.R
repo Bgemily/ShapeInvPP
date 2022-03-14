@@ -27,7 +27,8 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
                                                       reaction_time_vec = reaction_time_vec, 
                                                       clusters_list = clusters_list, 
                                                       N_component = N_component,
-                                                      freq_trun = freq_trun,
+                                                      freq_trun = freq_trun, 
+                                                      t_vec = t_vec,
                                                       v0 = v0, v1 = v1)
   
   
@@ -66,7 +67,10 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
           f_zi_act_mi = f_zi_act
         }
         f_zi = f_zi_vis + f_zi_act_mi
-        dist_tmp = dist_tmp + sum(f_zi^2) - 2*sum(N_mi*f_zi)
+        f_zi = f_zi/(sum(f_zi)+.Machine$double.eps)
+        N_spks = sum(N_mi)
+        N_mi = N_mi/(sum(N_mi)+.Machine$double.eps)
+        dist_tmp = dist_tmp + (sum(f_zi^2) - 2*sum(N_mi*f_zi))*N_spks
       }
       dist_mat[id_node, id_clus] = dist_tmp
     }
@@ -89,6 +93,7 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
   
   return(list(clusters_list=clusters_list, 
               l2_loss=l2_loss,
+              t_vec=t_vec,
               center_intensity_array=center_intensity_array))
 }
 

@@ -36,7 +36,8 @@ plot_intensity_array = function(center_intensity_array,
         mutate(cluster = as.factor(cluster), 
                component=as.factor(component)) %>%
         filter(cluster==id_clus & component==id_component) %>%
-        ggplot(aes(x=t, y=intensity_val, group=interaction(cluster,component))) +
+        ggplot(aes(x=t, y=intensity_val, 
+                   group=interaction(cluster,component))) +
         geom_line(alpha=1)+
         geom_vline(xintercept = 0, 
                    color=switch(id_component,
@@ -45,6 +46,8 @@ plot_intensity_array = function(center_intensity_array,
                    linetype=switch(id_component,
                                 `1`='solid',
                                 `2`='dashed')) +
+        annotate(geom = 'text', label = paste0('Cluster size: ',clus_size_vec[id_clus]), 
+                 x = Inf, y = Inf, hjust = 1, vjust = 1) +
         xlab(NULL) + ylab(NULL) +
         theme_bw() +
         # theme(axis.ticks.y = element_blank(), 

@@ -31,7 +31,7 @@ get_init = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
   }
    
   poinproc_mat_2 = poinproc_mat/(rowSums(poinproc_mat)+.Machine$double.eps)
-  membership = cluster::pam(x=poinproc_mat, k=N_clus, diss=FALSE, cluster.only=TRUE)
+  membership = cluster::pam(x=poinproc_mat_2, k=N_clus, diss=FALSE, cluster.only=TRUE)
 
   clusters = mem2clus(membership = membership, N_clus_min = N_clus)
   clusters_list = clusters
@@ -42,6 +42,7 @@ get_init = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
   
   
   return(list(membership_vec=membership_vec, 
+              poinproc_mat = poinproc_mat,
               clusters_list=clusters_list))
 }
 
