@@ -29,7 +29,8 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
                                                       N_component = N_component,
                                                       freq_trun = freq_trun, 
                                                       t_vec = t_vec,
-                                                      v0 = v0, v1 = v1)
+                                                      v0 = v0, v1 = v1,
+                                                      rmv_conn_prob = TRUE)
   
   
   # Update clusters--------------------------------------------------------------------------
@@ -81,7 +82,7 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
   ### Update memberships and clusters
   for (i in 1:N_node) {
     dist_vec = dist_mat[i, ]
-    membership[i] = which.min(dist_vec)
+    membership[i] = which.min(dist_vec)[1]
     dist_to_centr_vec[i] = min(dist_vec)
   }
   clusters = mem2clus(membership = membership, N_clus_min = N_clus)

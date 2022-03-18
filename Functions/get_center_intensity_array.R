@@ -10,15 +10,15 @@ get_center_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_
                                       n0_mat_list=NULL, 
                                       rmv_conn_prob=FALSE)
 {  
-  time_unit = t_vec[2]-t_vec[1]
+  t_unit = t_vec[2]-t_vec[1]
   N_clus = length(clusters_list)
   N_node = nrow(spks_time_mlist)
   N_trial = ncol(spks_time_mlist)
   
   
   center_intensity_array = array(dim=c(N_clus, N_component, length(t_vec)))
-
   for (q in 1:N_clus) {
+    N_spks = 0
     intensity_vis = intensity_act = 0
     if(length(clusters_list[[q]])>0){
       for (id_trial in 1:N_trial) {
@@ -63,10 +63,19 @@ get_center_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_
                                      head(fft_act, freq_trun)), inverse = TRUE))
         intensity_act_tmp[which(t_vec_2<=-v1)] = 0
         intensity_act = intensity_act + intensity_act_tmp
+        
+        N_spks = N_spks + length(id_spks_time_vis) + length(id_spks_time_act)
       }
       intensity_vis = intensity_vis / (N_trial*length(clusters_list[[q]]))
       intensity_act = intensity_act / (N_trial*length(clusters_list[[q]]))
       
+    }
+    
+    if(rmv_conn_prob){
+      if(N_spks>0){
+        intensity_vis = intensity_vis*(N_trial*length(clusters_list[[q]]))/N_spks
+        intensity_act = intensity_act*(N_trial*length(clusters_list[[q]]))/N_spks
+      }
     }
     
     center_intensity_array[q,1,] = intensity_vis

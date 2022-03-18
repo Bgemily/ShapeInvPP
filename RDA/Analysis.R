@@ -32,13 +32,13 @@ stim_onset_vec = dat$stim_onset[id_trials,1]
 
 N_clus_min = 1 # Number of clusters
 N_clus_max = 10
-N_clus_vec = c(4,8)
+N_clus_vec = c(4,6,8)
 freq_trun = 7
-MaxIter = 50
+MaxIter = 20
 v0 = 0.2
 v1 = 0.1
 t_vec=seq(0, max(reaction_time_vec-stim_onset_vec+v0)+0.01, by=0.01)
-N_restart = 5
+N_restart = 3
 
 now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
 for (ind_N_clus in 1:length(N_clus_vec)){
@@ -85,7 +85,7 @@ for (ind_N_clus in 1:length(N_clus_vec)){
     }
   }
   
-  method = paste0("Model1")
+  method = paste0("Model2")
   folder_path = paste0('../Results/Rdata/RDA/', method, '/', 'session',id_session,'/',now_trial)
   dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
   save(res,loss_restart,
