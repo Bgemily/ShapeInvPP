@@ -158,7 +158,7 @@ align_multi_curves_gd_ = function(f_origin_list, f_shift_list, n0, step_size,
 # Move f1 towards f2 by n0. Positive n0: towards right. Negative n0: towards left.
 align_multi_curves_gd_v2 = function(f_origin_list, f_target_list, n0=0, step_size=0.02, 
                                  MaxIter=1000, stopping_redu=0.0001, t_unit=0.05, weights=NULL,
-                                 n0_min = 0, n0_max = length(f_origin_list[[1]]))
+                                 n0_min = 0, n0_max = length(f_origin_list[[1]]), pad=NULL)
 {
   if(!is.list(f_origin_list)) f_origin_list = list(f_origin_list)
   if(!is.list(f_target_list)) f_target_list = list(f_target_list)
@@ -168,7 +168,11 @@ align_multi_curves_gd_v2 = function(f_origin_list, f_target_list, n0=0, step_siz
   n0_max -> n0_max 
   
   ### Extend f1 and f2 from [0,T] to [-T,2T]
-  extend = function(f) {return(c( rep(head(f,1),length(f)-1), f, rep(tail(f,1),2*round(length(f)/2)) ))} # make N:=length_of_func odd
+  if(!is.null(pad)){
+    extend = function(f) {return(c( rep(pad,length(f)-1), f, rep(pad,2*round(length(f)/2)) ))} # make N:=length_of_func odd
+  } else{
+    extend = function(f) {return(c( rep(head(f,1),length(f)-1), f, rep(tail(f,1),2*round(length(f)/2)) ))} # make N:=length_of_func odd
+  }
   f_origin_list = lapply(X = f_origin_list, FUN = extend)
   f_target_list = lapply(X = f_target_list, FUN = extend)
   
@@ -192,7 +196,10 @@ align_multi_curves_gd_v2 = function(f_origin_list, f_target_list, n0=0, step_siz
   while (dist_redu>stopping_redu && iter_count<MaxIter) {
     iter_count = iter_count+1
     
-    gd_list = mapply(FUN = gradient_v2, theta_prime=theta_prime_list, gamma_prime=gamma_prime_list, pad=pad_list,
+    gd_list = mapply(FUN = gradient_v2, 
+                     theta_prime=theta_prime_list, 
+                     gamma_prime=gamma_prime_list, 
+                     pad=pad_list,
                      MoreArgs = list(n0=n0), SIMPLIFY = FALSE)
     if(is.null(weights)) 
       gd = mean(unlist(gd_list))

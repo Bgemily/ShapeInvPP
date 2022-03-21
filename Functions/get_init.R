@@ -2,47 +2,57 @@
 ### Initialize time shifts by earliest edge time.
 get_init = function(spks_time_mlist, stim_onset_vec, reaction_time_vec, 
                     N_clus,
-                    N_component=2,
+                    N_component=1,
                     freq_trun=5, 
-                    v0 = 0.2, v1 = 0.1,
-                    t_vec=seq(0, max(reaction_time_vec-stim_onset_vec+v0), by=0.01)
+                    v0 = 0.15, v1 = 0.1,
+                    t_vec=seq(0, v0, by=0.01)
                     )
 {
 
-  time_unit = t_vec[2] - t_vec[1]
+  t_unit = t_vec[2] - t_vec[1]
   N_node = nrow(spks_time_mlist)
   N_trial = ncol(spks_time_mlist)
 
-  
 
-  # Initialize clusters -----------------------------------------------------
-  poinproc_mat = matrix(nrow=N_node, ncol=length(t_vec))
-  for(id_node in 1:N_node){
-    poinproc_mean = 0
+  # Initialize time shifts --------------------------------------------------
+  v_vec = rep(0,N_node)
+  spks_time_vec_list = list()
+  for (id_node in 1:N_node) {
+    spks_time_vec = c()
     for (id_trial in 1:N_trial) {
       spks_time_tmp = spks_time_mlist[id_node, id_trial][[1]]-stim_onset_vec[id_trial]
       spks_time_tmp = spks_time_tmp[which(spks_time_tmp<=max(t_vec) & spks_time_tmp>=min(t_vec))]
-      poinproc = hist(spks_time_tmp, breaks=t_vec, plot=FALSE)$counts
-      poinproc = c(poinproc,0)
-      poinproc_mean = poinproc_mean + poinproc
+      spks_time_vec = c(spks_time_vec, spks_time_tmp)
     }
-    poinproc_mean = poinproc_mean/N_trial
-    poinproc_mat[id_node, ] = poinproc_mean
+    if(length(spks_time_vec)>0){
+      v_vec[id_node] = median(spks_time_vec)
+    }
+    spks_time_vec_list[id_node] = list(spks_time_vec)
   }
-   
-  poinproc_mat_2 = poinproc_mat/(rowSums(poinproc_mat)+.Machine$double.eps)
-  membership = cluster::pam(x=poinproc_mat_2, k=N_clus, diss=FALSE, cluster.only=TRUE)
+  v_vec = v_vec - min(v_vec)
 
+  # Initialize clusters -----------------------------------------------------
+  node_intensity_array = get_center_intensity_array(spks_time_mlist = spks_time_mlist,
+                                                    stim_onset_vec = stim_onset_vec,
+                                                    reaction_time_vec = reaction_time_vec,
+                                                    clusters_list = mem2clus(1:N_node),
+                                                    v_vec = v_vec,
+                                                    N_component = N_component,
+                                                    freq_trun = freq_trun,
+                                                    v0 = v0, v1 = v1,
+                                                    t_vec = t_vec,
+                                                    rmv_conn_prob = TRUE)
+  membership = cluster::pam(x=node_intensity_array[,1,], k=N_clus, diss=FALSE, cluster.only=TRUE)
+  
+  
   clusters = mem2clus(membership = membership, N_clus_min = N_clus)
   clusters_list = clusters
   membership_vec = membership
   
   
   
-  
-  
   return(list(membership_vec=membership_vec, 
-              poinproc_mat = poinproc_mat,
+              v_vec=v_vec,
               clusters_list=clusters_list))
 }
 

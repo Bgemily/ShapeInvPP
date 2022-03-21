@@ -3,7 +3,7 @@ plot_intensity_array = function(center_intensity_array,
                                 clusters_list,
                                 t_vec,
                                 v0 = 0.2, v1 = 0.1,
-                                N_component = 2
+                                N_component = 1
                                 )
 {
   

@@ -3,11 +3,12 @@
 do_cluster_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
                           # Initial values
                           clusters_list_init,
+                          v_vec_init,
                           # Tuning parameter
-                          N_component=2,
+                          N_component=1,
                           freq_trun=5, 
-                          v0 = 0.2, v1 = 0.1,
-                          t_vec=seq(0, max(reaction_time_vec-stim_onset_vec+v0)+0.01, by=0.01),
+                          v0 = 0.15, v1 = 0.1,
+                          t_vec=seq(0, v0, length.out=200),
                           MaxIter=10, conv_thres=5e-3, 
                           # Unused arguments
                           N_clus=NULL, 
@@ -30,21 +31,25 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
   loss_history = c()
  
   # Update cluster-specific intensities and clusters ---------------------
-  ### Get init clusters
+  ### Get init values
   clusters_list = clusters_list_init
+  v_vec = v_vec_init
   
   ### Save estimation
   clusters_history = c(clusters_history, list(clusters_list))
 
   ### Estimate parameters 
   clusters_list_update = clusters_list_current = clusters_list
+  v_vec_update = v_vec_current = v_vec
   center_intensity_array = get_center_intensity_array(spks_time_mlist = spks_time_mlist, 
                                                       stim_onset_vec = stim_onset_vec, 
                                                       reaction_time_vec = reaction_time_vec, 
                                                       clusters_list = clusters_list, 
+                                                      v_vec = v_vec,
                                                       N_component = N_component,
                                                       freq_trun = freq_trun,
                                                       v0 = v0, v1 = v1,
+                                                      t_vec = t_vec,
                                                       rmv_conn_prob = TRUE)
   center_intensity_array_update = center_intensity_array_current = center_intensity_array
   
@@ -56,13 +61,16 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
                              stim_onset_vec = stim_onset_vec, 
                              reaction_time_vec = reaction_time_vec, 
                              clusters_list = clusters_list_current, 
+                             v_vec = v_vec_current,
                              N_component = N_component, 
                              freq_trun = freq_trun, 
-                             v0 = v0, v1 = v1)
+                             v0 = v0, v1 = v1,
+                             t_vec = t_vec)
     clusters_list_update = res$clusters_list
     center_intensity_array_update = res$center_intensity_array
-    l2_loss = res$l2_loss
+    v_vec_update = res$v_vec
     
+    l2_loss = res$l2_loss
     loss_history = c(loss_history, l2_loss)
     
     ### Evaluate stopping criterion
@@ -71,21 +79,23 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
     delta_clusters = 1 - get_one_ARI(memb_est_vec = clus2mem(clusters_update), 
                                      memb_true_vec = clus2mem(clusters_current))
     
-    
-    N_component = dim(center_intensity_array_update)[2]
     delta_center_intensity_vec = sapply(1:N_component, function(id_component){
       sqrt( sum((abs(center_intensity_array_update[,id_component,]-center_intensity_array_current[,id_component,]))^2) / 
         (sum(abs(center_intensity_array_current[,id_component,])^2) + .Machine$double.eps) )
     }
       )
     
-    stopping = mean(c(delta_center_intensity_vec,delta_clusters)) < conv_thres
+    delta_v_vec = sqrt( sum((v_vec_update-v_vec_current)^2) / 
+                          (sum((v_vec_current)^2) + .Machine$double.eps) )
+    
+    stopping = mean(c(delta_clusters,delta_center_intensity_vec,delta_v_vec)) < conv_thres
     
     
     ### *update -> *current
     n_iter = n_iter+1
     clusters_list_update -> clusters_list_current
     center_intensity_array_update -> center_intensity_array_current 
+    v_vec_update -> v_vec_current
     
     clusters_history = c(clusters_history, list(clusters_list_current))
   }
@@ -101,12 +111,13 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
   
   clusters_list_current -> clusters_list
   center_intensity_array_current -> center_intensity_array
-  
+  v_vec_current -> v_vec
 
   return(list(clusters_list=clusters_list, 
               loss_history=loss_history,
               clusters_history=clusters_history, 
-              center_intensity_array=center_intensity_array, 
+              center_intensity_array=center_intensity_array,
+              v_vec=v_vec,
               t_vec=t_vec,
               N_iteration=N_iteration))
   

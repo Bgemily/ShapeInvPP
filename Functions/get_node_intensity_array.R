@@ -1,13 +1,13 @@
-
+# TODO: Add v_vec in input
 ### Obtain truncated fourier series (smoothed shifted point process) for each node and each trial 
 
 get_node_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
-                                    clusters_list=NULL, 
+                                    clusters_list, 
+                                    v_vec,
                                     N_component=2,
                                     freq_trun=5,
                                     v0 = 0.2, v1 = 0.1,
                                     t_vec=seq(0, max(reaction_time_vec-stim_onset_vec+v0)+0.01, by=0.01),
-                                    n0_mat=edge_time_mat*0, 
                                     rmv_conn_prob=FALSE)
 {  
   time_unit = t_vec[2]-t_vec[1]
@@ -29,6 +29,7 @@ get_node_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_ti
       else{
         fft_tmp = rep(0,2*freq_trun+1)
       }
+      # TODO: Check whether tail() and head() are flipped
       intensity_tmp = Re(fft(c(tail(fft_tmp, freq_trun+1), 
                                    rep(0, length(t_vec)-2*freq_trun-1),
                                    head(fft_tmp, freq_trun)), inverse = TRUE))
