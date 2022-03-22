@@ -50,7 +50,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
                                                       freq_trun = freq_trun,
                                                       v0 = v0, v1 = v1,
                                                       t_vec = t_vec,
-                                                      rmv_conn_prob = TRUE)
+                                                      rmv_conn_prob = TRUE)$center_intensity_array
   center_intensity_array_update = center_intensity_array_current = center_intensity_array
   
   n_iter = 1

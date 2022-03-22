@@ -17,6 +17,7 @@ get_center_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_
   
   
   center_intensity_array = array(dim=c(N_clus, 1, length(t_vec)))
+  N_spks_vec = rep(0,N_clus)
   for (q in 1:N_clus) {
     intensity_q = 0
     N_spks_q = 0
@@ -28,6 +29,7 @@ get_center_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_
           spks_time_nodetrial = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
                                                             spks_time_nodetrial<=max(t_vec))]
           spks_time_q = c(spks_time_q, spks_time_nodetrial)
+          
         }
       }
       if (length(spks_time_q)>0) {
@@ -53,10 +55,12 @@ get_center_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_
     }
     
     center_intensity_array[q,1,] = intensity_q
-
+    N_spks_vec[q] = N_spks_q
+    
   }
   
-  return(center_intensity_array)
+  return(list(center_intensity_array=center_intensity_array,
+              N_spks_vec=N_spks_vec))
 }
 
 

@@ -32,7 +32,7 @@ est_timeshift_density = function(spks_time_mlist, stim_onset_vec, reaction_time_
                                                       freq_trun = freq_trun, 
                                                       t_vec = t_vec,
                                                       v0 = v0, v1 = v1,
-                                                      rmv_conn_prob = TRUE)
+                                                      rmv_conn_prob = TRUE)$center_intensity_array
   center_intensity_array_update = center_intensity_array_current = center_intensity_array
   while(!converge && n_iter<= max_iter_centering)
   {
@@ -46,7 +46,7 @@ est_timeshift_density = function(spks_time_mlist, stim_onset_vec, reaction_time_
                                                         freq_trun = freq_trun, 
                                                         t_vec = t_vec,
                                                         v0 = v0, v1 = v1,
-                                                        rmv_conn_prob = TRUE)
+                                                        rmv_conn_prob = TRUE)$center_intensity_array
 
     ### Get aggregated counting processes \bar N_{i}
     node_intensity_array = get_center_intensity_array(spks_time_mlist = spks_time_mlist,
@@ -58,7 +58,7 @@ est_timeshift_density = function(spks_time_mlist, stim_onset_vec, reaction_time_
                                                     freq_trun = freq_trun,
                                                     v0 = v0, v1 = v1,
                                                     t_vec = t_vec,
-                                                    rmv_conn_prob = TRUE)
+                                                    rmv_conn_prob = TRUE)$center_intensity_array
     
     ### Update time shifts
     n0_vec_tmp = rep(0,N_node)

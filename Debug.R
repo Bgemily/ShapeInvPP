@@ -38,7 +38,7 @@ summary(tmp$v_vec)
 
 grid.arrange(plot_intensity_array(tmp$center_intensity_array, tmp$clusters_list, tmp$t_vec)$g)
 
-center_intensity_array = get_center_intensity_array(spks_time_mlist = spks_time_mlist_tmp, 
+res = get_center_intensity_array(spks_time_mlist = spks_time_mlist_tmp, 
                                                     stim_onset_vec = stim_onset_vec, 
                                                     reaction_time_vec = reaction_time_vec, 
                                                     clusters_list = tmp$clusters_list, 
@@ -48,4 +48,5 @@ center_intensity_array = get_center_intensity_array(spks_time_mlist = spks_time_
                                                     t_vec = tmp$t_vec,
                                                     v0 = 0.15, v1 = 0,
                                                     rmv_conn_prob = TRUE)
+center_intensity_array = res$center_intensity_array
 grid.arrange(plot_intensity_array(center_intensity_array, clusters_list, t_vec)$g)

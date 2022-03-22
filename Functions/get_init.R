@@ -41,7 +41,7 @@ get_init = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
                                                     freq_trun = freq_trun,
                                                     v0 = v0, v1 = v1,
                                                     t_vec = t_vec,
-                                                    rmv_conn_prob = TRUE)
+                                                    rmv_conn_prob = TRUE)$center_intensity_array
   membership = cluster::pam(x=node_intensity_array[,1,], k=N_clus, diss=FALSE, cluster.only=TRUE)
   
   
