@@ -2,7 +2,7 @@
 get_adaptive_fft = function(event_time_vec, 
                             freq_trun_max, 
                             t_vec, 
-                            bw=0.03,
+                            bw=0.01,
                             freq_trun_min=freq_trun_max)
 {
   t_unit = t_vec[2]-t_vec[1]

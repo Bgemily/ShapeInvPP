@@ -10,12 +10,12 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
                           v0 = 0.15, v1 = 0.1,
                           t_vec=seq(0, v0, length.out=200),
                           MaxIter=10, conv_thres=5e-3, 
+                          fix_timeshift=FALSE,
                           # Unused arguments
                           N_clus=NULL, 
                           n0_vec_list_init=NULL,
                           step_size=200,
                           opt_radius=max(t_vec)/2,
-                          fix_timeshift=FALSE,
                           gamma=0.001,
                           ...)
 {
@@ -65,7 +65,9 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
                              N_component = N_component, 
                              freq_trun = freq_trun, 
                              v0 = v0, v1 = v1,
-                             t_vec = t_vec)
+                             t_vec = t_vec,
+                             fix_timeshift=fix_timeshift
+                            )
     clusters_list_update = res$clusters_list
     center_intensity_array_update = res$center_intensity_array
     v_vec_update = res$v_vec

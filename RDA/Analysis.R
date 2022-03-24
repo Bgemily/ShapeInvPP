@@ -24,13 +24,29 @@ which(dat$scenario_num==1 & dat$reaction_type==1 &
         dat$contrast_left==1 & dat$contrast_right==0 &
         dat$reaction_time-dat$stim_onset[,1]<0.5)->id_trials
 
+spks_time_mlist = dat$spks_pp[,id_trials]
+
+N_node = nrow(spks_time_mlist)
+N_trial = ncol(spks_time_mlist)
+N_spks_vec = rep(0, N_node)
+for (id_node in 1:N_node){
+  for (id_trial in 1:N_trial){
+    spks_time_tmp = unlist(spks_time_mlist[id_node,id_trial])
+    N_spks_tmp = length(spks_time_tmp)
+    N_spks_vec[id_node] = N_spks_vec[id_node] + N_spks_tmp
+  }
+}
+
+id_nodes = which(N_spks_vec>=30)
+
+
 
 # Apply our algorithm (vision) ---------------------------------------------------------
-spks_time_mlist = dat$spks_pp[,id_trials]
+spks_time_mlist = dat$spks_pp[id_nodes,id_trials]
 stim_onset_vec = dat$stim_onset[id_trials,1]
 reaction_time_vec = dat$reaction_time[id_trials]
 
-method = paste0("Model3_kernel")
+method = paste0("Model3_rmvsmlNspks_incstpsiz")
 signal_type = 'vision'
 
 N_clus_vec = c(6,5,4)
@@ -94,12 +110,13 @@ for(freq_trun in freq_trun_vec){
     folder_path = paste0('../Results/Rdata/RDA', 
                          '/', method, "_", 'freq_trun',freq_trun,
                          '/', 'session',id_session,
-                         '/', signal_type,
-                         '/',now_trial)
+                         '/', signal_type)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     data_res = list(spks_time_mlist=spks_time_mlist,
                     stim_onset_vec=stim_onset_vec,
                     reaction_time_vec=reaction_time_vec,
+                    id_trials=id_trials,
+                    id_nodes=id_nodes,
                     id_session=id_session)
     param_res = list(N_clus=N_clus,
                      freq_trun=freq_trun,
@@ -117,11 +134,11 @@ for(freq_trun in freq_trun_vec){
 
 
 # Apply our algorithm (reaction) ---------------------------------------------------------
-spks_time_mlist = dat$spks_pp[,id_trials]
+spks_time_mlist = dat$spks_pp[id_nodes,id_trials]
 stim_onset_vec = dat$reaction_time[id_trials]
 reaction_time_vec = dat$reaction_time[id_trials]
 
-method = paste0("Model3_kernel")
+method = paste0("Model3_rmvsmlNspks_incstpsiz")
 signal_type = 'reaction'
 
 N_clus_vec = c(6,5,4)
@@ -185,12 +202,13 @@ for(freq_trun in freq_trun_vec){
     folder_path = paste0('../Results/Rdata/RDA', 
                          '/', method, "_", 'freq_trun',freq_trun,
                          '/', 'session',id_session,
-                         '/', signal_type,
-                         '/',now_trial)
+                         '/', signal_type)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     data_res = list(spks_time_mlist=spks_time_mlist,
                     stim_onset_vec=stim_onset_vec,
                     reaction_time_vec=reaction_time_vec,
+                    id_trials=id_trials,
+                    id_nodes=id_nodes,
                     id_session=id_session)
     param_res = list(N_clus=N_clus,
                      freq_trun=freq_trun,
@@ -210,11 +228,11 @@ for(freq_trun in freq_trun_vec){
 
 
 # Apply our algorithm (gocue) ---------------------------------------------------------
-spks_time_mlist = dat$spks_pp[,id_trials]
+spks_time_mlist = dat$spks_pp[id_nodes,id_trials]
 stim_onset_vec = dat$gocue[id_trials,1] 
 reaction_time_vec = dat$reaction_time[id_trials]
 
-method = paste0("Model3_kernel")
+method = paste0("Model3_rmvsmlNspks_incstpsiz")
 signal_type = 'gocue'
 
 N_clus_vec = c(6,5,4)
@@ -278,12 +296,13 @@ for(freq_trun in freq_trun_vec){
     folder_path = paste0('../Results/Rdata/RDA', 
                          '/', method, "_", 'freq_trun',freq_trun,
                          '/', 'session',id_session,
-                         '/',signal_type,
-                         '/',now_trial)
+                         '/',signal_type)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     data_res = list(spks_time_mlist=spks_time_mlist,
                     stim_onset_vec=stim_onset_vec,
                     reaction_time_vec=reaction_time_vec,
+                    id_trials=id_trials,
+                    id_nodes=id_nodes,
                     id_session=id_session)
     param_res = list(N_clus=N_clus,
                      freq_trun=freq_trun,
@@ -302,11 +321,11 @@ for(freq_trun in freq_trun_vec){
 
 
 # Apply our algorithm (response) ---------------------------------------------------------
-spks_time_mlist = dat$spks_pp[,id_trials]
+spks_time_mlist = dat$spks_pp[id_nodes,id_trials]
 stim_onset_vec = dat$response_time[id_trials,1] 
 reaction_time_vec = dat$reaction_time[id_trials]
 
-method = paste0("Model3_kernel")
+method = paste0("Model3_rmvsmlNspks_incstpsiz")
 signal_type = 'response'
 
 N_clus_vec = c(6,5,4)
@@ -370,12 +389,13 @@ for(freq_trun in freq_trun_vec){
     folder_path = paste0('../Results/Rdata/RDA', 
                          '/', method, "_", 'freq_trun',freq_trun,
                          '/', 'session',id_session,
-                         '/',signal_type,
-                         '/',now_trial)
+                         '/',signal_type)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     data_res = list(spks_time_mlist=spks_time_mlist,
                     stim_onset_vec=stim_onset_vec,
                     reaction_time_vec=reaction_time_vec,
+                    id_trials=id_trials,
+                    id_nodes=id_nodes,
                     id_session=id_session)
     param_res = list(N_clus=N_clus,
                      freq_trun=freq_trun,
@@ -393,11 +413,11 @@ for(freq_trun in freq_trun_vec){
 
 
 # Apply our algorithm (feedback) ---------------------------------------------------------
-spks_time_mlist = dat$spks_pp[,id_trials]
+spks_time_mlist = dat$spks_pp[id_nodes,id_trials]
 stim_onset_vec = dat$feedback_time[id_trials,1] 
 reaction_time_vec = dat$reaction_time[id_trials]
 
-method = paste0("Model3_kernel")
+method = paste0("Model3_rmvsmlNspks_incstpsiz")
 signal_type = 'feedback'
 
 N_clus_vec = c(6,5,4)
@@ -461,12 +481,13 @@ for(freq_trun in freq_trun_vec){
     folder_path = paste0('../Results/Rdata/RDA', 
                          '/', method, "_", 'freq_trun',freq_trun,
                          '/', 'session',id_session,
-                         '/',signal_type,
-                         '/',now_trial)
+                         '/',signal_type)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     data_res = list(spks_time_mlist=spks_time_mlist,
                     stim_onset_vec=stim_onset_vec,
                     reaction_time_vec=reaction_time_vec,
+                    id_trials=id_trials,
+                    id_nodes=id_nodes,
                     id_session=id_session)
     param_res = list(N_clus=N_clus,
                      freq_trun=freq_trun,

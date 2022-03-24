@@ -7,10 +7,10 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
                               freq_trun=5, 
                               v0 = 0.15, v1 = 0.1,
                               t_vec=seq(0, v0, by=0.01),
+                              fix_timeshift=FALSE,
                               # Unused arguments
                               order_list=NULL, 
                               opt_radius=max(t_vec)/2,
-                              fix_timeshift=FALSE,
                               prob_err_mtplr=0.005,
                               gamma=0.001,
                               ...)
@@ -24,14 +24,15 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
   # Update time shifts and intensities ------------------------------------------------------
   
   res = est_timeshift_density(spks_time_mlist = spks_time_mlist,
-                                stim_onset_vec = stim_onset_vec,
-                                reaction_time_vec = reaction_time_vec,
-                                clusters_list = clusters_list,
-                                v_vec = v_vec,
-                                N_component = N_component,
-                                freq_trun = freq_trun,
-                                v0 = v0, v1 = v1,
-                                t_vec = t_vec)
+                              stim_onset_vec = stim_onset_vec,
+                              reaction_time_vec = reaction_time_vec,
+                              clusters_list = clusters_list,
+                              v_vec = v_vec,
+                              N_component = N_component,
+                              freq_trun = freq_trun,
+                              v0 = v0, v1 = v1,
+                              t_vec = t_vec,
+                              fix_timeshift=fix_timeshift)
   v_vec = res$v_vec
   center_intensity_array = res$center_intensity_array
   

@@ -207,6 +207,8 @@ align_multi_curves_gd_v2 = function(f_origin_list, f_target_list, n0=0, step_siz
       gd = sum(unlist(gd_list)*weights)
     
     n0 = n0 - (step_size)*gd
+    # print((step_size)*gd)
+    # browser()
     n0 = round(n0) 
     
     if (n0<n0_min) {

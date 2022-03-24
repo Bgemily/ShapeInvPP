@@ -5,7 +5,9 @@ get_init = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
                     N_component=1,
                     freq_trun=5, 
                     v0 = 0.15, v1 = 0.1,
-                    t_vec=seq(0, v0, by=0.01)
+                    t_vec=seq(0, v0, by=0.01),
+                    fix_timeshift=FALSE,
+                    default_timeshift=0
                     )
 {
 
@@ -15,21 +17,26 @@ get_init = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
 
 
   # Initialize time shifts --------------------------------------------------
-  v_vec = rep(0,N_node)
-  spks_time_vec_list = list()
-  for (id_node in 1:N_node) {
-    spks_time_vec = c()
-    for (id_trial in 1:N_trial) {
-      spks_time_tmp = spks_time_mlist[id_node, id_trial][[1]]-stim_onset_vec[id_trial]
-      spks_time_tmp = spks_time_tmp[which(spks_time_tmp<=max(t_vec) & spks_time_tmp>=min(t_vec))]
-      spks_time_vec = c(spks_time_vec, spks_time_tmp)
+  if (fix_timeshift) {
+    v_vec = rep(default_timeshift, N_node)
+  } else{
+    v_vec = rep(0,N_node)
+    spks_time_vec_list = list()
+    for (id_node in 1:N_node) {
+      spks_time_vec = c()
+      for (id_trial in 1:N_trial) {
+        spks_time_tmp = spks_time_mlist[id_node, id_trial][[1]]-stim_onset_vec[id_trial]
+        spks_time_tmp = spks_time_tmp[which(spks_time_tmp<=max(t_vec) & spks_time_tmp>=min(t_vec))]
+        spks_time_vec = c(spks_time_vec, spks_time_tmp)
+      }
+      if(length(spks_time_vec)>0){
+        v_vec[id_node] = median(spks_time_vec)
+      }
+      spks_time_vec_list[id_node] = list(spks_time_vec)
     }
-    if(length(spks_time_vec)>0){
-      v_vec[id_node] = median(spks_time_vec)
-    }
-    spks_time_vec_list[id_node] = list(spks_time_vec)
+    v_vec = v_vec - min(v_vec)
   }
-  v_vec = v_vec - min(v_vec)
+  
 
   # Initialize clusters -----------------------------------------------------
   node_intensity_array = get_center_intensity_array(spks_time_mlist = spks_time_mlist,

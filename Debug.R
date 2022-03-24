@@ -31,7 +31,7 @@ do_cluster_pdf(spks_time_mlist = spks_time_mlist_tmp,
                freq_trun = Inf,
                MaxIter = 15,
                v0 = 0.15, v1=0,
-               t_vec=seq(0, 0.15, length.out=200))->tmp
+               t_vec=seq(0, 0.15, length.out=200),fix_timeshift = TRUE)->tmp
 plot(tmp$loss_history,type='b')
 tmp$clusters_list
 summary(tmp$v_vec)
@@ -49,4 +49,4 @@ res = get_center_intensity_array(spks_time_mlist = spks_time_mlist_tmp,
                                                     v0 = 0.15, v1 = 0,
                                                     rmv_conn_prob = TRUE)
 center_intensity_array = res$center_intensity_array
-grid.arrange(plot_intensity_array(center_intensity_array, clusters_list, t_vec)$g)
+grid.arrange(plot_intensity_array(center_intensity_array, res$clusters_list, res$t_vec)$g)
