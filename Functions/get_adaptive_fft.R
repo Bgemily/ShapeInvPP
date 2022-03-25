@@ -1,3 +1,4 @@
+### Calculate smoothed dN/dt
 ### Choose adaptive frequency truncation parameter to smooth a vector of event times
 get_adaptive_fft = function(event_time_vec, 
                             freq_trun_max, 

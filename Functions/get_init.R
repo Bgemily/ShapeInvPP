@@ -1,6 +1,7 @@
 ### Initialize of cluster memberships and time shifts
 ### Initialize time shifts by earliest edge time.
-get_init = function(spks_time_mlist, stim_onset_vec, reaction_time_vec, 
+get_init = function(spks_time_mlist, stim_onset_vec, 
+                    reaction_time_vec=NULL, 
                     N_clus,
                     N_component=1,
                     freq_trun=5, 
@@ -49,8 +50,7 @@ get_init = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
                                                     v0 = v0, v1 = v1,
                                                     t_vec = t_vec,
                                                     rmv_conn_prob = TRUE)$center_intensity_array
-  membership = cluster::pam(x=node_intensity_array[,1,], k=N_clus, diss=FALSE, cluster.only=TRUE)
-  
+  membership = kmeans(x=node_intensity_array[,1,], centers = N_clus, nstart = 5)$cluster
   
   clusters = mem2clus(membership = membership, N_clus_min = N_clus)
   clusters_list = clusters
