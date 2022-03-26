@@ -40,39 +40,50 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
   
   # Update clusters--------------------------------------------------------------------------
   clusters = clusters_list
-
-  ### Compute distance between each node and each cluster
-  dist_mat = matrix(nrow=N_node, ncol=N_clus)
-  dist_1_vec = c()
-  dist_2_vec = c()
+  
+  N_spks_mat = matrix(nrow=N_node, ncol=N_trial)
+  dNN_array = array(dim = c(N_node,N_trial,length(t_vec)))
   for (id_node in 1:N_node) {
-    for (id_clus in 1:N_clus) {
-      dist_tmp = 0
-      density_zi = center_density_array[id_clus, 1, ]
-      center_Nspks_zi = center_Nspks_mat[id_clus, 1]
-      for (id_trial in 1:N_trial) {
-        spks_time_mi_vec = spks_time_mlist[id_node, id_trial][[1]] - stim_onset_vec[id_trial] - v_vec[id_node]
-        spks_time_mi_vec = spks_time_mi_vec[which(spks_time_mi_vec<=max(t_vec) &
-                                                    spks_time_mi_vec>=min(t_vec))]
-        N_spks_mi = length(spks_time_mi_vec)
-        dN_mi = hist(spks_time_mi_vec, breaks=c(t_vec[1]-t_unit,t_vec)+(t_unit/2),
-                    plot=FALSE)$counts
-        dNN_mi = dN_mi/(N_spks_mi+.Machine$double.eps)
-        dist_1 = N_spks_mi*(sum(density_zi^2)*t_unit - 2*sum(density_zi*dNN_mi))
-        
-        dist_1_vec = c(dist_1_vec, dist_1)
-        if(center_Nspks_zi>0){
-          dist_2 = gamma * (center_Nspks_zi)^(-1) * (N_spks_mi-center_Nspks_zi)^2
-        } else{
-          dist_2 = gamma * 0
-        }
-        dist_2_vec = c(dist_2_vec, dist_2)
-        
-        dist_tmp = dist_tmp + dist_1 + dist_2
-      }
-      dist_mat[id_node, id_clus] = dist_tmp
+    for (id_trial in 1:N_trial) {
+      spks_time_mi_vec = spks_time_mlist[id_node, id_trial][[1]] - stim_onset_vec[id_trial] - v_vec[id_node]
+      spks_time_mi_vec = spks_time_mi_vec[which(spks_time_mi_vec<=max(t_vec) &
+                                                  spks_time_mi_vec>=min(t_vec))]
+      N_spks_mi = length(spks_time_mi_vec)
+      dN_mi = hist(spks_time_mi_vec, breaks=c(t_vec[1]-t_unit,t_vec)+(t_unit/2),
+                   plot=FALSE)$counts
+      dNN_mi = dN_mi/(N_spks_mi+.Machine$double.eps)
+      
+      N_spks_mat[id_node, id_trial] = N_spks_mi
+      dNN_array[id_node, id_trial, ] = dNN_mi
     }
   }
+
+  ### Compute distance between each node and each cluster
+  dist_mat = matrix(0,nrow=N_node, ncol=N_clus)
+  for (id_trial in 1:N_trial) {
+    ### Def of dist_1: N_spks_mi*(sum(density_zi^2)*t_unit - 2*sum(density_zi*dNN_mi))
+    dist_1_mat = matrix(nrow=N_node, ncol=N_clus)
+    N_spks_vec = N_spks_mat[ , id_trial]
+    dNN_mat = dNN_array[ , id_trial, ]
+    inner_prod_mat = dNN_mat %*% t(center_density_array[, 1, ])
+    center_density_L2norm_vec = rowSums(center_density_array[, 1, ]^2)*t_unit
+    dist_1_mat = N_spks_vec %*% t(center_density_L2norm_vec) - N_spks_vec * 2*inner_prod_mat
+    
+    N_spks_mat_tmp = matrix(N_spks_mat[ , id_trial], 
+                            nrow=N_node, 
+                            ncol=N_clus, 
+                            byrow = FALSE)
+    center_Nspks_mat_tmp = matrix(center_Nspks_mat[ ,1], 
+                                  nrow=N_node, 
+                                  ncol=N_clus, 
+                                  byrow = TRUE)
+    center_Nspks_invrs_mat_tmp = center_Nspks_mat_tmp^(-1)
+    center_Nspks_invrs_mat_tmp[which(center_Nspks_mat_tmp==0)] = 0
+    dist_2_mat = gamma * center_Nspks_invrs_mat_tmp * (N_spks_mat_tmp - center_Nspks_mat_tmp)^2
+    
+    dist_mat = dist_mat + dist_1_mat + dist_2_mat
+  }
+  
 
   ### Update memberships and clusters
   membership = numeric(N_node)
@@ -96,8 +107,8 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
               center_density_array=center_density_array,
               center_Nspks_mat=center_Nspks_mat,
               center_intensity_array=center_intensity_array,
-              dist_1_vec=dist_1_vec,
-              dist_2_vec=dist_2_vec))
+              dist_1_mat=dist_1_mat,
+              dist_2_mat=dist_2_mat))
 }
 
 

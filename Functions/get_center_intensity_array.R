@@ -8,6 +8,7 @@ get_center_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_
                                       v0 = 0.15, v1 = 0.1,
                                       t_vec=seq(0, v0, by=0.01),
                                       n0_mat_list=NULL,
+                                      bw=0.01,
                                       # Unused arguments
                                       rmv_conn_prob=FALSE)
 {  
@@ -39,7 +40,8 @@ get_center_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_
       if (length(spks_time_q)>0) {
         fft_q_res = get_adaptive_fft(event_time_vec = spks_time_q, 
                                        freq_trun_max = freq_trun, 
-                                       t_vec = t_vec)
+                                       t_vec = t_vec, 
+                                     bw = bw)
         fft_q = fft_q_res$fft_vec_best
       } else if(freq_trun<Inf) {
         fft_q = rep(0,2*freq_trun+1)

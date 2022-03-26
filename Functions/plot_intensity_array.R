@@ -1,10 +1,11 @@
 
 plot_intensity_array = function(center_intensity_array,
+                                center_Nspks_vec,
                                 clusters_list,
                                 t_vec,
                                 v0 = 0.2, v1 = 0.1,
                                 N_component = 1
-                                )
+)
 {
   
   t_unit = t_vec[2] - t_vec[1]
@@ -27,7 +28,7 @@ plot_intensity_array = function(center_intensity_array,
   
   
   clus_size_vec = sapply(clusters_list, length)
-
+  
   ### Draw plots
   g_list = list()
   for (id_clus in 1:N_clus) {
@@ -44,18 +45,14 @@ plot_intensity_array = function(center_intensity_array,
                                 `1`='red',
                                 `2`='orange'),
                    linetype=switch(id_component,
-                                `1`='solid',
-                                `2`='dashed')) +
-        annotate(geom = 'text', label = paste0('Cluster size: ',clus_size_vec[id_clus]), 
+                                   `1`='solid',
+                                   `2`='dashed')) +
+        annotate(geom = 'text', label = paste0('Cluster: ',id_clus,
+                                               ', ','N_spks: ', round(center_Nspks_vec[id_clus],1),
+                                               ', ','size: ',clus_size_vec[id_clus]), 
                  x = Inf, y = Inf, hjust = 1, vjust = 1) +
         xlab(NULL) + ylab(NULL) +
         theme_bw() +
-        # theme(axis.ticks.y = element_blank(), 
-        #       axis.text.y = element_blank(), 
-        #       axis.title.y = element_blank(),
-        #       axis.ticks.x = element_blank(),
-        #       axis.text.x = element_blank(), 
-        #       axis.title.x = element_blank()) +
         theme(legend.position = c(.95, .95),
               legend.background = element_blank(),
               legend.key.size = unit(-1, 'cm'), 
@@ -66,7 +63,7 @@ plot_intensity_array = function(center_intensity_array,
               panel.grid.minor = element_blank(),
               plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))  + 
         coord_cartesian(ylim=range(center_intensity_array))
-
+      
       g_list = c(g_list, list(g))
     }
   }
@@ -76,5 +73,5 @@ plot_intensity_array = function(center_intensity_array,
   
   return(list(g=g, big.df=big.df, g_list=g_list))
   
-
+  
 }

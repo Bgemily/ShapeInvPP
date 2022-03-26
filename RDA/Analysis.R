@@ -15,6 +15,13 @@ library(cluster)
 library(mclust)
 library(reshape2)
 
+# Parallel computing setup ------------------------------------------------
+
+library(foreach)
+library(doParallel)
+N_cores = 20
+registerDoParallel(cores=N_cores)
+
 
 # Prepare data ----------------------------
 id_session=1;
@@ -70,16 +77,45 @@ for (id_session in 1:3) {
   brain_area_vec = c(brain_area_vec, brain_area_2)
 }
 
+### Remove neurons with small N_spks
+spks_time_mlist_full = spks_time_mlist
+stim_onset_vec_full = stim_onset_vec
+id_session_vec_full = id_session_vec
+id_node_vec_full = id_node_vec
+id_trial_vec_full = id_trial_vec
+response_type_vec_full = response_type_vec
+brain_area_vec_full = brain_area_vec
 
+N_node = nrow(spks_time_mlist_full)
+N_trial = ncol(spks_time_mlist_full)
+N_spks_vec = rep(0, N_node)
+for (id_node in 1:N_node){
+  for (id_trial in 1:N_trial){
+    spks_time_tmp = unlist(spks_time_mlist_full[id_node,id_trial]) - stim_onset_vec_full[id_trial]
+    spks_time_tmp = spks_time_tmp[which(spks_time_tmp<=0 & 
+                                          spks_time_tmp>=-0.5)]
+    N_spks_tmp = length(spks_time_tmp)
+    N_spks_vec[id_node] = N_spks_vec[id_node] + N_spks_tmp
+  }
+}
+
+subsample = which(N_spks_vec>=3)
+spks_time_mlist = spks_time_mlist_full[subsample, ,drop=FALSE]
+stim_onset_vec = stim_onset_vec_full[subsample]
+id_session_vec = id_session_vec_full[subsample]
+id_node_vec = id_node_vec_full[subsample]
+id_trial_vec = id_trial_vec_full[subsample]
+response_type_vec = response_type_vec_full[subsample]
+brain_area_vec = brain_area_vec_full[subsample]
 
 
 # Apply our algorithm ---------------------------------------------------------
 
-method = paste0("Model4_gamma")
+method = paste0("Model4_rmv_small_Nspks")
 signal_type = 'pre_stim'
 
 
-N_clus_vec = c(6,5,4)
+N_clus_vec = c(7,8,9)
 freq_trun_vec = c(Inf)
 gamma_vec = c(0,0.3,1,3,10)
 freq_trun = Inf
@@ -87,14 +123,15 @@ N_clus = 6
 gamma = 1
 MaxIter = 20
 v0 = 0.0
-v1 = 0.2
+v1 = 0.5
 t_vec=seq(0-v1, v0, length.out=200)
 fix_timeshift = TRUE
 N_restart = 1
 
-now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-for(gamma in gamma_vec){
-  for (ind_N_clus in 1:length(N_clus_vec)){
+# now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
+foreach(id_gamma = 1:length(gamma_vec)) %:% 
+  foreach (ind_N_clus = 1:length(N_clus_vec)) %dopar% {
+    gamma = gamma_vec[id_gamma]
     N_clus = N_clus_vec[ind_N_clus]
     res = get_init(spks_time_mlist = spks_time_mlist, 
                    stim_onset_vec = stim_onset_vec,
@@ -150,13 +187,16 @@ for(gamma in gamma_vec){
                          '/', 'session', 'ALL',
                          '/', signal_type)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
-    data_res = list(spks_time_mlist=spks_time_mlist,
-                    stim_onset_vec=stim_onset_vec,
-                    id_trial_vec=id_trial_vec, 
-                    id_node_vec=id_node_vec,
-                    id_session_vec=id_session_vec,
-                    response_type_vec=response_type_vec,
-                    brain_area_vec=brain_area_vec)
+    data_res = list(spks_time_mlist_analyzed = spks_time_mlist,
+                    stim_onset_vec_analyzed = stim_onset_vec,
+                    subsample = subsample,
+                    spks_time_mlist = spks_time_mlist_full,
+                    stim_onset_vec = stim_onset_vec_full,
+                    id_trial_vec = id_trial_vec_full, 
+                    id_node_vec = id_node_vec_full,
+                    id_session_vec = id_session_vec_full,
+                    response_type_vec = response_type_vec_full,
+                    brain_area_vec = brain_area_vec_full)
     param_res = list(N_clus=N_clus,
                      freq_trun=freq_trun,
                      gamma=gamma,
@@ -170,6 +210,6 @@ for(gamma in gamma_vec){
          file = paste0(folder_path, '/', "Nclus", N_clus, '.Rdata'))
   }
   
-}
+
 
 

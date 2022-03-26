@@ -15,20 +15,26 @@ get_adaptive_fft = function(event_time_vec,
   # emp_intens_vec = hist(event_time_vec, breaks=breaks, plot=FALSE)$counts
   # emp_intens_vec = emp_intens_vec/t_unit
   ## V2
-  if(length(event_time_vec)>1){
-    density = density(event_time_vec,
-                      bw=bw,
-                      from=min(t_vec), to=max(t_vec),
-                      n=length(t_vec))$y
-    emp_intens_vec = density*length(event_time_vec)
+  if(bw==0){
+    breaks = c(t_vec[1]-t_unit,t_vec)+t_unit/2
+    emp_intens_vec = hist(event_time_vec, breaks=breaks, plot=FALSE)$counts / t_unit
   } else{
-    event_time_vec = rep(event_time_vec[1],2)
-    density = density(event_time_vec,
-                      bw=bw,
-                      from=min(t_vec), to=max(t_vec),
-                      n=length(t_vec))$y
-    emp_intens_vec = density
+    if(length(event_time_vec)>1){
+      density = density(event_time_vec,
+                        bw=bw,
+                        from=min(t_vec), to=max(t_vec),
+                        n=length(t_vec))$y
+      emp_intens_vec = density*length(event_time_vec)
+    } else{
+      event_time_vec = rep(event_time_vec[1],2)
+      density = density(event_time_vec,
+                        bw=bw,
+                        from=min(t_vec), to=max(t_vec),
+                        n=length(t_vec))$y
+      emp_intens_vec = density
+    }
   }
+  
   
   
   ### Get normalized fourier series

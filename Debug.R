@@ -12,13 +12,13 @@ spks_time_mlist_tmp = matrix(list(),N_node,1)
 
 for (i in 1:(N_node/2)) {
   for (j in 1:1) {
-    spks_time_mlist_tmp[i,j] = list(stim_onset_vec[j]+runif(sample(20+1:500,1),0,0.25))
+    spks_time_mlist_tmp[i,j] = list(stim_onset_vec[j]+runif(sample(20+1:5,1),0,0.1))
   }
 }
 
 for (i in (N_node/2+1):N_node) {
   for (j in 1:1) {
-    spks_time_mlist_tmp[i,j] = list(stim_onset_vec[j]+runif(sample(20+1:500,1),0,0.1))
+    spks_time_mlist_tmp[i,j] = list(stim_onset_vec[j]+runif(sample(200+1:5,1),0,0.1))
   }
 }
 
@@ -30,7 +30,7 @@ do_cluster_pdf(spks_time_mlist = spks_time_mlist_tmp,
                v_vec_init = rep(0,100),
                freq_trun = Inf,
                MaxIter = 15,
-               v0 = 0.15, v1=0, gamma=0,
+               v0 = 0.15, v1=0, gamma=00000,
                t_vec=seq(0, 0.15, length.out=200),fix_timeshift = TRUE)->tmp
 plot(tmp$loss_history,type='b')
 tmp$clusters_list
