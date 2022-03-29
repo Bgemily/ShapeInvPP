@@ -1,5 +1,5 @@
 ### Input: spks_time_mlist: N_node * N_trial with each element being a list of spike times
-### Perform algorithm based on cumulative intensities 
+### Perform algorithm based on intensities 
 do_cluster_pdf = function(spks_time_mlist, stim_onset_vec, 
                           reaction_time_vec=NULL,
                           # Initial values

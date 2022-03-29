@@ -111,13 +111,13 @@ brain_area_vec = brain_area_vec_full[subsample]
 
 # Apply our algorithm ---------------------------------------------------------
 
-method = paste0("Model4_rmv_small_Nspks")
+method = paste0("Model4_pdf")
 signal_type = 'pre_stim'
 
 
-N_clus_vec = c(7,8,9)
+N_clus_vec = c(9,10,11,12)
 freq_trun_vec = c(Inf)
-gamma_vec = c(0,0.3,1,3,10)
+gamma_vec = c(0,0.1,0.2,0.3,0.5,1)
 freq_trun = Inf
 N_clus = 6
 gamma = 1
