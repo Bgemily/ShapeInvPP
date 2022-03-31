@@ -30,7 +30,10 @@ get_center_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_
       N_spks_nodetrial_vec_q = c()
       for (id_node in clusters_list[[q]]) {
         for (id_trial in 1:N_trial) {
-          spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_trial]) - stim_onset_vec[id_trial] - v_vec[id_node]
+          spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_trial]) - stim_onset_vec[id_trial]
+          spks_time_nodetrial = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
+                                                            spks_time_nodetrial<=max(t_vec))]
+          spks_time_nodetrial = spks_time_nodetrial - v_vec[id_node]
           spks_time_nodetrial = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
                                                             spks_time_nodetrial<=max(t_vec))]
           spks_time_q = c(spks_time_q, spks_time_nodetrial)

@@ -24,6 +24,7 @@ get_adaptive_fft = function(event_time_vec,
                         bw=bw,
                         from=min(t_vec), to=max(t_vec),
                         n=length(t_vec))$y
+      density = density / sum(density*t_unit)
       emp_intens_vec = density*length(event_time_vec)
     } else{
       event_time_vec = rep(event_time_vec[1],2)
@@ -31,6 +32,7 @@ get_adaptive_fft = function(event_time_vec,
                         bw=bw,
                         from=min(t_vec), to=max(t_vec),
                         n=length(t_vec))$y
+      density = density / (sum(density*t_unit)+.Machine$double.eps)
       emp_intens_vec = density
     }
   }

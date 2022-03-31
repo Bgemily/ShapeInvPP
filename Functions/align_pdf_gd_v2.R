@@ -56,6 +56,9 @@ gradient_v2 = function(theta_prime, gamma_prime, n0, pad=1)
   l_vec = c(tail(l_vec, length(l_vec)/2)-N,
             head(l_vec, length(l_vec)/2))
   
+  if(is.null(pad)){
+    pad = 0
+  }
   gradient = 2 * sum(Re(1i*2*pi*(l_vec/N)*(theta_prime)*Conj(gamma_prime)*exp(1i*2*pi*(-n0)*l_vec/N))) + 
               (-2)*Re(theta_prime_0 - n0*pad - gamma_prime_0)*pad 
     
@@ -70,9 +73,12 @@ gradient_v2 = function(theta_prime, gamma_prime, n0, pad=1)
 
 # Align multiple curves with *one* shift parameter --------------------------
 
-get_theta_gamma_prime_v2 = function(f_origin, f_target){
+get_theta_gamma_prime_v2 = function(f_origin, f_target, periodic=FALSE){
   fft_f_origin = fft(f_origin)
   fft_f_target = fft(f_target)
+  if(periodic){
+    return(list(theta_prime=fft_f_origin, gamma_prime=fft_f_target, pad=NULL))
+  }
   N = length(fft_f_origin)
   l_vec = seq(1, N-1)
   pad = tail(f_origin,1)
@@ -156,7 +162,9 @@ align_multi_curves_gd_ = function(f_origin_list, f_shift_list, n0, step_size,
 }
 
 # Move f1 towards f2 by n0. Positive n0: towards right. Negative n0: towards left.
-align_multi_curves_gd_v2 = function(f_origin_list, f_target_list, n0=0, step_size=0.02, 
+align_multi_curves_gd_v2 = function(f_origin_list, f_target_list, 
+                                    periodic=FALSE,
+                                    n0=0, step_size=0.02, 
                                  MaxIter=1000, stopping_redu=0.0001, t_unit=0.05, weights=NULL,
                                  n0_min = 0, n0_max = length(f_origin_list[[1]]), pad=NULL)
 {
@@ -184,6 +192,7 @@ align_multi_curves_gd_v2 = function(f_origin_list, f_target_list, n0=0, step_siz
   ### Compute terms needed in gradients
   tmp_list = mapply(FUN = get_theta_gamma_prime_v2, 
                     f_origin=f_origin_list, f_target=f_target_list, 
+                    MoreArgs = list(periodic=periodic),
                     SIMPLIFY = FALSE)
   theta_prime_list = lapply(X = tmp_list, FUN = "[[", 'theta_prime')
   gamma_prime_list = lapply(X = tmp_list, FUN = "[[", 'gamma_prime')
@@ -207,8 +216,6 @@ align_multi_curves_gd_v2 = function(f_origin_list, f_target_list, n0=0, step_siz
       gd = sum(unlist(gd_list)*weights)
     
     n0 = n0 - (step_size)*gd
-    # print((step_size)*gd)
-    # browser()
     n0 = round(n0) 
     
     if (n0<n0_min) {

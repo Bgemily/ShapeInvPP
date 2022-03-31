@@ -100,6 +100,8 @@ for (id_node in 1:N_node){
 }
 
 subsample = which(N_spks_vec>=3)
+# set.seed(831)
+# subsample=sample(subsample,500)
 spks_time_mlist = spks_time_mlist_full[subsample, ,drop=FALSE]
 stim_onset_vec = stim_onset_vec_full[subsample]
 id_session_vec = id_session_vec_full[subsample]
@@ -111,104 +113,110 @@ brain_area_vec = brain_area_vec_full[subsample]
 
 # Apply our algorithm ---------------------------------------------------------
 
-method = paste0("Model4_pdf")
+method = paste0("Model4_est_timeshift")
 signal_type = 'pre_stim'
 
 
-N_clus_vec = c(9,10,11,12)
+N_clus_vec = c(2,3)
 freq_trun_vec = c(Inf)
-gamma_vec = c(0,0.1,0.2,0.3,0.5,1)
+gamma_vec = c(0,1,10)
 freq_trun = Inf
-N_clus = 6
+N_clus = 3
 gamma = 1
 MaxIter = 20
+step_size = 5e-5
 v0 = 0.0
 v1 = 0.5
 t_vec=seq(0-v1, v0, length.out=200)
-fix_timeshift = TRUE
+fix_timeshift = FALSE
 N_restart = 1
 
 # now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
 foreach(id_gamma = 1:length(gamma_vec)) %:% 
   foreach (ind_N_clus = 1:length(N_clus_vec)) %dopar% {
-    gamma = gamma_vec[id_gamma]
-    N_clus = N_clus_vec[ind_N_clus]
-    res = get_init(spks_time_mlist = spks_time_mlist, 
-                   stim_onset_vec = stim_onset_vec,
-                   N_clus = N_clus,
-                   freq_trun = freq_trun,
-                   t_vec = t_vec,
-                   v0 = v0, v1 = v1, 
-                   fix_timeshift = fix_timeshift)
-    
-    clusters_list_init = res$clusters_list
-    v_vec_init = res$v_vec
-    
-    # Apply algorithm
-    res = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
-                         stim_onset_vec = stim_onset_vec,
-                         clusters_list_init = clusters_list_init,
-                         v_vec_init = v_vec_init,
-                         freq_trun = freq_trun, 
-                         MaxIter = MaxIter,
-                         t_vec = t_vec,
-                         v0 = v0, v1 = v1, 
-                         gamma = gamma,
-                         fix_timeshift = fix_timeshift)
-    # Restart
-    loss_restart = c(tail(res$loss_history,1))
-    if(N_restart>1){
-      for (. in 1:(N_restart-1)) {
-        mem_init = clus2mem(clusters_list_init)
-        mem_init_2 = mem_init
-        mem_init_2[sample(1:length(mem_init_2),length(mem_init_2)%/%5)] = sample(1:N_clus,length(mem_init_2)%/%5,replace=TRUE)
-        clusters_list_init_2 = mem2clus(mem_init_2)
-        v_vec_init_2 = v_vec_init
-        res_2 = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
-                               stim_onset_vec = stim_onset_vec,
-                               clusters_list_init = clusters_list_init_2,
-                               v_vec_init = v_vec_init_2,
-                               freq_trun = freq_trun, 
-                               MaxIter = MaxIter,
-                               t_vec = t_vec,
-                               v0 = v0, v1 = v1, 
-                               gamma = gamma,
-                               fix_timeshift = fix_timeshift)
-        loss_restart = c(loss_restart, tail(res_2$loss_history,1))
-        if(tail(res_2$loss_history,1) < tail(res$loss_history,1)){
-          res = res_2
+      gamma = gamma_vec[id_gamma]
+      N_clus = N_clus_vec[ind_N_clus]
+      set.seed(831)
+      res = get_init(spks_time_mlist = spks_time_mlist, 
+                     stim_onset_vec = stim_onset_vec,
+                     N_clus = N_clus,
+                     freq_trun = freq_trun,
+                     t_vec = t_vec,
+                     v0 = v0, v1 = v1, 
+                     fix_timeshift = fix_timeshift)
+      
+      clusters_list_init = res$clusters_list
+      v_vec_init = res$v_vec
+      
+      # Apply algorithm
+      res = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
+                           stim_onset_vec = stim_onset_vec,
+                           clusters_list_init = clusters_list_init,
+                           v_vec_init = v_vec_init,
+                           freq_trun = freq_trun, 
+                           MaxIter = MaxIter,
+                           t_vec = t_vec,
+                           v0 = v0, v1 = v1, 
+                           gamma = gamma,
+                           fix_timeshift = fix_timeshift,
+                           step_size = step_size)
+      # Restart
+      loss_restart = c(tail(res$loss_history,1))
+      if(N_restart>1){
+        for (. in 1:(N_restart-1)) {
+          mem_init = clus2mem(clusters_list_init)
+          mem_init_2 = mem_init
+          mem_init_2[sample(1:length(mem_init_2),length(mem_init_2)%/%5)] = sample(1:N_clus,length(mem_init_2)%/%5,replace=TRUE)
+          clusters_list_init_2 = mem2clus(mem_init_2)
+          v_vec_init_2 = v_vec_init
+          res_2 = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
+                                 stim_onset_vec = stim_onset_vec,
+                                 clusters_list_init = clusters_list_init_2,
+                                 v_vec_init = v_vec_init_2,
+                                 freq_trun = freq_trun, 
+                                 MaxIter = MaxIter,
+                                 t_vec = t_vec,
+                                 v0 = v0, v1 = v1, 
+                                 gamma = gamma,
+                                 fix_timeshift = fix_timeshift)
+          loss_restart = c(loss_restart, tail(res_2$loss_history,1))
+          if(tail(res_2$loss_history,1) < tail(res$loss_history,1)){
+            res = res_2
+          }
         }
       }
+      
+      folder_path = paste0('../Results/Rdata/RDA', 
+                           '/', method, "_", 
+                           'gamma', gamma,
+                           '/', 'session', 'ALL',
+                           '/', signal_type)
+      dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
+      data_res = list(spks_time_mlist_analyzed = spks_time_mlist,
+                      stim_onset_vec_analyzed = stim_onset_vec,
+                      subsample = subsample,
+                      spks_time_mlist = spks_time_mlist_full,
+                      stim_onset_vec = stim_onset_vec_full,
+                      id_trial_vec = id_trial_vec_full, 
+                      id_node_vec = id_node_vec_full,
+                      id_session_vec = id_session_vec_full,
+                      response_type_vec = response_type_vec_full,
+                      brain_area_vec = brain_area_vec_full)
+      param_res = list(N_clus=N_clus,
+                       freq_trun=freq_trun,
+                       gamma=gamma,
+                       v0=v0, v1=v1,
+                       t_vec=t_vec,
+                       N_restart=N_restart)
+      save(res,
+           loss_restart,
+           data_res,
+           param_res,
+           file = paste0(folder_path, 
+                         '/', "Nclus", N_clus, 
+                         '_', "lr", step_size, 
+                         '.Rdata'))
     }
-    
-    folder_path = paste0('../Results/Rdata/RDA', 
-                         '/', method, "_", 
-                         'gamma', gamma,
-                         '/', 'session', 'ALL',
-                         '/', signal_type)
-    dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
-    data_res = list(spks_time_mlist_analyzed = spks_time_mlist,
-                    stim_onset_vec_analyzed = stim_onset_vec,
-                    subsample = subsample,
-                    spks_time_mlist = spks_time_mlist_full,
-                    stim_onset_vec = stim_onset_vec_full,
-                    id_trial_vec = id_trial_vec_full, 
-                    id_node_vec = id_node_vec_full,
-                    id_session_vec = id_session_vec_full,
-                    response_type_vec = response_type_vec_full,
-                    brain_area_vec = brain_area_vec_full)
-    param_res = list(N_clus=N_clus,
-                     freq_trun=freq_trun,
-                     gamma=gamma,
-                     v0=v0, v1=v1,
-                     t_vec=t_vec,
-                     N_restart=N_restart)
-    save(res,
-         loss_restart,
-         data_res,
-         param_res,
-         file = paste0(folder_path, '/', "Nclus", N_clus, '.Rdata'))
-  }
   
 
 

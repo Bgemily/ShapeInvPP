@@ -16,7 +16,6 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
                           # Unused arguments
                           N_clus=NULL, 
                           n0_vec_list_init=NULL,
-                          step_size=200,
                           opt_radius=max(t_vec)/2,
                           ...)
 {
@@ -55,7 +54,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
   center_density_array = res$center_density_array
   center_Nspks_mat = res$center_Nspks_mat
   center_intensity_array = res$center_intensity_array
-  
+  # browser()
   center_density_array_update = center_density_array_current = center_density_array
   center_Nspks_mat_update = center_Nspks_mat_current = center_Nspks_mat
   
@@ -73,7 +72,8 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
                              v0 = v0, v1 = v1,
                              t_vec = t_vec,
                              fix_timeshift=fix_timeshift,
-                             gamma=gamma
+                             gamma=gamma,
+                             ...
                             )
     clusters_list_update = res$clusters_list
     center_density_array_update = res$center_density_array

@@ -31,11 +31,11 @@ get_init = function(spks_time_mlist, stim_onset_vec,
         spks_time_vec = c(spks_time_vec, spks_time_tmp)
       }
       if(length(spks_time_vec)>0){
-        v_vec[id_node] = median(spks_time_vec)
+        v_vec[id_node] = median(spks_time_vec) - median(t_vec)
       }
       spks_time_vec_list[id_node] = list(spks_time_vec)
     }
-    v_vec = v_vec - min(v_vec)
+    # v_vec = v_vec - min(v_vec) - length(t_vec)%/%10*t_unit
   }
   
 

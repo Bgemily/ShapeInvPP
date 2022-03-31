@@ -32,7 +32,9 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
                               freq_trun = freq_trun,
                               v0 = v0, v1 = v1,
                               t_vec = t_vec,
-                              fix_timeshift=fix_timeshift)
+                              fix_timeshift=fix_timeshift,
+                              ...)
+  # browser()
   v_vec = res$v_vec
   center_density_array = res$center_density_array
   center_Nspks_mat = res$center_Nspks_mat
@@ -45,7 +47,10 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
   dNN_array = array(dim = c(N_node,N_trial,length(t_vec)))
   for (id_node in 1:N_node) {
     for (id_trial in 1:N_trial) {
-      spks_time_mi_vec = spks_time_mlist[id_node, id_trial][[1]] - stim_onset_vec[id_trial] - v_vec[id_node]
+      spks_time_mi_vec = spks_time_mlist[id_node, id_trial][[1]] - stim_onset_vec[id_trial] 
+      spks_time_mi_vec = spks_time_mi_vec[which(spks_time_mi_vec<=max(t_vec) &
+                                                  spks_time_mi_vec>=min(t_vec))]
+      spks_time_mi_vec = spks_time_mi_vec - v_vec[id_node]
       spks_time_mi_vec = spks_time_mi_vec[which(spks_time_mi_vec<=max(t_vec) &
                                                   spks_time_mi_vec>=min(t_vec))]
       N_spks_mi = length(spks_time_mi_vec)
@@ -84,6 +89,11 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
     dist_mat = dist_mat + dist_1_mat + dist_2_mat
   }
   
+  ### (Debug) Evaluate l2 loss
+  # dist_vec = unlist(sapply(1:length(clusters), function(id_clus)dist_mat[clusters[[id_clus]], id_clus]))
+  # l2_loss = sum(dist_vec)
+  # browser()
+  
 
   ### Update memberships and clusters
   membership = numeric(N_node)
@@ -96,8 +106,8 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
   clusters = mem2clus(membership = membership, N_clus_min = N_clus)
   clusters_list = clusters
   l2_loss = sum(dist_to_centr_vec)
-  
-  
+
+    
   # Output -----------------------------------------------------------------------
   
   return(list(clusters_list=clusters_list, 
