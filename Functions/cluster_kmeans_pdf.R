@@ -70,8 +70,12 @@ cluster_kmeans_pdf = function(spks_time_mlist, stim_onset_vec, reaction_time_vec
     dist_1_mat = matrix(nrow=N_node, ncol=N_clus)
     N_spks_vec = N_spks_mat[ , id_trial]
     dNN_mat = dNN_array[ , id_trial, ]
-    inner_prod_mat = dNN_mat %*% t(center_density_array[, 1, ])
-    center_density_L2norm_vec = rowSums(center_density_array[, 1, ]^2)*t_unit
+    center_density_mat = center_density_array[, 1, ]
+    if(N_clus==1){
+      center_density_mat = matrix(center_density_mat, nrow=1)
+    }
+    inner_prod_mat = dNN_mat %*% t(center_density_mat)
+    center_density_L2norm_vec = rowSums(center_density_mat^2)*t_unit
     dist_1_mat = N_spks_vec %*% t(center_density_L2norm_vec) - N_spks_vec * 2*inner_prod_mat
     
     N_spks_mat_tmp = matrix(N_spks_mat[ , id_trial], 

@@ -1,138 +1,108 @@
 
-select_model = function(edge_time_mat_list, N_node_vec, 
-                        N_clus_min, N_clus_max, 
-                        result_list,
-                        total_time)
+select_model = function(spks_time_mlist, 
+                        stim_onset_vec, 
+                        result_list)
 {
-  # Select best cluster number using ICL ------------------------------------
-  ICL_mat = compl_log_lik_mat = log_lik_mat = 
-    penalty_mat = penalty_2_mat = 
-    matrix(nrow = length(result_list[[1]]),
-           ncol = length(N_clus_min:N_clus_max))
+  ICL_vec = rep(0,length(result_list))
+  compl_log_lik_vec = rep(0,length(result_list))
+  log_lik_vec = rep(0,length(result_list))
+  log_lik_1_vec = rep(0,length(result_list))
+  log_lik_2_vec = rep(0,length(result_list))
+  clus_entropy_vec = rep(0,length(result_list))
+  penalty_vec = rep(0,length(result_list))
+  
+  N_node = nrow(spks_time_mlist)
+  N_trial = ncol(spks_time_mlist)
+  
+  for (id_res in 1:length(result_list)) {
+    ### Retrieve estimates 
+    res_tmp = result_list[[id_res]]
+    clusters_list_tmp = res_tmp$clusters_list
+    N_clus_tmp = length(clusters_list_tmp)
+    clus_size_vec = sapply(clusters_list_tmp, length)
+    v_vec_tmp = res_tmp$v_vec
+    center_intensity_array_tmp = res_tmp$center_intensity_array
+    center_Nspks_mat_tmp = res_tmp$center_Nspks_mat
+    pi_vec = clus_size_vec / sum(clus_size_vec)
+    tau_mat = matrix(0, nrow = N_node, ncol = N_clus_tmp)
+    for (q in 1:N_clus_tmp) {
+      tau_mat[clusters_list_tmp[[q]], q] = 1
+    } 
+    t_vec = res_tmp$t_vec
+    
+    # First term of log likelihood: \sum_{i,m} ( -\sum_{q} F_{q,k}(T)*tau_{i,m,q} )
+    F_q_T = center_Nspks_mat_tmp[,1]
+    tau_F = tau_mat %*% F_q_T 
+    log_lik_tmp_1 = sum(-tau_F)
+    
+    # Second term of log likelihood: \sum_{q}{ \sum_{i,m,r} \log f_{q}[ (t_{i,m,r}-v_{vis,m}) - v_{i,m} ]*tau_{i,m,q} }
+    log_lik_tmp_2 = 0
+    for (q in 1:N_clus_tmp) {
+      log_lik_q_vec = log(center_intensity_array_tmp[q,1,])
+      log_lik_q_vec[is.na(log_lik_q_vec)] = 0
+      adjst_edge_time_q_vec = c()
+      for (id_node in clusters_list_tmp[[q]]) {
+        id_trial = 1
+        tmp = unlist(spks_time_mlist[id_node, id_trial]) - v_vec_tmp[id_node]
+        adjst_edge_time_q_vec = c(adjst_edge_time_q_vec, tmp)
+      }
+      adjst_edge_time_q_vec = adjst_edge_time_q_vec[which(adjst_edge_time_q_vec<=max(t_vec) &
+                                                            adjst_edge_time_q_vec>=min(t_vec))]
+      
+      if(length(adjst_edge_time_q_vec)==0){
+        next
+      }
 
-  for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
-    N_clus_tmp = c(N_clus_min:N_clus_max)[ind_N_clus]
-
-    for (ind_freq_trun in 1:length(result_list[[ind_N_clus]])) {
-      res_tmp = result_list[[ind_N_clus]][[ind_freq_trun]]
-      ### Retrieve estimates under current cluster number and current basis number
-      clusters_list_tmp = res_tmp$clusters_list
-      clus_size_vec = sapply(clusters_list_tmp[[1]], length)
-      v_vec_list_tmp = res_tmp$v_vec_list
-      v_mat_list_tmp = n0_vec2mat(n0_vec = v_vec_list_tmp)
-      center_pdf_array_tmp = res_tmp$center_pdf_array
-      freq_trun_mat = res_tmp$freq_trun_mat
-      N_basis_mat = res_tmp$N_basis_mat
-      if (is.null(N_basis_mat) & !is.null(freq_trun_mat)){
-        N_basis_mat = 1+2*freq_trun_mat
-      } else if (is.null(N_basis_mat) & is.null(freq_trun_mat)){
-        N_basis_mat = matrix(2,nrow=N_clus_tmp, ncol=N_clus_tmp)
-      }
-      pi_vec = res_tmp$pi_vec
-      if (is.null(pi_vec)){
-        pi_vec = clus_size_vec / sum(clus_size_vec)
-      }
-      tau_mat = res_tmp$tau_mat
-      if (is.null(tau_mat)) {
-        tau_mat = matrix(0, nrow = N_node_vec[1], ncol = N_clus_tmp)
-        for (q in 1:N_clus_tmp) {
-          tau_mat[clusters_list_tmp[[1]][[q]], q] = 1
-        } 
-      }
+      ### counts: number of spikes whose (adjusted) edge time is close to each breakpoint in t_vec
+      breaks = c(2*t_vec[1]-t_vec[2], t_vec)
+      counts = hist(adjst_edge_time_q_vec, breaks=breaks, plot=FALSE, right=FALSE)$counts
       
-      t_vec = seq(0,total_time,length.out = dim(center_pdf_array_tmp)[3])
-      ### Compute log likelihood
-      # First term of log likelihood: \sum_{i<j,t_{i,j}<Inf} log( 1-\sum_{q,k} F_{q,k}(T)*tau_{i,q}*tau_{j,k} )
-      F_qk_T = apply(center_pdf_array_tmp*(t_vec[2]-t_vec[1]), c(1,2), function(vec)sum(vec[-length(vec)]))
-      F_qk_T[is.na(F_qk_T)] = 0
-      tau_F_tauT = tau_mat %*% F_qk_T %*% t(tau_mat)
-      tmp = edge_time_mat_list[[1]]
-      diag(tmp) = NA
-      ind_non_edge = which(tmp==Inf)
-      log_lik_tmp = (1/2)*sum(log(1-tau_F_tauT)[ind_non_edge])
-      
-      
-      # Second term of log likelihood: \sum_{q,k}{ \sum_{i<j} \log f_{q,k}(t_{i,j}-\max(v_i,v_j))*tau_{i,q}*tau_{j,k} }
-      for (q in 1:N_clus_tmp) {
-        for (k in 1:N_clus_tmp) {
-          log_lik_qk_vec = log(center_pdf_array_tmp[q,k,])
-          log_lik_qk_vec[is.na(log_lik_qk_vec)] = 0
-          adjst_edge_time_qk_vec = c(unlist(mapply(function(clus_list, mat1, mat2) (mat1-mat2)[clus_list[[q]],clus_list[[k]]], 
-                                                   clusters_list_tmp, edge_time_mat_list, v_mat_list_tmp)))
-          if(length(adjst_edge_time_qk_vec)==0){
-            next
-          }
-          if (min(adjst_edge_time_qk_vec)<0) {
-            adjst_edge_time_qk_vec = adjst_edge_time_qk_vec - min(adjst_edge_time_qk_vec)
-          }
-          ### Remove adjusted edge times after total_time
-          adjst_edge_time_qk_vec[adjst_edge_time_qk_vec>total_time] = Inf
-          ### counts: number of edges whose (adjusted) edge time is close to each breakpoint in t_vec
-          counts = hist(adjst_edge_time_qk_vec, breaks=t_vec, plot=FALSE, right=FALSE)$counts
-          counts = c(counts,0)
-          counts = counts / 2 ### Every finite edge time will be counted twice
-          
-          ### Add compl_log_lik_tmp by \sum_{i,j:z_i=q,z_j=k}{\log f_{q,k}(t_{i,j}-\max(v_i,v_j))}
-          ind_tmp = which(counts > 0 & log_lik_qk_vec>-Inf)
-          log_lik_tmp = log_lik_tmp + sum(log_lik_qk_vec[ind_tmp]*counts[ind_tmp])
-        }
-      }
-      
-      ### Second penalty: \sum_{i}\sum_{q} \tau^{i,q} * \log(\pi_q)
-      log_pi_vec = log(pi_vec)
-      log_pi_vec[log_pi_vec==-Inf] = 0
-      penalty_tmp_2 = -sum(tau_mat %*% log_pi_vec)
-      
-      ### Compute penalty
-      penalty_tmp = (N_clus_tmp-1)/2*sum(log(N_node_vec)) + 
-        sum(N_basis_mat[upper.tri(N_basis_mat)],diag(N_basis_mat))/2*sum(log(N_node_vec*(N_node_vec-1)/2))
-      
-      ### Compute ICL
-      ICL_tmp = log_lik_tmp - penalty_tmp - penalty_tmp_2
-      compl_log_lik_tmp = log_lik_tmp - penalty_tmp_2
-      
-      ### Store ICL, loglik, penalties under current cluster number and current basis number
-      ICL_mat[ind_freq_trun, ind_N_clus] = ICL_tmp
-      compl_log_lik_mat[ind_freq_trun, ind_N_clus] = compl_log_lik_tmp
-      log_lik_mat[ind_freq_trun, ind_N_clus] = log_lik_tmp
-      penalty_2_mat[ind_freq_trun, ind_N_clus] = penalty_tmp_2
-      penalty_mat[ind_freq_trun, ind_N_clus] = penalty_tmp
+      ### Add compl_log_lik_tmp by \sum_{(i,m):z_{i,m}=q}{\log f_{q}[ (t_{i,m,r}-v_{vis,m}) - v_{i,m} ]}
+      ind_tmp = which(counts > 0 & log_lik_q_vec>-Inf)
+      log_lik_tmp_2 = log_lik_tmp_2 + sum(log_lik_q_vec[ind_tmp]*counts[ind_tmp])
+      print(paste("Nclus:",N_clus_tmp,
+                  ', Nspks_q:', center_Nspks_mat_tmp[q,1],
+                  ', max(lik_q):', max(center_intensity_array_tmp[q,1,]),
+                  ', max(log_lik_q_vec):', max(log_lik_q_vec[ind_tmp])))
     }
     
+    
+    log_lik_tmp = log_lik_tmp_1 + log_lik_tmp_2
+    
+    ### Fuzzy clustering entropy: \sum_{i}\sum_{q} \tau^{i,q} * \log(\pi_q)
+    log_pi_vec = log(pi_vec)
+    log_pi_vec[log_pi_vec==-Inf] = 0
+    clus_entropy = sum(tau_mat %*% log_pi_vec)
+    
+    ### Compute penalty
+    penalty_tmp = 1/2*(N_clus_tmp-1+2*N_clus_tmp)*log(N_node) 
+    
+    ### Compute ICL
+    compl_log_lik_tmp = log_lik_tmp + clus_entropy
+    ICL_tmp = compl_log_lik_tmp - penalty_tmp 
+    
+    ### Store ICL, loglik, penalties under current res_tmp
+    ICL_vec[id_res] = ICL_tmp
+    compl_log_lik_vec[id_res] = compl_log_lik_tmp
+    log_lik_vec[id_res] = log_lik_tmp
+    log_lik_1_vec[id_res] = log_lik_tmp_1
+    log_lik_2_vec[id_res] = log_lik_tmp_2
+    clus_entropy_vec[id_res] = clus_entropy
+    penalty_vec[id_res] = penalty_tmp
   }
   
+  
   ### Retrieve index of best freq_trun and best cluster number
-  ind_best_freq_trun = which(ICL_mat==max(ICL_mat), arr.ind = TRUE)[1,'row']
-  ind_best_N_clus = which(ICL_mat==max(ICL_mat), arr.ind = TRUE)[1,'col']
-    
-  ### Retrieve best ICL,log lik,penalties under best freq_trun
-  ICL_vec = ICL_mat[ind_best_freq_trun, ]
-  compl_log_lik_vec = compl_log_lik_mat[ind_best_freq_trun, ]
-  log_lik_vec = log_lik_mat[ind_best_freq_trun, ]
-  penalty_2_vec = penalty_2_mat[ind_best_freq_trun, ]
-  penalty_vec = penalty_mat[ind_best_freq_trun, ]
-  
-  
-  N_clus_est = c(N_clus_min:N_clus_max)[ind_best_N_clus]
-  
-  ### Retrieve estimation results of the best cluster number
-  res = result_list[[ind_best_N_clus]][[ind_best_freq_trun]]
-  
+  id_best_res = which(ICL_vec==max(ICL_vec))
+
   # Output ------------------------------------------------------------------
   
-  return(list(N_clus_est = N_clus_est, 
-              ind_best_N_clus = ind_best_N_clus,
-              ind_best_freq_trun = ind_best_freq_trun,
-              res_best = res, 
-              ICL_mat = ICL_mat,
-              compl_log_lik_mat = compl_log_lik_mat, 
-              log_lik_mat = log_lik_mat, 
-              penalty_2_mat = penalty_2_mat,
-              penalty_mat = penalty_mat,
+  return(list(id_best_res = id_best_res, 
               ICL_vec = ICL_vec, 
               compl_log_lik_vec = compl_log_lik_vec, 
               log_lik_vec = log_lik_vec, 
-              penalty_2_vec = penalty_2_vec,
-              penalty_vec = penalty_vec,
-              counts = counts))
+              log_lik_1_vec = log_lik_1_vec,
+              log_lik_2_vec = log_lik_2_vec,
+              clus_entropy_vec = clus_entropy_vec,
+              penalty_vec = penalty_vec))
 }
