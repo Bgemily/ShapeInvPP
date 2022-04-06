@@ -12,7 +12,8 @@ est_timeshift_density = function(spks_time_mlist,
                                  step_size=0.0001,
                                  max_iter_centering=5, 
                                  epsilon=0.001,
-                                 fix_timeshift=FALSE)
+                                 fix_timeshift=FALSE,
+                                 bw_nodedsty=0.02)
 {
   t_unit = t_vec[2]-t_vec[1]
   N_node = nrow(spks_time_mlist)
@@ -69,7 +70,7 @@ est_timeshift_density = function(spks_time_mlist,
                                                         freq_trun = freq_trun,
                                                         v0 = v0, v1 = v1,
                                                         t_vec = t_vec, 
-                                                        rmv_conn_prob = TRUE)$center_density_array
+                                                        bw=bw_nodedsty)$center_density_array
       for (q in 1:N_clus) {
         n0_vec_tmp = rep(0,N_node)
         shifted_spks_time_q = c()
