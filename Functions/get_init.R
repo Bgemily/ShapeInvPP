@@ -8,6 +8,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
                     v0 = 0.15, v1 = 0.1,
                     t_vec=seq(0, v0, by=0.01),
                     fix_timeshift=FALSE,
+                    rmv_conn_prob=FALSE,
                     default_timeshift=0
                     )
 {
@@ -40,7 +41,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
   
 
   # Initialize clusters -----------------------------------------------------
-  node_intensity_array = get_center_intensity_array(spks_time_mlist = spks_time_mlist,
+  tmp = get_center_intensity_array(spks_time_mlist = spks_time_mlist,
                                                     stim_onset_vec = stim_onset_vec,
                                                     reaction_time_vec = reaction_time_vec,
                                                     clusters_list = mem2clus(1:N_node),
@@ -49,7 +50,13 @@ get_init = function(spks_time_mlist, stim_onset_vec,
                                                     freq_trun = freq_trun,
                                                     v0 = v0, v1 = v1,
                                                     t_vec = t_vec,
-                                                    rmv_conn_prob = TRUE)$center_intensity_array
+                                                    rmv_conn_prob = TRUE)
+  
+  if (rmv_conn_prob){
+    node_intensity_array = tmp$center_density_array
+  } else{
+    node_intensity_array = tmp$center_intensity_array
+  }
   membership = kmeans(x=node_intensity_array[,1,], centers = N_clus, nstart = 5)$cluster
   
   clusters = mem2clus(membership = membership, N_clus_min = N_clus)

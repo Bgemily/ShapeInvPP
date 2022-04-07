@@ -181,7 +181,7 @@ for (id_brain_region in 1:length(brain_region_vec)) {
   #                    N_clus = N_clus,
   #                    freq_trun = freq_trun,
   #                    t_vec = t_vec,
-  #                    v0 = v0, v1 = v1,
+  #                    v0 = v0, v1 = v1, rmv_conn_prob = TRUE,
   #                    fix_timeshift = fix_timeshift)
   # 
   #     clusters_list_init = res$clusters_list
