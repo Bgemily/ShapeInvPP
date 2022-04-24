@@ -1,6 +1,7 @@
 
 ### Obtain truncated fourier series (smoothed point process) for each cluster and intensity component
-get_center_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_time_vec,
+get_center_intensity_array = function(spks_time_mlist, 
+                                      stim_onset_vec, 
                                       clusters_list, 
                                       v_vec,
                                       N_component=1,
@@ -9,7 +10,9 @@ get_center_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_
                                       t_vec=seq(0, v0, by=0.01),
                                       n0_mat_list=NULL,
                                       bw=0.01,
+                                      align_median=FALSE,
                                       # Unused arguments
+                                      reaction_time_vec=NULL,
                                       rmv_conn_prob=FALSE)
 {  
   t_unit = t_vec[2]-t_vec[1]
@@ -27,6 +30,25 @@ get_center_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_
     F_hat_q = 0
     if(length(clusters_list[[q]])>0){
       spks_time_q = c()
+      for (id_node in clusters_list[[q]]) {
+        for (id_trial in 1:N_trial) {
+          spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_trial]) - stim_onset_vec[id_trial]
+          spks_time_nodetrial = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
+                                                            spks_time_nodetrial<=max(t_vec))]
+          spks_time_nodetrial = spks_time_nodetrial - v_vec[id_node]
+          spks_time_nodetrial = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) &
+                                                            spks_time_nodetrial<=max(t_vec))]
+          spks_time_q = c(spks_time_q, spks_time_nodetrial)
+        }
+      }
+      ### Force the median of spiking times to be the median of t_vec
+      if (align_median) {
+        v_vec[clusters_list[[q]]] = v_vec[clusters_list[[q]]] + (median(spks_time_q) - median(t_vec))
+        spks_time_q = spks_time_q - (median(spks_time_q) - median(t_vec))
+        spks_time_q = spks_time_q[which(spks_time_q>=min(t_vec) &
+                                          spks_time_q<=max(t_vec))]
+      }
+      
       N_spks_nodetrial_vec_q = c()
       for (id_node in clusters_list[[q]]) {
         for (id_trial in 1:N_trial) {
@@ -34,12 +56,12 @@ get_center_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_
           spks_time_nodetrial = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
                                                             spks_time_nodetrial<=max(t_vec))]
           spks_time_nodetrial = spks_time_nodetrial - v_vec[id_node]
-          spks_time_nodetrial = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
+          spks_time_nodetrial = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) &
                                                             spks_time_nodetrial<=max(t_vec))]
-          spks_time_q = c(spks_time_q, spks_time_nodetrial)
           N_spks_nodetrial_vec_q = c(N_spks_nodetrial_vec_q, length(spks_time_nodetrial))
         }
       }
+      
       if (length(spks_time_q)>0) {
         fft_q_res = get_adaptive_fft(event_time_vec = spks_time_q, 
                                        freq_trun_max = freq_trun, 
@@ -75,7 +97,8 @@ get_center_intensity_array = function(spks_time_mlist, stim_onset_vec, reaction_
   
   return(list(center_intensity_array=center_intensity_array,
               center_density_array=center_density_array,
-              center_Nspks_mat=center_Nspks_mat))
+              center_Nspks_mat=center_Nspks_mat,
+              v_vec=v_vec))
 }
 
 

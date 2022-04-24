@@ -131,22 +131,24 @@ ggplot()+
 #######
 library(ggplot2)
 gamma_vec = factor(res_select_model$cand_gamma_vec)
+
 ggplot()+
   geom_line(aes(x=res_select_model$cand_N_clus_vec, 
-                y=res_select_model$log_lik_1_vec,
-                group=gamma_vec,
-                color=gamma_vec
-                ))
-ggplot()+
-  geom_line(aes(x=res_select_model$cand_N_clus_vec, 
-                y=res_select_model$log_lik_2_vec,
+                y=res_select_model$log_lik_vec,
                 group=gamma_vec,
                 color=gamma_vec
   ))
 
 ggplot()+
   geom_line(aes(x=res_select_model$cand_N_clus_vec, 
-                y=res_select_model$log_lik_vec,
+                y=res_select_model$clus_entropy_vec,
+                group=gamma_vec,
+                color=gamma_vec
+  ))
+
+ggplot()+
+  geom_line(aes(x=res_select_model$cand_N_clus_vec, 
+                y=res_select_model$compl_log_lik_vec,
                 group=gamma_vec,
                 color=gamma_vec
   ))
@@ -158,8 +160,8 @@ ggplot()+
                 color=gamma_vec
   ))
 
+
+
 res_select_model$N_clus_best
 res_select_model$gamma_best
-
-
 

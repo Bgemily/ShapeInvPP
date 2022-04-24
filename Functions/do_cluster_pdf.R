@@ -84,7 +84,6 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
     l2_loss = res$l2_loss
     loss_history = c(loss_history, l2_loss)
     
-    
     ### Evaluate stopping criterion
     clusters_update = clusters_list_update
     clusters_current = clusters_list_current

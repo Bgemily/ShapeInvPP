@@ -60,10 +60,6 @@ select_model = function(spks_time_mlist,
       ### Add compl_log_lik_tmp by \sum_{(i,m):z_{i,m}=q}{\log f_{q}[ (t_{i,m,r}-v_{vis,m}) - v_{i,m} ]}
       ind_tmp = which(counts > 0 & log_lik_q_vec>-Inf)
       log_lik_tmp_2 = log_lik_tmp_2 + sum(log_lik_q_vec[ind_tmp]*counts[ind_tmp])
-      print(paste("Nclus:",N_clus_tmp,
-                  ', Nspks_q:', center_Nspks_mat_tmp[q,1],
-                  ', max(lik_q):', max(center_intensity_array_tmp[q,1,]),
-                  ', max(log_lik_q_vec):', max(log_lik_q_vec[ind_tmp])))
     }
     
     
