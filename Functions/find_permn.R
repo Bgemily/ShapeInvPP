@@ -1,11 +1,13 @@
 
 ### Find the optimal permutation
-find_permn = function(center_cdf_array_from, center_cdf_array_to){
-  if (!identical(dim(center_cdf_array_from), dim(center_cdf_array_to))) {
-    stop("dim(center_cdf_array_from) and dim(center_cdf_array_to) should be the same.")
+find_permn = function(center_density_array_from, 
+                      center_density_array_to)
+{
+  if (!identical(dim(center_density_array_from), dim(center_density_array_to))) {
+    stop("dim(center_density_array_from) and dim(center_density_array_to) should be the same.")
   }
   
-  N_clus = dim(center_cdf_array_from)[1]
+  N_clus = dim(center_density_array_from)[1]
   permn_list = combinat::permn(1:N_clus)
   
   min_dist = Inf
@@ -14,18 +16,31 @@ find_permn = function(center_cdf_array_from, center_cdf_array_to){
     ### Use cross-correlation to measure similarity
     dist = 0
     for (q in 1:N_clus) {
-      for (k in q:N_clus) {
-        center_cdf_1 = center_cdf_array_from[permn, permn, ][q,k,]
-        center_cdf_2 = center_cdf_array_to[q,k,]
-        if (var(center_cdf_1)==0) {
-          center_cdf_1 = c(center_cdf_1[-1],center_cdf_1[1]+1e-10)
-        }
-        if (var(center_cdf_2)==0) {
-          center_cdf_2 = c(center_cdf_2[-1],center_cdf_2[1]+1e-10)
-        }
-        tmp = 1-max(ccf(x = center_cdf_1, y = center_cdf_2, plot=FALSE)$acf)
-        dist = dist + tmp
+      center_density_from_tmp_1 = center_density_array_from[permn, , ,drop=FALSE][q,1,]
+      center_density_to_tmp_1 = center_density_array_to[q,1,]
+      if (var(center_density_from_tmp_1)==0) {
+        center_density_from_tmp_1 = c(center_density_from_tmp_1[-1],center_density_from_tmp_1[1]+1e-10)
       }
+      if (var(center_density_to_tmp_1)==0) {
+        center_density_to_tmp_1 = c(center_density_to_tmp_1[-1],center_density_to_tmp_1[1]+1e-10)
+      }
+      
+      
+      center_density_from_tmp_2 = center_density_array_from[permn, , ,drop=FALSE][q,2,]
+      center_density_to_tmp_2 = center_density_array_to[q,2,]
+      if (var(center_density_from_tmp_2)==0) {
+        center_density_from_tmp_2 = c(center_density_from_tmp_2[-1],center_density_from_tmp_2[1]+1e-10)
+      }
+      if (var(center_density_to_tmp_2)==0) {
+        center_density_to_tmp_2 = c(center_density_to_tmp_2[-1],center_density_to_tmp_2[1]+1e-10)
+      }
+      
+      center_density_from_tmp = center_density_from_tmp_1 + center_density_from_tmp_2
+      center_density_to_tmp = center_density_to_tmp_1 + center_density_to_tmp_2
+      dist_tmp = 1-max(ccf(x = center_density_from_tmp, 
+                           y = center_density_to_tmp, plot=FALSE)$acf)
+      
+      dist = dist + dist_tmp
     }
   
     if(dist < min_dist){

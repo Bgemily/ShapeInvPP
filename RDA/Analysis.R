@@ -25,7 +25,7 @@ registerDoParallel(cores=N_cores)
 
 # Get mouse info for all sessions -----------------------------------------
 load("../Data/mouse_name.rdata")
-target_session_vec = 1:16
+target_session_vec = 12:39
 session_vec = session_vec[target_session_vec]
 mouse_name_vec = mouse_name_vec[target_session_vec]
 brain_region_list = brain_region_list[target_session_vec]
@@ -37,7 +37,7 @@ for (id_mouse in 1:length(mouse_name_set_vec)){
   mouse_name = mouse_name_set_vec[id_mouse]
   id_session_mouse_vec = session_vec[which(mouse_name_vec==mouse_name)]
   id_session_mouse_list[[id_mouse]] =  id_session_mouse_vec
-  brain_region_mouse_vec = unique(unlist(brain_region_list[id_session_mouse_vec]))
+  brain_region_mouse_vec = unique(unlist(brain_region_list[which(mouse_name_vec==mouse_name)]))
   brain_region_mouse_list[[id_mouse]] = brain_region_mouse_vec
 }
 
@@ -144,7 +144,7 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
     brain_area_vec_full = brain_area_vec
     
     v0 = 0.0
-    v1 = 0.2
+    v1 = 0.5
     t_vec=seq(0-v1, v0, length.out=200)
     
     N_node = nrow(spks_time_mlist_full)
@@ -170,7 +170,7 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
     
     # Apply our algorithm ---------------------------------------------------------
     
-    method = paste0("Model4_multi_mouse_0.2s")
+    method = paste0("Model4_multi_mouse")
     signal_type = 'pre_stim'
     
     N_clus_vec = c(1,2,3)

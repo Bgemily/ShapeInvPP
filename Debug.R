@@ -6,162 +6,95 @@ sapply(file.sources, source)
 library(tidyverse)
 
 stim_onset_vec = 0
-reaction_time_vec = stim_onset_vec + 0.5
 N_node = 100
-spks_time_mlist_tmp = matrix(list(),N_node,1)
+spks_time_mlist = matrix(list(),N_node,1)
 
-v_vec_true = rep(0,N_node)
-for (i in 1:(N_node/2)) {
-  for (j in 1:1) {
-    v_vec_true[i] = runif(1,0,0.35)*0
-    spks_time_mlist_tmp[i,j] = list(stim_onset_vec[j]+rnorm(20,0.1,0.05)+v_vec_true[i])
-  }
-}
+t_vec = res$data_param$t_vec
 
-for (i in 1:(N_node/4)) {
-  for (j in 1:1) {
-    v_vec_true[i] = runif(1,0.05,0.2)*0
-    spks_time_mlist_tmp[i,j] = list(stim_onset_vec[j]+rnorm(40,0.1,0.05)+v_vec_true[i])
-  }
-}
+network_list = do.call(generate_data, args = res$data_param)
+network_list = generate_data(SEED=38,
+                             N_node=100,
+                             N_spks = 1000,
+                             conn_patt_sep = 1,
+                             time_shift_rad = 0.05 )
 
-for (i in (N_node/2+1):N_node) {
-  for (j in 1:1) {
-    spks_time_mlist_tmp[i,j] = list(stim_onset_vec[j]+runif(10,0,0.25))
-  }
-}
+spks_time_mlist = network_list$spks_time_mlist[1:100,1,drop=FALSE]
+stim_onset_vec = network_list$stim_onset_vec[1:100]
+
+center_density_array_true = network_list$center_density_array_true
+mem_true_vec = network_list$mem_true_vec
+clus_true_list = network_list$clus_true_list
+v_true_list = network_list$v_vec_list
+
+t_vec = network_list$t_vec
+
+plot(t_vec,center_density_array_true[1,1,]+center_density_array_true[1,2,],type='l')
+lines(density(spks_time_mlist[1,1][[1]],bw=0.015),col=2)
+
+plot(t_vec,center_density_array_true[2,1,]+center_density_array_true[2,2,],type='l')
 
 
 
 
-for (i in (1):N_node) {
-  for (j in 1:1) {
-    spks_time_mlist_tmp[i,j] = list(stim_onset_vec[j]+runif(10,0,0.5))
-  }
-}
-
-t_vec = seq(0, 0.5, length.out=200)
-
-res_list = list()
-
-N_clus = 1
-res = get_init(spks_time_mlist = spks_time_mlist_tmp, 
+N_clus = 2
+res = get_init(spks_time_mlist = spks_time_mlist, 
                stim_onset_vec = stim_onset_vec,
                N_clus = N_clus,
-               t_vec = t_vec,
+               N_component = 2,
+               v0 = 0.5, v1 = 0.5,
+               t_vec = t_vec, 
                fix_timeshift = FALSE)
 clusters_list_init = res$clusters_list
-v_vec_init = res$v_vec
-do_cluster_pdf(spks_time_mlist = spks_time_mlist_tmp, 
-               stim_onset_vec, reaction_time_vec, 
-               clusters_list_init = clusters_list_init, 
-               v_vec_init = v_vec_init,
+v_vec_list_init = res$v_vec_list
+
+print(clusters_list_init)
+plot(v_true_list[[1]][1:100], v_vec_list_init[[1]][1:100]); abline(a=0,b=1,col=2)
+plot(v_true_list[[2]][1:100], v_vec_list_init[[2]][1:100]); abline(a=0,b=1,col=2)
+
+
+do_cluster_pdf(spks_time_mlist = spks_time_mlist,
+               stim_onset_vec = stim_onset_vec,
+               clusters_list_init = clusters_list_init,
+               v_vec_list_init = v_vec_list_init,
+               # v_vec_list_init = v_true_list,
+               step_size = 0.0005,
+               N_component = 2, 
                freq_trun = Inf,
-               MaxIter = 10,
-               gamma=10,
+               MaxIter = 10, 
+               conv_thres = 0,
+               gamma=0,
                t_vec=t_vec,
                fix_timeshift = FALSE)->tmp
 plot(tmp$loss_history,type='b')
 tmp$clusters_list
+plot(v_true_list[[1]], tmp$v_vec_list[[1]]);abline(a=0, b=1, col='red')
+plot(v_true_list[[2]], tmp$v_vec_list[[2]]);abline(a=0, b=1, col='red')
 
-res_list[[1]] = tmp
-
-
-
-N_clus = 1
-res = get_init(spks_time_mlist = spks_time_mlist_tmp, 
-               stim_onset_vec = stim_onset_vec,
-               N_clus = N_clus,
-               t_vec = t_vec,
-               fix_timeshift = TRUE)
-clusters_list_init = res$clusters_list
-v_vec_init = res$v_vec
-do_cluster_pdf(spks_time_mlist = spks_time_mlist_tmp, 
-               stim_onset_vec, reaction_time_vec, 
-               clusters_list_init = clusters_list_init, 
-               v_vec_init = v_vec_init,
-               freq_trun = Inf,
-               MaxIter = 10,
-               gamma=10,
-               t_vec=t_vec,
-               fix_timeshift = TRUE)->tmp
-plot(tmp$loss_history,type='b')
-tmp$clusters_list
-
-res_list[[2]] = tmp
+plot(v_vec_list_init[[1]], tmp$v_vec_list[[1]]);abline(a=0, b=1, col='red')
+plot(v_vec_list_init[[2]], tmp$v_vec_list[[2]]);abline(a=0, b=1, col='red')
 
 
-
+res_list = list(tmp)
 id_res = 1
-tmp = plot_intensity_array(center_intensity_array = res_list[[id_res]]$center_intensity_array,
-                     center_Nspks_vec = res_list[[id_res]]$center_Nspks_mat[,1], 
-                     clusters_list = res_list[[id_res]]$clusters_list,
-                     t_vec = res_list[[id_res]]$t_vec)
-grid.arrange(tmp$g)
-id_res = 2
-tmp = plot_intensity_array(center_intensity_array = res_list[[id_res]]$center_intensity_array,
-                           center_Nspks_vec = res_list[[id_res]]$center_Nspks_mat[,1], 
-                           clusters_list = res_list[[id_res]]$clusters_list,
+tmp3 = get_center_intensity_array(spks_time_mlist = spks_time_mlist,
+                                 stim_onset_vec = stim_onset_vec,
+                                 clusters_list = mem2clus(1:N_node),
+                                 v_vec = tmp$v_vec_list[[1]],
+                                 N_component = 1,
+                                 freq_trun = 5,
+                                 v0 = 0.5, 
+                                 v1 = 0.5,
+                                 t_vec = tmp$t_vec,
+                                 bw=0.01)
+tmp3$center_intensity_array-> node_intensity_array_shifted
+tmp3$center_density_array-> node_density_array_shifted
+tmp3$center_Nspks_mat[,1]-> node_Nspks_vec
+tmp2 = plot_intensity_array(center_intensity_array = res_list[[id_res]]$center_intensity_array[,1,,drop=F]+
+                             1*res_list[[id_res]]$center_intensity_array[,2,,drop=F],
+                           center_Nspks_vec = rowSums(res_list[[id_res]]$center_Nspks_mat), 
+                           clusters_list = res_list[[id_res]]$clusters_list, 
+                           # node_intensity_array = node_intensity_array_shifted, 
+                           # node_Nspks_vec = node_Nspks_vec, 
                            t_vec = res_list[[id_res]]$t_vec)
-grid.arrange(tmp$g)
-
-
-res_select_model = select_model(spks_time_mlist = spks_time_mlist_tmp, 
-                                stim_onset_vec = stim_onset_vec, 
-                                result_list = res_list)
-res_select_model$log_lik_vec
-res_select_model$log_lik_1_vec
-res_select_model$log_lik_2_vec
-
-ggplot()+
-  geom_line(aes(x=N_clus_vec, 
-                y=res_select_model$log_lik_vec
-  ))
-
-ggplot()+
-  geom_line(aes(x=N_clus_vec, 
-                y=res_select_model$log_lik_1_vec
-  ))
-
-ggplot()+
-  geom_line(aes(x=N_clus_vec, 
-                y=res_select_model$log_lik_2_vec
-  ))
-
-#######
-library(ggplot2)
-gamma_vec = factor(res_select_model$cand_gamma_vec)
-
-ggplot()+
-  geom_line(aes(x=res_select_model$cand_N_clus_vec, 
-                y=res_select_model$log_lik_vec,
-                group=gamma_vec,
-                color=gamma_vec
-  ))
-
-ggplot()+
-  geom_line(aes(x=res_select_model$cand_N_clus_vec, 
-                y=res_select_model$clus_entropy_vec,
-                group=gamma_vec,
-                color=gamma_vec
-  ))
-
-ggplot()+
-  geom_line(aes(x=res_select_model$cand_N_clus_vec, 
-                y=res_select_model$compl_log_lik_vec,
-                group=gamma_vec,
-                color=gamma_vec
-  ))
-
-ggplot()+
-  geom_line(aes(x=res_select_model$cand_N_clus_vec, 
-                y=res_select_model$ICL_vec,
-                group=gamma_vec,
-                color=gamma_vec
-  ))
-
-
-
-res_select_model$N_clus_best
-res_select_model$gamma_best
+grid.arrange(tmp2$g)
 
