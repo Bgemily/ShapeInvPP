@@ -98,3 +98,9 @@ tmp2 = plot_intensity_array(center_intensity_array = res_list[[id_res]]$center_i
                            t_vec = res_list[[id_res]]$t_vec)
 grid.arrange(tmp2$g)
 
+for (id_session in c(24,38,1,2,3)) {
+  dat = readRDS(paste(new.path,"session",id_session,".rds",sep=''))
+  print(id_session)
+  print(rbind(dat$response[which(dat$prev_reward==-1&dat$scenario_num==-1)-1,1],
+              dat$scenario_num[which(dat$prev_reward==-1&dat$scenario_num==-1)-1]))
+}

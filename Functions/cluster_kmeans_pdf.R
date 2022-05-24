@@ -35,6 +35,7 @@ cluster_kmeans_pdf = function(spks_time_mlist,
                                      freq_trun = freq_trun, 
                                      t_vec = t_vec,
                                      v0 = v0, v1 = v1,
+                                     fix_timeshift = fix_timeshift,
                                      align_density = TRUE)
     center_density_array = tmp$center_density_array
     center_Nspks_mat = tmp$center_Nspks_mat
@@ -48,7 +49,6 @@ cluster_kmeans_pdf = function(spks_time_mlist,
     tmp = est_timeshift(spks_time_mlist = spks_time_mlist, 
                         stim_onset_vec = stim_onset_vec, 
                         center_density_array = center_density_array,
-                        center_Nspks_mat = center_Nspks_mat,
                         v_vec = v_vec, 
                         N_component = N_component,
                         freq_trun = freq_trun, 
@@ -154,6 +154,7 @@ cluster_kmeans_pdf = function(spks_time_mlist,
                                      freq_trun = freq_trun, 
                                      t_vec = t_vec,
                                      v0 = v0, v1 = v1,
+                                     fix_timeshift = fix_timeshift,
                                      align_density = FALSE)
     center_density_array = tmp$center_density_array
     center_Nspks_mat = tmp$center_Nspks_mat

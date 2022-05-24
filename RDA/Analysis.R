@@ -25,7 +25,7 @@ registerDoParallel(cores=N_cores)
 
 # Get mouse info for all sessions -----------------------------------------
 load("../Data/mouse_name.rdata")
-target_session_vec = 12:39
+target_session_vec = 1:39
 session_vec = session_vec[target_session_vec]
 mouse_name_vec = mouse_name_vec[target_session_vec]
 brain_region_list = brain_region_list[target_session_vec]
@@ -83,7 +83,10 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
         feedback_type_vec_1_P = rep(NA,length(id_trial_vec_1_P))
         feedback_type_vec_1 = c(feedback_type_vec_1, feedback_type_vec_1_P)
         
-        pre_feedback_type_vec_1 = c(NA, feedback_type_vec_1[-length(feedback_type_vec_1)])
+        pre_feedback_type_vec_active = dat$prev_reward
+        pre_feedback_type_vec_1 = pre_feedback_type_vec_active[id_trial_vec_1]
+        pre_feedback_type_vec_1_P = rep(NA,length(id_trial_vec_1_P))
+        pre_feedback_type_vec_1 = c(pre_feedback_type_vec_1, pre_feedback_type_vec_1_P)
         
         response_type_vec_1 = dat$response[id_trial_vec_1, 1]
         response_type_vec_1_P = rep(NA,length(id_trial_vec_1_P))
@@ -163,25 +166,25 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
     subsample = which(N_spks_vec>=3)
     # set.seed(831)
     # subsample=sample(subsample,50)
-    # subsample=rep(c(136997,469), each=50)
     spks_time_mlist = spks_time_mlist_full[subsample, ,drop=FALSE]
     stim_onset_vec = stim_onset_vec_full[subsample]
     
     
     # Apply our algorithm ---------------------------------------------------------
     
-    method = paste0("Model4_multi_mouse")
+    method = paste0("Model4_multi_mouse_no_timeshift")
     signal_type = 'pre_stim'
     
     N_clus_vec = c(1,2,3)
     freq_trun_vec = c(Inf)
-    gamma_vec = c(0)
+    gamma_vec = c(10000)
     freq_trun = Inf
     N_clus = 3
     gamma = 1
     MaxIter = 20
     step_size = 5e-5
-    fix_timeshift = FALSE
+    # fix_timeshift = FALSE
+    fix_timeshift = TRUE
     N_restart = 1
     
     for(id_gamma in 1:length(gamma_vec)) {
@@ -240,6 +243,23 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
             }
           }
         }
+        
+        ### Permutate clusters
+        res$clusters_list -> clusters_list
+        res$center_density_array -> center_density_array
+        res$center_intensity_array -> center_intensity_array
+        res$center_Nspks_mat -> center_Nspks_mat
+        
+        permn = order(center_Nspks_mat[,1], decreasing = FALSE)
+        clusters_list_permn = clusters_list[permn] 
+        center_density_array_permn = center_density_array[permn, , ,drop=F]
+        center_intensity_array_permn = center_intensity_array[permn, , ,drop=F]
+        center_Nspks_mat_permn = center_Nspks_mat[permn, ,drop=F]
+        res$clusters_list = clusters_list_permn
+        res$center_density_array = center_density_array_permn
+        res$center_intensity_array = center_intensity_array_permn
+        res$center_Nspks_mat = center_Nspks_mat_permn
+        
         
         folder_path = paste0('../Results/Rdata/RDA',
                              '/', method, "_",

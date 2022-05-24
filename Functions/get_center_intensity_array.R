@@ -13,6 +13,7 @@ get_center_intensity_array = function(spks_time_mlist,
                                       bw=0.015,
                                       # bw=0.02,
                                       align_density=FALSE,
+                                      fix_timeshift=FALSE,
                                       # Unused arguments
                                       reaction_time_vec=NULL,
                                       rmv_conn_prob=FALSE)
@@ -44,7 +45,7 @@ get_center_intensity_array = function(spks_time_mlist,
           }
         }
         ### Force the median of spiking times to be the median of t_vec
-        if (align_density) {
+        if (align_density & !fix_timeshift) {
           v_vec[clusters_list[[q]]] = v_vec[clusters_list[[q]]] + (median(spks_time_q) - median(t_vec))
           spks_time_q = spks_time_q - (median(spks_time_q) - median(t_vec))
           spks_time_q = spks_time_q[which(spks_time_q>=min(t_vec) &
