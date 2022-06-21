@@ -56,8 +56,6 @@ est_timeshift = function(spks_time_mlist,
                                             pad = 0,
                                             periodic = TRUE)$n0
           v_mat[id_node,id_clus] = n0_tmp*t_unit
-          # browser(expr = (q==2 ))
-          # plot(f_origin_list[[1]],type='l'); lines(f_target_list[[1]],col=2)
           
         }
         
@@ -67,7 +65,7 @@ est_timeshift = function(spks_time_mlist,
     
   } else if(N_component == 2) {
     v_mat_list = list(matrix(nrow = N_node, ncol = N_clus),
-                 matrix(nrow = N_node, ncol = N_clus))
+                      matrix(nrow = N_node, ncol = N_clus))
     dist_mat = matrix(nrow = N_node, ncol = N_clus)
     for (id_clus in 1:N_clus) {
       center_density_1 = center_density_array[id_clus,1, ]   
@@ -95,10 +93,11 @@ est_timeshift = function(spks_time_mlist,
           v_mat_list[[2]][id_node,id_clus] = v_vec_list[[2]][id_node]
           
         } else{
-          n0_max_vec = c(length(t_vec),
-                         length(t_vec) )
-          n0_min_vec = c(-length(t_vec),
-                         -length(t_vec) )
+          # u_0 = v1, u_1 = v0
+          n0_max_vec = c(round((v1/2)/t_unit),
+                         round((v0-v1/2)/t_unit) )
+          n0_min_vec = c(0,
+                         0 )
           n0_tmp_vec = align_two_components(f_target = f_target,
                                             f_origin_1 = f_origin_1,
                                             f_origin_2 = f_origin_2,
@@ -133,7 +132,7 @@ est_timeshift = function(spks_time_mlist,
     
     
   }
- 
+  
   
   
   return(list(v_mat=v_mat,

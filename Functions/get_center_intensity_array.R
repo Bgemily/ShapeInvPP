@@ -10,8 +10,8 @@ get_center_intensity_array = function(spks_time_mlist,
                                       v0 = 0.15, v1 = 0.1,
                                       t_vec=seq(0, v0, by=0.01),
                                       n0_mat_list=NULL,
-                                      bw=0.015,
-                                      # bw=0.02,
+                                      # bw=0.015,
+                                      bw=0.01,
                                       align_density=FALSE,
                                       fix_timeshift=FALSE,
                                       # Unused arguments
@@ -134,11 +134,18 @@ get_center_intensity_array = function(spks_time_mlist,
           X_array_q[ , id_node_tmp, 1] = exp(-1i*2*pi*l_vec*v_vec_list[[1]][id_node]/(max(t_vec)-min(t_vec)))
           X_array_q[ , id_node_tmp, 2] = exp(-1i*2*pi*l_vec*v_vec_list[[2]][id_node]/(max(t_vec)-min(t_vec)))
         }
-        W_mat_q = diag(N_spks_nodetrial_vec_q)
+        if(length(N_spks_nodetrial_vec_q)>1){
+          W_mat_q = diag(N_spks_nodetrial_vec_q)
+          theta_list = lapply( 2:length(l_vec), function(l){
+            solve(t(Conj(X_array_q[l, , ])) %*% W_mat_q %*% X_array_q[l, , ]) %*% 
+              (t(Conj(X_array_q[l, , ])) %*% W_mat_q %*% Y_mat_q[l, ])} )
+        } else{
+          W_mat_q = N_spks_nodetrial_vec_q
+          theta_list = lapply( 2:length(l_vec), function(l){
+            c((X_array_q[l, , 1])^(-1)*Y_mat_q[l, ], 0) } )
+        }
         
-        theta_list = lapply( 2:length(l_vec), function(l){
-          solve(t(Conj(X_array_q[l, , ])) %*% W_mat_q %*% X_array_q[l, , ]) %*% 
-            (t(Conj(X_array_q[l, , ])) %*% W_mat_q %*% Y_mat_q[l, ])} )
+        
         alpha_vec = sapply(theta_list, "[", 1)
         beta_vec = sapply(theta_list, "[", 2)
         alpha_beta_0 = sum(N_spks_nodetrial_vec_q*Y_mat_q[1,]) / sum(N_spks_nodetrial_vec_q)
@@ -149,16 +156,32 @@ get_center_intensity_array = function(spks_time_mlist,
         density_q_2 = Re(fft(beta_vec, inverse = TRUE))
         
         ### Flip two components
-        tmp_1 = (density_q_1 - sum(density_q_1))^2
-        tmp_2 = (density_q_2 - sum(density_q_2))^2
-        if(which(cumsum(tmp_1)/sum(tmp_1)>=0.5)[1] > which(cumsum(tmp_2)/sum(tmp_2)>=0.5)[1] ){
-          density_q_1 -> tmp
-          density_q_1 = density_q_2
-          density_q_2 = tmp
+        if(which.max(density_q_1)[1] > which.max(density_q_2)[1] ){
+          alpha_vec = sapply(theta_list, "[", 2)
+          beta_vec = sapply(theta_list, "[", 1)
+          alpha_beta_0 = sum(N_spks_nodetrial_vec_q*Y_mat_q[1,]) / sum(N_spks_nodetrial_vec_q)
+          alpha_vec = c(alpha_beta_0, alpha_vec)
+          beta_vec = c(0, beta_vec)
+          density_q_1 = Re(fft(alpha_vec, inverse = TRUE))
+          density_q_2 = Re(fft(beta_vec, inverse = TRUE))
+          
           v_vec_list[[1]][clusters_list[[q]]] -> tmp
           v_vec_list[[1]][clusters_list[[q]]] = v_vec_list[[2]][clusters_list[[q]]]
           v_vec_list[[2]][clusters_list[[q]]] = tmp
         }
+        
+        ### Force second density to be zero when t<=0
+        density_q_2_before0 = mean(density_q_2[which(t_vec<=0)])
+        density_q_2 = density_q_2-density_q_2_before0
+        density_q_1 = density_q_1+density_q_2_before0
+        density_q_2[which(t_vec<=0)] = 0
+        
+        ### Force the second density to be non-zero right after t=0
+        if(density_q_2[which(t_vec>0)[1]]<=max(density_q_2)*0.05){
+          length_rmv = min(t_vec[which(density_q_2>=max(density_q_2)*0.05)]) / t_unit
+          density_q_2 = c( tail(density_q_2,length(t_vec)-length_rmv), rep(tail(density_q_2,1),length_rmv) )
+        }
+        
         
         F_hat_q = sqrt( mean(N_spks_nodetrial_vec_q^2) )
         

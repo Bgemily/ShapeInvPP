@@ -1,9 +1,10 @@
 
 plot_intensity_array = function(center_intensity_array,
-                                center_Nspks_vec,
+                                center_Nspks_mat,
+                                center_intensity_array_true,
                                 clusters_list,
                                 t_vec,
-                                v0 = 0.2, v1 = 0.1,
+                                u_1 = 0.2, u_0 = 0.1,
                                 N_component = 1
 )
 {
@@ -15,12 +16,14 @@ plot_intensity_array = function(center_intensity_array,
   for (id_clus in 1:N_clus) {
     for (id_component in 1:N_component) {
       intensity_tmp = center_intensity_array[id_clus,id_component, ]
-      tmp.df = data.frame(intensity_val=intensity_tmp)
+      intensity_tmp_true = center_intensity_array_true[id_clus,id_component, ]  
+      tmp.df = data.frame(intensity_val=intensity_tmp,
+                          intensity_val_true=intensity_tmp_true)
       tmp.df$cluster = id_clus
       tmp.df$component = id_component
       tmp.df$t = switch(id_component, 
                         `1`=t_vec,
-                        `2`=t_vec-max(t_vec)+v0)
+                        `2`=t_vec-max(t_vec)+u_1)
       
       big.df = rbind(big.df, tmp.df)
     }
@@ -39,16 +42,21 @@ plot_intensity_array = function(center_intensity_array,
         filter(cluster==id_clus & component==id_component) %>%
         ggplot(aes(x=t, y=intensity_val, 
                    group=interaction(cluster,component))) +
-        geom_line(alpha=1)+
+        geom_line(alpha=1, size=1)+
+        geom_line(aes(x=t, y=intensity_val_true, 
+                      group=interaction(cluster,component)),
+                  alpha=1,
+                  color='red', size=1,
+                  linetype='dashed')+
         geom_vline(xintercept = 0, 
                    color=switch(id_component,
-                                `1`='red',
-                                `2`='orange'),
+                                `1`='blue',
+                                `2`='blue'),
                    linetype=switch(id_component,
                                    `1`='solid',
-                                   `2`='dashed')) +
+                                   `2`='solid')) +
         annotate(geom = 'text', label = paste0('Cluster: ',id_clus,
-                                               ', ','N_spks: ', round(center_Nspks_vec[id_clus],1),
+                                               ', ','N_spks: ', round(center_Nspks_mat[id_clus,id_component],1),
                                                ', ','size: ',clus_size_vec[id_clus]), 
                  x = Inf, y = Inf, hjust = 1, vjust = 1) +
         xlab(NULL) + ylab(NULL) +

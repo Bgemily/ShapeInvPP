@@ -178,7 +178,7 @@ cluster_kmeans_pdf = function(spks_time_mlist,
     v_mat_list_tmp = tmp$v_mat_list
     dist_mat_tmp = tmp$dist_mat
     
-  
+    
     ### Get distance between each node and each cluster
     dist_mat = matrix(0, nrow=N_node, ncol=N_clus)
     for (id_clus in 1:N_clus) {
@@ -249,15 +249,11 @@ cluster_kmeans_pdf = function(spks_time_mlist,
       v_vec_list[[2]][clusters_list[[id_clus]]] = v_mat_list_tmp[[2]][clusters_list[[id_clus]], id_clus]
     }
     
-    ### For each cluster, globally shift time shift
+    ### For each cluster, force the minimum time shifts to be zero
     if (!fix_timeshift) {
       for (id_clus in 1:N_clus) {
-        v_vec_list[[1]][clusters_list[[id_clus]]] = v_vec_list[[1]][clusters_list[[id_clus]]] - (quantile(v_vec_list[[1]][clusters_list[[id_clus]]], 0.5)-0)
-        v_vec_list[[2]][clusters_list[[id_clus]]] = v_vec_list[[2]][clusters_list[[id_clus]]] - (quantile(v_vec_list[[2]][clusters_list[[id_clus]]], 0.0)-0)
-
+        v_vec_list[[1]][clusters_list[[id_clus]]] = v_vec_list[[1]][clusters_list[[id_clus]]] - (quantile(v_vec_list[[1]][clusters_list[[id_clus]]], 0.0)-0)
         v_vec_list[[1]] = round(v_vec_list[[1]]/t_unit)*t_unit
-        v_vec_list[[2]] = round(v_vec_list[[2]]/t_unit)*t_unit
-        
       }
     }
     
@@ -274,7 +270,7 @@ cluster_kmeans_pdf = function(spks_time_mlist,
               center_density_array=center_density_array,
               center_Nspks_mat=center_Nspks_mat,
               center_intensity_array=center_intensity_array
-              ))
+  ))
 }
 
 

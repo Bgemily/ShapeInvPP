@@ -10,13 +10,13 @@ get_init = function(spks_time_mlist, stim_onset_vec,
                     fix_timeshift=FALSE,
                     rmv_conn_prob=FALSE,
                     default_timeshift=0
-                    )
+)
 {
-
+  
   t_unit = t_vec[2] - t_vec[1]
   N_node = nrow(spks_time_mlist)
   N_trial = ncol(spks_time_mlist)
-
+  
   v_vec = v_vec_list = NULL
   if (N_component==1) {
     # Initialize time shifts --------------------------------------------------
@@ -83,13 +83,13 @@ get_init = function(spks_time_mlist, stim_onset_vec,
           spks_time_vec_2 = c(spks_time_vec_2, spks_time_tmp_2)
         }
         if(length(spks_time_vec_1)>0){
-          v_vec_list[[1]][id_node] = median(spks_time_vec_1) - min(t_vec)
+          v_vec_list[[1]][id_node] = median(spks_time_vec_1) 
         }
         if(length(spks_time_vec_2)>0){
-          v_vec_list[[2]][id_node] = median(spks_time_vec_2) - 0
+          v_vec_list[[2]][id_node] = median(spks_time_vec_2) 
         }
       }
-      v_vec_list[[1]] = v_vec_list[[1]] - median(v_vec_list[[1]])
+      v_vec_list[[1]] = v_vec_list[[1]] - min(v_vec_list[[1]])
       v_vec_list[[2]] = v_vec_list[[2]] - min(v_vec_list[[2]])
       
       v_vec_list[[1]] = round(v_vec_list[[1]]/t_unit)*t_unit
@@ -112,16 +112,14 @@ get_init = function(spks_time_mlist, stim_onset_vec,
       N_spks_nodetrial_vec_tmp = c()
       for (id_trial in 1:N_trial) {
         spks_time_tmp = unlist(spks_time_mlist[id_node,id_trial]) - stim_onset_vec[id_trial]
-        spks_time_tmp_1 = spks_time_tmp[which(spks_time_tmp>=min(t_vec) & 
-                                                spks_time_tmp<=0)]
+        spks_time_tmp_1 = spks_time_tmp[which(spks_time_tmp>=(min(t_vec)+v_vec_list[[1]][id_node]) & 
+                                                spks_time_tmp<=(0+v_vec_list[[2]][id_node]))]
         spks_time_tmp_1_shifted = spks_time_tmp_1 - v_vec_list[[1]][id_node]
-        spks_time_tmp_1_shifted = spks_time_tmp_1_shifted[which(spks_time_tmp_1_shifted>=min(t_vec) &
-                                                                  spks_time_tmp_1_shifted<=max(t_vec))]
-        spks_time_tmp_2 = spks_time_tmp[which(spks_time_tmp>0 & 
+        
+        spks_time_tmp_2 = spks_time_tmp[which(spks_time_tmp>(0+v_vec_list[[2]][id_node]) & 
                                                 spks_time_tmp<=max(t_vec))]
         spks_time_tmp_2_shifted = spks_time_tmp_2 - v_vec_list[[2]][id_node]
-        spks_time_tmp_2_shifted = spks_time_tmp_2_shifted[which(spks_time_tmp_2_shifted>=0 &
-                                                                  spks_time_tmp_2_shifted<=max(t_vec))]
+        
         
         spks_time_tmp = c(spks_time_tmp_1_shifted, spks_time_tmp_2_shifted)
         
@@ -132,8 +130,8 @@ get_init = function(spks_time_mlist, stim_onset_vec,
       
       if (length(spks_time_vec_tmp)>0) {
         fft_res = get_adaptive_fft(event_time_vec = spks_time_vec_tmp, 
-                                     freq_trun_max = Inf, 
-                                     t_vec = t_vec)
+                                   freq_trun_max = Inf, 
+                                   t_vec = t_vec)
         fft_tmp = fft_res$fft_vec_best
       } else{
         fft_tmp = rep(0,length(t_vec))
@@ -173,17 +171,17 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     
     if (!fix_timeshift) {
       for (id_clus in 1:N_clus) {
-        v_vec_list[[1]][clusters_list[[id_clus]]] = v_vec_list[[1]][clusters_list[[id_clus]]] - (quantile(v_vec_list[[1]][clusters_list[[id_clus]]], 0.5)-0)
-        v_vec_list[[2]][clusters_list[[id_clus]]] = v_vec_list[[2]][clusters_list[[id_clus]]] - (quantile(v_vec_list[[2]][clusters_list[[id_clus]]], 0.0)-0)
-        
+        v_vec_list[[1]][clusters_list[[id_clus]]] = v_vec_list[[1]][clusters_list[[id_clus]]] - (quantile(v_vec_list[[1]][clusters_list[[id_clus]]], 0.0)-0)
         v_vec_list[[1]] = round(v_vec_list[[1]]/t_unit)*t_unit
+        
+        v_vec_list[[2]][clusters_list[[id_clus]]] = v_vec_list[[2]][clusters_list[[id_clus]]] - (quantile(v_vec_list[[2]][clusters_list[[id_clus]]], 0.0)-0)
         v_vec_list[[2]] = round(v_vec_list[[2]]/t_unit)*t_unit
         
       }
     }
     
   }
-
+  
   
   return(list(membership_vec=membership_vec, 
               v_vec=v_vec,

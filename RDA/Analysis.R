@@ -42,12 +42,10 @@ for (id_mouse in 1:length(mouse_name_set_vec)){
 }
 
 # Loop over brain regions and mouse -------------------------------------------------
-foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
-  foreach (id_brain_region = 1:length(brain_region_mouse_list[[id_mouse]])) %dopar% {
+foreach (id_mouse = 1:length(mouse_name_set_vec)) %dopar% {
     mouse_name = mouse_name_set_vec[id_mouse]
     id_session_mouse_vec = id_session_mouse_list[[id_mouse]]
-    brain_region = brain_region_mouse_list[[id_mouse]][id_brain_region]
-    
+
     # Prepare data ----------------------------
     new.path='../Data/Main/'
     spks_time_mlist = matrix(nrow=0,ncol=1)
@@ -69,7 +67,7 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
       )
       id_trial_vec_1_P = which(dat_P$scenario=="passiveVisual")
       id_trial_vec_1_P = id_trial_vec_1_P[which(dat_P$contrast_left<dat_P$contrast_right)]
-      id_node_vec_1 = which(dat$brain_region==brain_region)
+      id_node_vec_1 = seq(length(dat$brain_region))
       if(length(id_node_vec_1)>0){
         spks_time_mlist_1 = dat$spks_pp[id_node_vec_1, id_trial_vec_1]
         spks_time_mlist_1_P = dat_P$spks_pp[id_node_vec_1, id_trial_vec_1_P]
@@ -149,6 +147,7 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
     v0 = 0.0
     v1 = 0.5
     t_vec=seq(0-v1, v0, length.out=200)
+    id_clus_splitted_vec = c(1)
     
     N_node = nrow(spks_time_mlist_full)
     N_trial = ncol(spks_time_mlist_full)
@@ -163,7 +162,19 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
       }
     }
     
-    subsample = which(N_spks_vec>=3)
+    sample_filter = "many_spikes"
+    if (sample_filter == 'three_spikes') {
+      subsample = which(N_spks_vec>=3)
+    } else if(sample_filter == 'many_spikes') {
+      ### Apply k-means to N_spks_vec
+      set.seed(831)
+      kmeans_res = kmeans(N_spks_vec, centers=4,
+                          iter.max = 100,nstart = 300)
+      permn = order(kmeans_res$centers, decreasing = TRUE)
+      clusters_list = mem2clus(membership = kmeans_res$cluster, N_clus_min = 4)[permn]
+      
+      subsample = unlist(clusters_list[id_clus_splitted_vec])
+    }
     # set.seed(831)
     # subsample=sample(subsample,50)
     spks_time_mlist = spks_time_mlist_full[subsample, ,drop=FALSE]
@@ -172,26 +183,26 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
     
     # Apply our algorithm ---------------------------------------------------------
     
-    method = paste0("Model4_multi_mouse_no_timeshift")
+    method = paste0("Model4_multi_mouse_initNclus4_split1")
     signal_type = 'pre_stim'
     
-    N_clus_vec = c(1,2,3)
+    N_clus_vec = c(2,3)
     freq_trun_vec = c(Inf)
-    gamma_vec = c(10000)
+    gamma_vec = c(0)
     freq_trun = Inf
-    N_clus = 3
-    gamma = 1
+    N_clus = 2
+    gamma = 0
     MaxIter = 20
     step_size = 5e-5
-    # fix_timeshift = FALSE
-    fix_timeshift = TRUE
+    fix_timeshift = FALSE
+    # fix_timeshift = TRUE
     N_restart = 1
     
     for(id_gamma in 1:length(gamma_vec)) {
       for (id_N_clus in 1:length(N_clus_vec)) {
         gamma = gamma_vec[id_gamma]
         N_clus = N_clus_vec[id_N_clus]
-        set.seed(831)
+        set.seed(81)
         res = get_init(spks_time_mlist = spks_time_mlist,
                        stim_onset_vec = stim_onset_vec,
                        N_clus = N_clus,
@@ -245,31 +256,29 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
         }
         
         ### Permutate clusters
-        res$clusters_list -> clusters_list
-        res$center_density_array -> center_density_array
-        res$center_intensity_array -> center_intensity_array
-        res$center_Nspks_mat -> center_Nspks_mat
+        permn = order(apply(res$center_density_array,1,max), decreasing = TRUE)
+        res$clusters_list = res$clusters_list[permn]
+        res$center_density_array = res$center_density_array[permn, , ,drop=F]
+        res$center_intensity_array = res$center_intensity_array[permn, , ,drop=F]
+        res$center_Nspks_mat = res$center_Nspks_mat[permn, ,drop=F]
         
-        permn = order(center_Nspks_mat[,1], decreasing = FALSE)
-        clusters_list_permn = clusters_list[permn] 
-        center_density_array_permn = center_density_array[permn, , ,drop=F]
-        center_intensity_array_permn = center_intensity_array[permn, , ,drop=F]
-        center_Nspks_mat_permn = center_Nspks_mat[permn, ,drop=F]
-        res$clusters_list = clusters_list_permn
-        res$center_density_array = center_density_array_permn
-        res$center_intensity_array = center_intensity_array_permn
-        res$center_Nspks_mat = center_Nspks_mat_permn
-        
+        ### Split clusters based on N_spks
+        if(sample_filter == 'many_spikes'){
+          clusters_split_list = c(lapply(res$clusters_list, function(id_vec) unlist(clusters_list[id_clus_splitted_vec])[id_vec]),
+                                  clusters_list[-id_clus_splitted_vec])
+          res$clusters_allneuron_split_list = clusters_split_list
+          res$clusters_allneuron_nosplit_list = clusters_list
+        }
         
         folder_path = paste0('../Results/Rdata/RDA',
                              '/', method, "_",
                              'gamma', gamma,
                              '/', 'mouse_', mouse_name,
-                             '/', 'brain_region', brain_region,
+                             # '/', 'brain_region', brain_region,
                              '/', signal_type)
         dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
         data_res = list(N_spks_vec = N_spks_vec,
-                        brain_region = brain_region,
+                        # brain_region = brain_region,
                         mouse_name = mouse_name,
                         subsample = subsample,
                         spks_time_mlist = spks_time_mlist_full,
@@ -286,6 +295,7 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
                          gamma=gamma,
                          v0=v0, v1=v1,
                          t_vec=t_vec,
+                         id_clus_splitted_vec=id_clus_splitted_vec,
                          N_restart=N_restart,
                          MaxIter = MaxIter,
                          step_size = step_size,
@@ -316,7 +326,7 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
                              '/', method, "_",
                              'gamma', gamma,
                              '/', 'mouse_', mouse_name,
-                             '/', 'brain_region', brain_region,
+                             # '/', 'brain_region', brain_region,
                              '/', signal_type)
         file = paste0(folder_path,
                       '/', "Nclus", N_clus,
@@ -352,7 +362,7 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
     folder_path = paste0('../Results/Rdata/RDA',
                          '/', method, 
                          '/', 'mouse_', mouse_name,
-                         '/', 'brain_region', brain_region,
+                         # '/', 'brain_region', brain_region,
                          '/', signal_type)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     save(res_select_model,
@@ -374,6 +384,8 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %:%
     
     
     
+    
+
 }
   
 

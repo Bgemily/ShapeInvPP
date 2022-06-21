@@ -3,97 +3,136 @@
 generate_data = function(SEED=NULL,
                          N_node=100, N_clus=2, 
                          clus_size_vec = rep(N_node/N_clus, N_clus),
-                         N_spks = 20,
-                         conn_patt_sep = 1,
-                         v0 = 0.5, v1 = 0.5,
-                         t_vec=seq(-v1, v0, by=0.01),
-                         time_shift_rad=0.1 )
+                         u_1 = 1, u_0 = 1,
+                         t_vec=seq(-u_0*3/2, u_1, by=0.01)  )
 {
   if(!is.null(SEED)) set.seed(SEED)
-
-# Generate cluster memberships ---------------------------------------
+  
+  # Generate cluster memberships ---------------------------------------
   mem_true_vec = rep(1:N_clus, clus_size_vec)
   clus_true_list = mem2clus(mem_true_vec, N_clus_min = N_clus)
   
   
-# Generate time shifts ----------------------------------------------------
+  # Generate time shifts ----------------------------------------------------
   v_vec_list = list()
   v_vec_list[[1]] = runif(n=N_node, 
-                          min = -time_shift_rad,
-                          max = time_shift_rad)
+                          min = 0,
+                          max = u_0/2)    
   v_vec_list[[2]] = runif(n = N_node,
                           min = 0,
-                          max = 2*time_shift_rad )
-  
-
-# Generate spike density functions --------------------------------------------
-  mean_mat = matrix(nrow = N_clus, ncol = 2)
-  mean_mat[1,1] = -0.05
-  mean_mat[1,2] = 0.15
-  mean_mat[2,1] = -0.05
-  mean_mat[2,2] = 0.15
-  sd_mat = matrix(nrow = N_clus, ncol = 2)
-  sd_mat[1,1] = 0.1
-  sd_mat[1,2] = 0.05
-  sd_mat[2,1] = 0.1*10
-  sd_mat[2,2] = 0.05
+                          max = u_1-u_0/2 )
+  v_vec_list[[1]] = v_vec_list[[1]] - min(v_vec_list[[1]])
   
   
+  
+  
+  # Generate expected number of spikes --------------------------------------------
+  center_N_spks_mat = matrix(ncol=N_clus,nrow=2)
+  if (N_clus==2) {
+    center_N_spks_mat[1,1] = 60*10
+    center_N_spks_mat[1,2] = 40*10
+    center_N_spks_mat[2,1] = 30*10
+    center_N_spks_mat[2,2] = 70*10
+  } else{
+    stop("TODO: specify center_density_array_true")
+  }
+  
+  
+  # Generate spike density functions --------------------------------------------  
   center_density_array_true = array(dim = c(N_clus, 2, length(t_vec)))
   if (N_clus==2) {
-    center_density_array_true[1,1, ] = dnorm(x = t_vec, 
-                                             mean = mean_mat[1,1], 
-                                             sd = sd_mat[1,1]) * 1/(1+conn_patt_sep)
-    center_density_array_true[1,2, ] = dnorm(x = t_vec, 
-                                             mean = mean_mat[1,2], 
-                                             sd = sd_mat[1,2]) * conn_patt_sep/(1+conn_patt_sep)
+    mu_tmp = -u_0+u_0/10; s_tmp = u_0/10
+    mu_tmp_prime = -u_0/2+u_0/3; s_tmp_prime = u_0/3   
+    center_density_array_true[1,1, ] = (2/3)*1/(2*s_tmp)*( 1 + cos(((t_vec - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec & t_vec<=mu_tmp+s_tmp) + 
+      (1/3)*1/(2*s_tmp_prime)*( 1 + cos(((t_vec - mu_tmp_prime)/s_tmp_prime)*pi) ) * I(mu_tmp_prime-s_tmp_prime<=t_vec & t_vec<=mu_tmp_prime+s_tmp_prime)
     
-    center_density_array_true[2,1, ] = dnorm(x = t_vec, 
-                                             mean = mean_mat[2,1], 
-                                             sd = sd_mat[2,1]) * 1/(1+conn_patt_sep^(-1))
-    center_density_array_true[2,2, ] = dnorm(x = t_vec, 
-                                             mean = mean_mat[2,2], 
-                                             sd = sd_mat[2,2]) * conn_patt_sep^(-1)/(1+conn_patt_sep^(-1))
+    s_tmp = sqrt(u_1)/5
+    center_density_array_true[1,2, ] = 1/(2*s_tmp)^2*( 1 + cos(((sqrt(abs(t_vec)) - s_tmp)/s_tmp) * pi) ) * I(0<=t_vec & t_vec<=(2*s_tmp)^2) 
+    
+    mu_tmp = -u_0*(1/2); s_tmp = u_0*(1/2)
+    center_density_array_true[2,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec & t_vec<=mu_tmp+s_tmp) 
+    
+    mu_tmp = sqrt(u_1)/4+u_1/2; s_tmp = sqrt(u_1)/4
+    center_density_array_true[2,2, ] = (1)*1/(2*s_tmp)^2*( 1 + cos(((sqrt(abs(t_vec)) - s_tmp)/s_tmp)*pi) ) * I(0<=t_vec & t_vec<=(2*s_tmp)^2) +
+      (0)*1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec & t_vec<=(mu_tmp+s_tmp)^2) 
+    
+    ### Add weights for two components
+    center_density_array_true[1,1,] = center_density_array_true[1,1,]*center_N_spks_mat[1,1]/sum(center_N_spks_mat[1,1:2])
+    center_density_array_true[1,2,] = center_density_array_true[1,2,]*center_N_spks_mat[1,2]/sum(center_N_spks_mat[1,1:2])
+    center_density_array_true[2,1,] = center_density_array_true[2,1,]*center_N_spks_mat[2,1]/sum(center_N_spks_mat[2,1:2])
+    center_density_array_true[2,2,] = center_density_array_true[2,2,]*center_N_spks_mat[2,2]/sum(center_N_spks_mat[2,1:2])
+    
     
   } else {
     stop("TODO: specify center_density_array_true")
   }
   
   
-# Generate spike times ---------------------------------------------
+  # Generate spike intensity functions --------------------------------------------      
+  center_intensity_array_true = array(dim = c(N_clus, 2, length(t_vec)))
+  if (N_clus==2) {
+    center_intensity_array_true[1,1, ] = center_density_array_true[1,1,]*sum(center_N_spks_mat[1,1:2])
+    center_intensity_array_true[1,2, ] = center_density_array_true[1,2,]*sum(center_N_spks_mat[1,1:2])    
+    center_intensity_array_true[2,1, ] = center_density_array_true[2,1,]*sum(center_N_spks_mat[2,1:2])   
+    center_intensity_array_true[2,2, ] = center_density_array_true[2,2,]*sum(center_N_spks_mat[2,1:2])
+    
+  } else {
+    stop("TODO: specify center_density_array_true")
+  }
+  
+  
+  
+  # Generate spike times ---------------------------------------------
+  rejection_sampling = function(density_vec, t_vec, N_sample){
+    sample_tmp = c()
+    while(length(sample_tmp)<N_sample){
+      x_tmp = sample(1:length(t_vec), size=1)
+      y_tmp = runif(n = 1, min=0, max=max(density_vec)+1)
+      if (y_tmp <= density_vec[x_tmp]){
+        sample_tmp = c(sample_tmp, t_vec[x_tmp])
+      }
+    }
+    return(sample_tmp)
+  }
+  
+  
   stim_onset_vec = 0
   spks_time_mlist = matrix(list(),N_node,1)
   for (id_node in clus_true_list[[1]]) {
     for (j in 1:1) {
       v_tmp_1 = v_vec_list[[1]][id_node]
       v_tmp_2 = v_vec_list[[2]][id_node]
-      spks_time_mlist[id_node,j] = list(c( stim_onset_vec[j]+rnorm(# n = max(3,N_spks*1/(1+conn_patt_sep)),
-                                                                   n = max(3,rpois(n=1,lambda=N_spks*1/(1+conn_patt_sep))),
-                                                                  mean = mean_mat[1,1], sd = sd_mat[1,1])+v_tmp_1,
-                                        stim_onset_vec[j]+rnorm(# n = max(3,N_spks*conn_patt_sep/(1+conn_patt_sep)),
-                                                                n = max(3,rpois(n=1,lambda=N_spks*conn_patt_sep/(1+conn_patt_sep))),
-                                                                mean = mean_mat[1,2], sd = sd_mat[1,2])+v_tmp_2 ))
+      spks_time_mlist[id_node,j] = list(c( rejection_sampling(density_vec = center_density_array_true[1,1,], 
+                                                              t_vec = t_vec, 
+                                                              N_sample = center_N_spks_mat[1,1]+0*rpois(n=1, lambda=center_N_spks_mat[1,1]) )+
+                                             stim_onset_vec[j]+v_tmp_1,
+                                           rejection_sampling(density_vec = center_density_array_true[1,2,], 
+                                                              t_vec = t_vec, 
+                                                              N_sample = center_N_spks_mat[1,2]+0*rpois(n=1, lambda=center_N_spks_mat[1,2]) )+
+                                             stim_onset_vec[j]+v_tmp_2 ))
     }
   }
   for (id_node in clus_true_list[[2]]) {
     for (j in 1:1) {
       v_tmp_1 = v_vec_list[[1]][id_node]
       v_tmp_2 = v_vec_list[[2]][id_node]
-      spks_time_mlist[id_node,j] = list(c( stim_onset_vec[j]+rnorm(# n = max(3,N_spks*1/(1+conn_patt_sep^(-1))),
-                                                                   n = max(3,rpois(n=1,lambda=N_spks*1/(1+conn_patt_sep^(-1)))),
-                                                                   mean = mean_mat[2,1], sd = sd_mat[2,1])+v_tmp_1,
-                                        stim_onset_vec[j]+rnorm(# n = max(3,N_spks*conn_patt_sep^(-1)/(1+conn_patt_sep^(-1))),
-                                                                n = max(3,rpois(n=1,lambda=N_spks*conn_patt_sep^(-1)/(1+conn_patt_sep^(-1)))),
-                                                                mean = mean_mat[2,2], sd = sd_mat[2,2])+v_tmp_2 ))
+      spks_time_mlist[id_node,j] = list(c( rejection_sampling(density_vec = center_density_array_true[2,1,], 
+                                                              t_vec = t_vec, 
+                                                              N_sample = center_N_spks_mat[2,1]+0*rpois(n=1, lambda=center_N_spks_mat[2,1]) )+
+                                             stim_onset_vec[j]+v_tmp_1,
+                                           rejection_sampling(density_vec = center_density_array_true[2,2,], 
+                                                              t_vec = t_vec, 
+                                                              N_sample = center_N_spks_mat[2,2]+0*rpois(n=1, lambda=center_N_spks_mat[2,2]) )+
+                                             stim_onset_vec[j]+v_tmp_2  ))
       # browser()
     }
   }
   
   
   
-
-# Output ------------------------------------------------------------------
-
+  
+  # Output ------------------------------------------------------------------
+  
   
   return(list(spks_time_mlist=spks_time_mlist, 
               stim_onset_vec=stim_onset_vec,
@@ -101,8 +140,10 @@ generate_data = function(SEED=NULL,
               clus_true_list=clus_true_list,
               v_vec_list=v_vec_list, 
               center_density_array_true=center_density_array_true,
+              center_N_spks_mat=center_N_spks_mat,
+              center_intensity_array_true=center_intensity_array_true,
               t_vec=t_vec
-              ))
+  ))
   
 }
 
