@@ -38,8 +38,8 @@ select_model = function(spks_time_mlist,
     # Second term of log likelihood: \sum_{q}{ \sum_{i,m,r} \log f_{q}[ (t_{i,m,r}-v_{vis,m}) - v_{i,m} ]*tau_{i,m,q} }
     log_lik_tmp_2 = 0
     for (q in 1:N_clus_tmp) {
-      log_lik_q_vec = log(center_intensity_array_tmp[q,1,])
-      log_lik_q_vec[is.na(log_lik_q_vec)] = 0
+      log_lik_q_vec = rep(0, length(center_intensity_array_tmp[q,1,]))
+      log_lik_q_vec[which(center_intensity_array_tmp[q,1,]>=0)] = log(center_intensity_array_tmp[q,1,][which(center_intensity_array_tmp[q,1,]>=0)])
       adjst_edge_time_q_vec = c()
       for (id_node in clusters_list_tmp[[q]]) {
         id_trial = 1

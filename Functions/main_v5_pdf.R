@@ -3,22 +3,28 @@
 main_v5_pdf = function(### Parameters for generative model
                         SEED, 
                         N_node = 100,
-                        N_spks = 40,
                         N_clus=2, 
                         conn_patt_sep = 4,
-                        time_shift_rad = 0.1,
-                        v0 = 0.5, v1 = 0.5,
-                        t_vec=seq(-v1, v0, length.out=400),
+                        u_1 = 1, u_0 = 1,
+                        t_vec = seq(-u_0,u_1,length.out=200),
+                        ### params when N_clus==1:
+                        N_spks_total = 60*10+40*10,
+                        N_spks_ratio = 3/2,
+                        sd_shrinkage = 1,
+                        ### params when N_clus==2:
+                        clus_mixture = 0,
                         ### Parameters for algorithms
                         N_component=2,
                         gamma=0,
                         MaxIter=10,
                         N_clus_min=N_clus, N_clus_max=N_clus,
                         fix_timeshift=FALSE,
+                        use_true_timeshift=FALSE,
+                        jitter_prop_true_timeshift=0,
                         save_center_pdf_array=FALSE,
                         ### Unused
                         jitter_time_rad = 10, max_iter=50,
-                        conv_thres=1e-2, 
+                        conv_thres=5e-3, 
                         freq_trun_vec=NULL,
                         opt_radius=total_time/2,
                         ...)
@@ -27,20 +33,24 @@ main_v5_pdf = function(### Parameters for generative model
   # Generate data -------------------------------------------------------
   
   network_list = generate_data(SEED=SEED,
-                               N_node=N_node, 
-                               N_spks = N_spks,
-                               conn_patt_sep = conn_patt_sep,
-                               v0 = v0, v1 = v1,
-                               t_vec = t_vec,
-                               time_shift_rad = time_shift_rad )
+                               N_node=N_node,
+                               N_clus=N_clus, 
+                               u_1=u_1, u_0=u_0,
+                               t_vec=t_vec,
+                               N_spks_total = N_spks_total,
+                               N_spks_ratio = N_spks_ratio,
+                               sd_shrinkage = sd_shrinkage,
+                               clus_mixture = clus_mixture)
   
   spks_time_mlist = network_list$spks_time_mlist
   stim_onset_vec = network_list$stim_onset_vec
   
   center_density_array_true = network_list$center_density_array_true
+  center_intensity_array_true = network_list$center_intensity_array_true
   mem_true_vec = network_list$mem_true_vec
   clus_true_list = network_list$clus_true_list
   v_true_list = network_list$v_vec_list
+  t_vec = network_list$t_vec
   
 
   # Fit model for various cluster number ------------------------------------
@@ -55,29 +65,32 @@ main_v5_pdf = function(### Parameters for generative model
                    stim_onset_vec = stim_onset_vec,
                    N_clus = N_clus_tmp,
                    N_component = N_component,
-                   v0 = v0, v1 = v1,
+                   v0 = u_1, v1 = u_0,
                    t_vec = t_vec, 
-                   fix_timeshift = fix_timeshift)
+                   fix_timeshift = fix_timeshift, 
+                   use_true_timeshift = use_true_timeshift, 
+                   jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
+                   v_true_list = v_true_list)
     clusters_list_init = res$clusters_list
     v_vec_list_init = res$v_vec_list
     
+    
     # Apply algorithm ---------
     
-    clusters_list_init -> clusters_list_est
-    v_vec_list_init -> v_vec_list_est
-
     time_start = Sys.time()
     ### Estimation z,v,f based on pdf
-    res = do_cluster_pdf(spks_time_mlist = spks_time_mlist, 
-                         stim_onset_vec = stim_onset_vec, 
-                         clusters_list_init = clusters_list_est, 
-                         v_vec_list_init = v_vec_list_est,
+    res = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
+                         stim_onset_vec = stim_onset_vec,
+                         clusters_list_init = clusters_list_init,
+                         v_vec_list_init = v_vec_list_init,
                          N_component = N_component, 
                          freq_trun = Inf,
-                         MaxIter = MaxIter,
+                         MaxIter = MaxIter, 
                          gamma=gamma,
-                         t_vec=t_vec,
+                         v0 = u_1, v1= u_0,
+                         t_vec=t_vec, 
                          fix_timeshift = fix_timeshift,
+                         conv_thres = conv_thres,
                          ...)
     time_end = Sys.time()
     time_estimation = time_end - time_start
@@ -128,22 +141,35 @@ main_v5_pdf = function(### Parameters for generative model
     # Compute errors of conn patts, i.e. F ---------
     
     ### Match clusters 
-    res = find_permn(center_density_array_from = center_density_array_est,
-                     center_density_array_to = center_density_array_true)
-    permn = res$permn
+    if(N_clus>=2){
+      res = find_permn(center_density_array_from = center_density_array_est,
+                       center_density_array_to = center_density_array_true)
+      permn = res$permn
+    } else{
+      permn = 1
+    }
+    
     center_density_array_est_permn = center_density_array_est[permn, , ,drop=FALSE]
+    center_intensity_array_est_permn = center_intensity_array_est[permn, , ,drop=FALSE]
+    center_Nspks_mat_est_permn = center_Nspks_mat_est[permn, ,drop=FALSE]
     
     
     ### Calculate distance 
-    dist_mat = matrix(nrow=N_clus, ncol=N_component)
+    dist_mse_mat = matrix(nrow=N_clus, ncol=N_component)
     for (id_clus in 1:N_clus) {
       for (id_component in 1:N_component) {
-        dist_mat[id_clus,id_component] = sqrt(sum( (center_density_array_est_permn[id_clus,id_component,] - 
-                                                      center_density_array_true[id_clus,id_component,])^2 * 
-                                                     (t_vec[2]-t_vec[1]) ))
+        dist_mse_mat[id_clus,id_component] = sum( (center_density_array_est_permn[id_clus,id_component,] - 
+                                                     center_density_array_true[id_clus,id_component,])^2 * 
+                                                    (t_vec[2]-t_vec[1]) )
       }
     }
-    F_mean_sq_err = mean(dist_mat^2)
+    F_mean_sq_err = mean(dist_mse_mat)
+    F_mean_sq_err_vec = colMeans(dist_mse_mat)
+    
+    F_l2_squared_norm_mat = apply(center_density_array_true, 1:2, function(density){
+      sum(density^2 * (t_vec[2]-t_vec[1]))
+    })
+    F_mse_squarel2_ratio_vec = colMeans( dist_mse_mat / F_l2_squared_norm_mat )
     
     
     # Compute errors of clusters, i.e. Z ------------------------------------
@@ -152,27 +178,36 @@ main_v5_pdf = function(### Parameters for generative model
                       memb_true_vec = mem_true_vec)
     
 
-    # Compute error of time shifts, i.e. v --------------------------------------------
+    # Compute error of time shifts, i.e. w, v --------------------------------------------
     v_mean_sq_err = mean((unlist(v_true_list)-unlist(v_vec_list_est))^2) 
+    v_mean_sq_err_vec = sapply(1:N_component, function(id_component){
+      mean((unlist(v_true_list[[id_component]])-unlist(v_vec_list_est[[id_component]]))^2) 
+    })
+      
     
     
     
   }
   else{
     ARI=NA 
-    F_mean_sq_err=NA 
-    v_mean_sq_err=NA
+    F_mean_sq_err=F_mean_sq_err_vec=F_mse_squarel2_ratio_vec=NA 
+    v_mean_sq_err=v_mean_sq_err_vec=NA
     clusters_list_est_permn=NA
     center_density_array_est_permn=NA
+    center_intensity_array_est_permn=NA
+    center_Nspks_mat_est_permn=NA
   }
   
   # Extract network related parameters -----------------------------------------
   data_param = list(SEED=SEED,
-                    N_node=N_node, 
-                    conn_patt_sep = conn_patt_sep,
-                    v0 = v0, v1 = v1,
-                    t_vec = t_vec,
-                    time_shift_rad = time_shift_rad )
+                    N_node=N_node,
+                    N_clus=N_clus, 
+                    u_1=u_1, u_0=u_0,
+                    t_vec=t_vec,
+                    N_spks_total = N_spks_total,
+                    N_spks_ratio = N_spks_ratio,
+                    sd_shrinkage = sd_shrinkage,
+                    clus_mixture = clus_mixture)
   
   
   # Output ------------------------------------------------------------------
@@ -192,10 +227,19 @@ main_v5_pdf = function(### Parameters for generative model
               center_density_array_est_permn=switch(save_center_pdf_array, 
                                                 "TRUE"=center_density_array_est_permn,
                                                 "FALSE"=NULL),
+              center_intensity_array_est_permn=switch(save_center_pdf_array, 
+                                                      "TRUE"=center_intensity_array_est_permn,
+                                                      "FALSE"=NULL),
+              center_Nspks_mat_est_permn=switch(save_center_pdf_array, 
+                                                "TRUE"=center_Nspks_mat_est_permn,
+                                                "FALSE"=NULL),
               # estimation error
               ARI=ARI, 
               F_mean_sq_err=F_mean_sq_err, 
+              F_mean_sq_err_vec=F_mean_sq_err_vec, 
+              F_mse_squarel2_ratio_vec=F_mse_squarel2_ratio_vec,
               v_mean_sq_err=v_mean_sq_err,
+              v_mean_sq_err_vec=v_mean_sq_err_vec,
               # other
               time_estimation=time_estimation,
               N_iteration=N_iteration,

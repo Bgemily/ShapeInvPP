@@ -9,7 +9,7 @@ est_timeshift = function(spks_time_mlist,
                          freq_trun=5, 
                          v0 = 0.15, v1 = 0.1,
                          t_vec=seq(0, v0, by=0.01),
-                         step_size=0.0001,
+                         step_size = 1e-4,
                          fix_timeshift=FALSE,
                          bw_nodedsty=0.02)
 {

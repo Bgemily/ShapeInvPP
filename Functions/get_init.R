@@ -8,6 +8,8 @@ get_init = function(spks_time_mlist, stim_onset_vec,
                     v0 = 0.15, v1 = 0.1,
                     t_vec=seq(0, v0, by=0.01),
                     fix_timeshift=FALSE,
+                    use_true_timeshift=FALSE, v_true_list = NULL,
+                    jitter_prop_true_timeshift=0,
                     rmv_conn_prob=FALSE,
                     default_timeshift=0
 )
@@ -67,8 +69,18 @@ get_init = function(spks_time_mlist, stim_onset_vec,
   } else if (N_component==2) {
     # Initialize time shifts -------------
     if (fix_timeshift) {
-      v_vec = rep(default_timeshift, N_node)
-      v_vec_list = list(v_vec, v_vec)
+      if(use_true_timeshift){
+        v_vec_list = v_true_list
+        ### Jitter true time shift
+        if(jitter_prop_true_timeshift>0){
+          v_vec_list = lapply(v_vec_list, function(v_vec){
+            jitter(v_vec, amount = jitter_prop_true_timeshift*(max(v_vec)-min(v_vec)))
+          })
+        }
+      } else{
+        v_vec = rep(default_timeshift, N_node)
+        v_vec_list = list(v_vec, v_vec)
+      }
     } else{
       v_vec_list = list(rep(0,N_node), rep(0,N_node))
       spks_time_vec_list = list()

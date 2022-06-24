@@ -42,12 +42,12 @@ plot_intensity_array = function(center_intensity_array,
         filter(cluster==id_clus & component==id_component) %>%
         ggplot(aes(x=t, y=intensity_val, 
                    group=interaction(cluster,component))) +
-        geom_line(alpha=1, size=1)+
+        geom_line(alpha=1, size=1, linetype='dashed')+
         geom_line(aes(x=t, y=intensity_val_true, 
                       group=interaction(cluster,component)),
                   alpha=1,
                   color='red', size=1,
-                  linetype='dashed')+
+                  linetype='solid')+
         geom_vline(xintercept = 0, 
                    color=switch(id_component,
                                 `1`='blue',
