@@ -11,6 +11,7 @@ est_timeshift = function(spks_time_mlist,
                          t_vec=seq(0, v0, by=0.01),
                          step_size = 1e-4,
                          fix_timeshift=FALSE,
+                         fix_comp1_timeshift_only=FALSE,
                          bw_nodedsty=0.02)
 {
   t_unit = t_vec[2]-t_vec[1]
@@ -78,10 +79,20 @@ est_timeshift = function(spks_time_mlist,
                                                             spks_time_nodetrial<=max(t_vec))]
           spks_time_vec = c(spks_time_vec, spks_time_nodetrial)
         }
-        node_density = density(spks_time_vec,
-                               bw=bw_nodedsty,
-                               from=min(t_vec), to=max(t_vec),
-                               n=length(t_vec))$y
+        if (length(spks_time_vec)>=2){
+          node_density = density(spks_time_vec,
+                                 bw=bw_nodedsty,
+                                 from=min(t_vec), to=max(t_vec),
+                                 n=length(t_vec))$y
+        } else if (length(spks_time_vec)==1){
+          node_density = density(rep(spks_time_vec,2),
+                                 bw=bw_nodedsty,
+                                 from=min(t_vec), to=max(t_vec),
+                                 n=length(t_vec))$y
+        } else if (length(spks_time_vec)==0){
+          node_density = 0*t_vec
+        }
+        
         f_target = node_density
         f_origin_1 = center_density_1
         f_origin_2 = center_density_2
@@ -109,9 +120,14 @@ est_timeshift = function(spks_time_mlist,
                                             # pad = 0,
                                             periodic = TRUE)$n0_vec
           
-          v_mat_list[[1]][id_node,id_clus] = n0_tmp_vec[1]*t_unit
-          v_mat_list[[2]][id_node,id_clus] = n0_tmp_vec[2]*t_unit
           
+          if( fix_comp1_timeshift_only ){
+            v_mat_list[[1]][id_node,id_clus] = v_vec_list[[1]][id_node]
+            v_mat_list[[2]][id_node,id_clus] = n0_tmp_vec[2]*t_unit
+          } else{
+            v_mat_list[[1]][id_node,id_clus] = n0_tmp_vec[1]*t_unit
+            v_mat_list[[2]][id_node,id_clus] = n0_tmp_vec[2]*t_unit
+          }
         }
         
         

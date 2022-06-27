@@ -19,6 +19,7 @@ main_v5_pdf = function(### Parameters for generative model
                         MaxIter=10,
                         N_clus_min=N_clus, N_clus_max=N_clus,
                         fix_timeshift=FALSE,
+                        fix_comp1_timeshift_only=FALSE,
                         use_true_timeshift=FALSE,
                         jitter_prop_true_timeshift=0,
                         save_center_pdf_array=FALSE,
@@ -68,6 +69,7 @@ main_v5_pdf = function(### Parameters for generative model
                    v0 = u_1, v1 = u_0,
                    t_vec = t_vec, 
                    fix_timeshift = fix_timeshift, 
+                   fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                    use_true_timeshift = use_true_timeshift, 
                    jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
                    v_true_list = v_true_list)
@@ -89,7 +91,8 @@ main_v5_pdf = function(### Parameters for generative model
                          gamma=gamma,
                          v0 = u_1, v1= u_0,
                          t_vec=t_vec, 
-                         fix_timeshift = fix_timeshift,
+                         fix_timeshift = fix_timeshift, 
+                         fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                          conv_thres = conv_thres,
                          ...)
     time_end = Sys.time()
@@ -233,6 +236,10 @@ main_v5_pdf = function(### Parameters for generative model
               center_Nspks_mat_est_permn=switch(save_center_pdf_array, 
                                                 "TRUE"=center_Nspks_mat_est_permn,
                                                 "FALSE"=NULL),
+              # generated data
+              network_list=switch(save_center_pdf_array, 
+                                  "TRUE"=network_list,
+                                  "FALSE"=NULL),
               # estimation error
               ARI=ARI, 
               F_mean_sq_err=F_mean_sq_err, 
@@ -241,6 +248,7 @@ main_v5_pdf = function(### Parameters for generative model
               v_mean_sq_err=v_mean_sq_err,
               v_mean_sq_err_vec=v_mean_sq_err_vec,
               # other
+              t_vec=t_vec,
               time_estimation=time_estimation,
               N_iteration=N_iteration,
               loss_history=loss_history

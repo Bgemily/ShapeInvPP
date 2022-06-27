@@ -8,6 +8,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
                     v0 = 0.15, v1 = 0.1,
                     t_vec=seq(0, v0, by=0.01),
                     fix_timeshift=FALSE,
+                    fix_comp1_timeshift_only=FALSE,
                     use_true_timeshift=FALSE, v_true_list = NULL,
                     jitter_prop_true_timeshift=0,
                     rmv_conn_prob=FALSE,
@@ -73,9 +74,9 @@ get_init = function(spks_time_mlist, stim_onset_vec,
         v_vec_list = v_true_list
         ### Jitter true time shift
         if(jitter_prop_true_timeshift>0){
-          v_vec_list = lapply(v_vec_list, function(v_vec){
-            jitter(v_vec, amount = jitter_prop_true_timeshift*(max(v_vec)-min(v_vec)))
-          })
+          u_0 = v1; u_1 = v0;
+          v_vec_list[[1]] = jitter(v_vec_list[[1]], amount = jitter_prop_true_timeshift*(u_0/2-0))
+          v_vec_list[[2]] = jitter(v_vec_list[[2]], amount = jitter_prop_true_timeshift*(u_1-u_0/2-0))
         }
       } else{
         v_vec = rep(default_timeshift, N_node)
@@ -107,6 +108,10 @@ get_init = function(spks_time_mlist, stim_onset_vec,
       v_vec_list[[1]] = round(v_vec_list[[1]]/t_unit)*t_unit
       v_vec_list[[2]] = round(v_vec_list[[2]]/t_unit)*t_unit
       
+      ### Force time shifts of first component to be truth
+      if( (!fix_timeshift) & fix_comp1_timeshift_only ){
+        v_vec_list[[1]] = v_true_list[[1]]
+      }
     }
     
     
@@ -189,6 +194,10 @@ get_init = function(spks_time_mlist, stim_onset_vec,
         v_vec_list[[2]][clusters_list[[id_clus]]] = v_vec_list[[2]][clusters_list[[id_clus]]] - (quantile(v_vec_list[[2]][clusters_list[[id_clus]]], 0.0)-0)
         v_vec_list[[2]] = round(v_vec_list[[2]]/t_unit)*t_unit
         
+      }
+      ### Force time shifts of first component to be truth
+      if( (!fix_timeshift) & fix_comp1_timeshift_only ){
+        v_vec_list[[1]] = v_true_list[[1]]
       }
     }
     

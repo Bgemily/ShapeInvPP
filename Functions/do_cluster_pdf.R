@@ -13,6 +13,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
                           t_vec=seq(0, v0, length.out=200),
                           MaxIter=10, conv_thres=5e-3, 
                           fix_timeshift=FALSE,
+                          fix_comp1_timeshift_only=FALSE,
                           gamma=0.06,
                           # Unused arguments
                           N_clus=NULL, 
@@ -149,7 +150,6 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
     
     ### Estimate parameters 
     clusters_list_update = clusters_list_current = clusters_list
-    v_vec_list_update = v_vec_list_current = v_vec_list
     res = get_center_intensity_array(spks_time_mlist = spks_time_mlist, 
                                      stim_onset_vec = stim_onset_vec, 
                                      clusters_list = clusters_list, 
@@ -162,9 +162,11 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
     center_density_array = res$center_density_array
     center_Nspks_mat = res$center_Nspks_mat
     center_intensity_array = res$center_intensity_array
-    # browser()
+    v_vec_list = res$v_vec_list
+    
     center_density_array_update = center_density_array_current = center_density_array
     center_Nspks_mat_update = center_Nspks_mat_current = center_Nspks_mat
+    v_vec_list_update = v_vec_list_current = v_vec_list
     
     n_iter = 1
     stopping = FALSE
@@ -179,6 +181,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
                                v0 = v0, v1 = v1,
                                t_vec = t_vec,
                                fix_timeshift=fix_timeshift,
+                               fix_comp1_timeshift_only=fix_comp1_timeshift_only,
                                gamma=gamma,
                                ...
       )

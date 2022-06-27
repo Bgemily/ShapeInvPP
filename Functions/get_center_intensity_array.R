@@ -126,10 +126,20 @@ get_center_intensity_array = function(spks_time_mlist,
             N_spks_nodetrial_vec_q = c(N_spks_nodetrial_vec_q, length(spks_time_nodetrial))
           }
         
-          density = density(spks_time_vec,
-                            bw=bw,
-                            from=min(t_vec), to=max(t_vec),
-                            n=length(t_vec))$y
+          if(length(spks_time_vec)>=2){
+            density = density(spks_time_vec,
+                              bw=bw,
+                              from=min(t_vec), to=max(t_vec),
+                              n=length(t_vec))$y
+          } else if(length(spks_time_vec)==0) {
+            density = 0*t_vec
+          } else if(length(spks_time_vec)==1) {
+            density = density(rep(spks_time_vec,2),
+                              bw=bw,
+                              from=min(t_vec), to=max(t_vec),
+                              n=length(t_vec))$y
+          }
+          
           Y_mat_q[ , id_node_tmp] = fft(density) / length(t_vec)
           X_array_q[ , id_node_tmp, 1] = exp(-1i*2*pi*l_vec*v_vec_list[[1]][id_node]/(max(t_vec)-min(t_vec)))
           X_array_q[ , id_node_tmp, 2] = exp(-1i*2*pi*l_vec*v_vec_list[[2]][id_node]/(max(t_vec)-min(t_vec)))
@@ -156,7 +166,7 @@ get_center_intensity_array = function(spks_time_mlist,
         density_q_2 = Re(fft(beta_vec, inverse = TRUE))
         
         ### Flip two components
-        if(which.max(density_q_1)[1] > which.max(density_q_2)[1] ){
+        if(FALSE & (which.max(density_q_1)[1] > which.max(density_q_2)[1]) ){
           alpha_vec = sapply(theta_list, "[", 2)
           beta_vec = sapply(theta_list, "[", 1)
           alpha_beta_0 = sum(N_spks_nodetrial_vec_q*Y_mat_q[1,]) / sum(N_spks_nodetrial_vec_q)
@@ -180,6 +190,9 @@ get_center_intensity_array = function(spks_time_mlist,
         if(density_q_2[which(t_vec>0)[1]]<=max(density_q_2)*0.05){
           length_rmv = min(t_vec[which(density_q_2>=max(density_q_2)*0.05)]) / t_unit
           density_q_2 = c( tail(density_q_2,length(t_vec)-length_rmv), rep(tail(density_q_2,1),length_rmv) )
+          if (!fix_timeshift) {
+            v_vec_list[[2]] = v_vec_list[[2]] + length_rmv*t_unit
+          }
         }
         
         
