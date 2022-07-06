@@ -195,6 +195,11 @@ get_center_intensity_array = function(spks_time_mlist,
           }
         }
         
+        ### Force the tails of densities to be zero
+        u_1 = v0; u_0 = v1
+        density_q_1 = density_q_1 * I(t_vec<=u_1-max(v_vec_list[[1]]))
+        density_q_2 = density_q_2 * I(t_vec<=u_1-max(v_vec_list[[2]]))
+        
         
         F_hat_q = sqrt( mean(N_spks_nodetrial_vec_q^2) )
         

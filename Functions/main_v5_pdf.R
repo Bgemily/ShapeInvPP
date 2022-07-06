@@ -4,13 +4,17 @@ main_v5_pdf = function(### Parameters for generative model
                         SEED, 
                         N_node = 100,
                         N_clus=2, 
-                        conn_patt_sep = 4,
                         u_1 = 1, u_0 = 1,
-                        t_vec = seq(-u_0,u_1,length.out=200),
+                        t_vec = seq(-u_0,u_1,by=0.01),
+                        t_vec_extend = t_vec,
                         ### params when N_clus==1:
                         N_spks_total = 60*10+40*10,
                         N_spks_ratio = 3/2,
                         sd_shrinkage = 1,
+                        c_1 = 0, delta_1 = 0,
+                        c_2 = 0, delta_2 = 0,
+                        c_3 = 0, delta_3 = 0,
+                        identical_components = FALSE,
                         ### params when N_clus==2:
                         clus_mixture = 0,
                         ### Parameters for algorithms
@@ -30,18 +34,26 @@ main_v5_pdf = function(### Parameters for generative model
                         opt_radius=total_time/2,
                         ...)
 {
-  
+  t_unit = t_vec[2]-t_vec[1]
   # Generate data -------------------------------------------------------
+  ### Extract network related parameters 
+  data_param = list(SEED=SEED,
+                    N_node=N_node,
+                    N_clus=N_clus, 
+                    u_1=u_1, u_0=u_0,
+                    t_vec=t_vec,
+                    t_vec_extend=t_vec_extend,
+                    N_spks_total = N_spks_total,
+                    N_spks_ratio = N_spks_ratio,
+                    sd_shrinkage = sd_shrinkage,
+                    c_1 = c_1, delta_1 = delta_1,
+                    c_2 = c_2, delta_2 = delta_2,
+                    c_3 = c_3, delta_3 = delta_3,
+                    identical_components = identical_components,
+                    clus_mixture = clus_mixture)
   
-  network_list = generate_data(SEED=SEED,
-                               N_node=N_node,
-                               N_clus=N_clus, 
-                               u_1=u_1, u_0=u_0,
-                               t_vec=t_vec,
-                               N_spks_total = N_spks_total,
-                               N_spks_ratio = N_spks_ratio,
-                               sd_shrinkage = sd_shrinkage,
-                               clus_mixture = clus_mixture)
+  network_list = do.call(what = generate_data, args = data_param)
+  
   
   spks_time_mlist = network_list$spks_time_mlist
   stim_onset_vec = network_list$stim_onset_vec
@@ -51,7 +63,6 @@ main_v5_pdf = function(### Parameters for generative model
   mem_true_vec = network_list$mem_true_vec
   clus_true_list = network_list$clus_true_list
   v_true_list = network_list$v_vec_list
-  t_vec = network_list$t_vec
   
 
   # Fit model for various cluster number ------------------------------------
@@ -91,6 +102,7 @@ main_v5_pdf = function(### Parameters for generative model
                          gamma=gamma,
                          v0 = u_1, v1= u_0,
                          t_vec=t_vec, 
+                         t_vec_extend=t_vec_extend,
                          fix_timeshift = fix_timeshift, 
                          fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                          conv_thres = conv_thres,
@@ -163,14 +175,14 @@ main_v5_pdf = function(### Parameters for generative model
       for (id_component in 1:N_component) {
         dist_mse_mat[id_clus,id_component] = sum( (center_density_array_est_permn[id_clus,id_component,] - 
                                                      center_density_array_true[id_clus,id_component,])^2 * 
-                                                    (t_vec[2]-t_vec[1]) )
+                                                    t_unit )
       }
     }
     F_mean_sq_err = mean(dist_mse_mat)
     F_mean_sq_err_vec = colMeans(dist_mse_mat)
     
     F_l2_squared_norm_mat = apply(center_density_array_true, 1:2, function(density){
-      sum(density^2 * (t_vec[2]-t_vec[1]))
+      sum(density^2 * t_unit)
     })
     F_mse_squarel2_ratio_vec = colMeans( dist_mse_mat / F_l2_squared_norm_mat )
     
@@ -200,17 +212,6 @@ main_v5_pdf = function(### Parameters for generative model
     center_intensity_array_est_permn=NA
     center_Nspks_mat_est_permn=NA
   }
-  
-  # Extract network related parameters -----------------------------------------
-  data_param = list(SEED=SEED,
-                    N_node=N_node,
-                    N_clus=N_clus, 
-                    u_1=u_1, u_0=u_0,
-                    t_vec=t_vec,
-                    N_spks_total = N_spks_total,
-                    N_spks_ratio = N_spks_ratio,
-                    sd_shrinkage = sd_shrinkage,
-                    clus_mixture = clus_mixture)
   
   
   # Output ------------------------------------------------------------------
@@ -248,7 +249,7 @@ main_v5_pdf = function(### Parameters for generative model
               v_mean_sq_err=v_mean_sq_err,
               v_mean_sq_err_vec=v_mean_sq_err_vec,
               # other
-              t_vec=t_vec,
+              t_vec=t_vec, t_vec_extend=t_vec_extend,
               time_estimation=time_estimation,
               N_iteration=N_iteration,
               loss_history=loss_history

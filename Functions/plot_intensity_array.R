@@ -70,7 +70,8 @@ plot_intensity_array = function(center_intensity_array,
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank(),
               plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))  + 
-        coord_cartesian(ylim=range(center_intensity_array))
+        coord_cartesian(ylim=range(c(center_intensity_array,
+                                     center_intensity_array_true)))
       
       g_list = c(g_list, list(g))
     }

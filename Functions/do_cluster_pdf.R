@@ -7,16 +7,17 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
                           v_vec_init=NULL,
                           v_vec_list_init=NULL,
                           # Tuning parameter
+                          N_clus=length(clusters_list_init), 
                           N_component=1,
                           freq_trun=5, 
                           v0 = 0.15, v1 = 0.1,
                           t_vec=seq(0, v0, length.out=200),
+                          t_vec_extend=t_vec,
                           MaxIter=10, conv_thres=5e-3, 
                           fix_timeshift=FALSE,
                           fix_comp1_timeshift_only=FALSE,
                           gamma=0.06,
                           # Unused arguments
-                          N_clus=NULL, 
                           n0_vec_list_init=NULL,
                           opt_radius=max(t_vec)/2,
                           ...)
@@ -24,6 +25,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
   if(is.matrix(stim_onset_vec)){
     stim_onset_vec = stim_onset_vec[,1]
   }
+  
   
   t_unit = t_vec[2] - t_vec[1]
   N_node = nrow(spks_time_mlist)
@@ -243,6 +245,38 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
     center_intensity_array = center_intensity_array
     v_vec_list_current -> v_vec_list
     
+    
+    ### Extend estimated densities and intensities to t_vec_extend
+    if (length(t_vec)<length(t_vec_extend)){
+      center_intensity_array_extend = array(dim=c(N_clus, N_component, length(t_vec_extend)))
+      center_density_array_extend = array(dim=c(N_clus, N_component, length(t_vec_extend)))
+      center_Nspks_mat_extend = matrix(nrow=N_clus, ncol=N_component)
+      for (id_clus in 1:N_clus) {
+        intensity_q_1 = center_intensity_array[id_clus, 1, ]
+        u_0 = v1; u_1 = v0;
+        intensity_q_1 = c(rep(0,length(t_vec_extend)-length(t_vec)),
+                          intensity_q_1 )
+        N_spks_q_1 = sum(intensity_q_1*t_unit)
+        
+        intensity_q_2 = center_intensity_array[id_clus, 2, ]
+        intensity_q_2 = c(rep(0,length(t_vec_extend)-length(t_vec)),
+                          intensity_q_2 )
+        N_spks_q_2 = sum(intensity_q_2*t_unit)
+        
+        
+        center_intensity_array_extend[id_clus, 1, ] = intensity_q_1
+        center_intensity_array_extend[id_clus, 2, ] = intensity_q_2
+        center_Nspks_mat_extend[id_clus, 1] = N_spks_q_1
+        center_Nspks_mat_extend[id_clus, 2] = N_spks_q_2
+        center_density_array_extend[id_clus, 1, ] = intensity_q_1/(N_spks_q_1+N_spks_q_2)
+        center_density_array_extend[id_clus, 2, ] = intensity_q_2/(N_spks_q_1+N_spks_q_2)
+      }
+      center_intensity_array = center_intensity_array_extend
+      center_Nspks_mat = center_Nspks_mat_extend
+      center_density_array = center_density_array_extend
+    }
+    
+    
   }
   
   
@@ -255,6 +289,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
               v_vec=v_vec,
               v_vec_list=v_vec_list,
               t_vec=t_vec,
+              t_vec_extend=t_vec_extend,
               N_iteration=N_iteration))
   
 }
