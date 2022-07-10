@@ -1,14 +1,16 @@
-
 ### Generate synthetic networks
 generate_data = function(SEED=NULL,
                          N_node=100, 
+                         N_replicate=1,
                          N_clus=2, 
                          clus_size_vec = rep(N_node/N_clus, N_clus),
                          u_1 = 1, u_0 = 1,
                          t_vec = seq(-u_0,u_1,by=0.01),
                          t_vec_extend = t_vec,
+                         N_spks_total = 1000,
+                         ### params when N_clus==4:
+                         clus_sep = 2,
                          ### params when N_clus==1:
-                         N_spks_total = 60*10+40*10,
                          N_spks_ratio = 3/2,
                          sd_shrinkage = 1,
                          c_1 = 0, delta_1 = 0,
@@ -34,21 +36,31 @@ generate_data = function(SEED=NULL,
   v_vec_list[[2]] = runif(n = N_node,
                           min = 0,
                           max = u_1-u_0/2 )
-  v_vec_list[[1]] = v_vec_list[[1]] - min(v_vec_list[[1]])
-  
+  for(id_clus in 1:N_clus){
+    v_vec_list[[1]][clus_true_list[[id_clus]]] = v_vec_list[[1]][clus_true_list[[id_clus]]] - min(v_vec_list[[1]][clus_true_list[[id_clus]]])
+  }
   
   
   
   # Generate expected number of spikes --------------------------------------------
   center_N_spks_mat = matrix(nrow=N_clus,ncol=2)
   if (N_clus==2) {
-    center_N_spks_mat[1,1] = 60*10
-    center_N_spks_mat[1,2] = 40*10
-    center_N_spks_mat[2,1] = 30*10
-    center_N_spks_mat[2,2] = 70*10
+    center_N_spks_mat[1,1] = N_spks_total*0.6
+    center_N_spks_mat[1,2] = N_spks_total*0.4
+    center_N_spks_mat[2,1] = N_spks_total*0.3
+    center_N_spks_mat[2,2] = N_spks_total*0.7
   } else if (N_clus==1){
     center_N_spks_mat[1,1] = N_spks_total*(N_spks_ratio/(N_spks_ratio+1))
     center_N_spks_mat[1,2] = N_spks_total*(1/(N_spks_ratio+1))
+  } else if (N_clus==4){
+    center_N_spks_mat[1,1] = N_spks_total*0.5
+    center_N_spks_mat[1,2] = N_spks_total*0.5
+    center_N_spks_mat[2,1] = N_spks_total*0.5
+    center_N_spks_mat[2,2] = N_spks_total*0.5
+    center_N_spks_mat[3,1] = N_spks_total*0.5
+    center_N_spks_mat[3,2] = N_spks_total*0.5
+    center_N_spks_mat[4,1] = N_spks_total*0.5
+    center_N_spks_mat[4,2] = N_spks_total*0.5
   } else{
     stop("TODO: specify center_density_array_true")
   }
@@ -110,13 +122,49 @@ generate_data = function(SEED=NULL,
                                                 length(which(t_vec_extend >= 0)))
       )
     }
-
+    
     ### Add weights for two components
     center_density_array_true[1,1,] = center_density_array_true[1,1,]*center_N_spks_mat[1,1]/sum(center_N_spks_mat[1,1:2])
     center_density_array_true[1,2,] = center_density_array_true[1,2,]*center_N_spks_mat[1,2]/sum(center_N_spks_mat[1,1:2])
     
     
-
+    
+  } else if (N_clus==4) {
+    ## Clus 1
+    s_tmp = u_0*(1/8)*1; mu_tmp = -u_0*(1/2) 
+    center_density_array_true[1,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
+    
+    s_tmp = sqrt(u_1)*(1/4/sqrt(2))*1; mu_tmp = u_1/2+s_tmp 
+    center_density_array_true[1,2, ] = (1)*1/(2*s_tmp)^2*( 1 + cos(((sqrt(abs(t_vec_extend)) - s_tmp)/s_tmp)*pi) ) * I(0<=t_vec_extend & t_vec_extend<=(2*s_tmp)^2) +
+      (0)*1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
+    ## Clus 2
+    s_tmp = u_0*(1/8)*clus_sep; mu_tmp = -u_0*(1/2); 
+    center_density_array_true[2,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
+    
+    s_tmp = sqrt(u_1)*(1/4/sqrt(2))*sqrt(clus_sep); mu_tmp = u_1/2+s_tmp; 
+    center_density_array_true[2,2, ] = (1)*1/(2*s_tmp)^2*( 1 + cos(((sqrt(abs(t_vec_extend)) - s_tmp)/s_tmp)*pi) ) * I(0<=t_vec_extend & t_vec_extend<=(2*s_tmp)^2) +
+      (0)*1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
+    ## Clus 3
+    s_tmp = u_0*(1/8)*(clus_sep^2); mu_tmp = -u_0*(1/2); 
+    center_density_array_true[3,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
+    
+    s_tmp = sqrt(u_1)*(1/4/sqrt(2))*sqrt(clus_sep^2); mu_tmp = u_1/2+s_tmp; 
+    center_density_array_true[3,2, ] = (1)*1/(2*s_tmp)^2*( 1 + cos(((sqrt(abs(t_vec_extend)) - s_tmp)/s_tmp)*pi) ) * I(0<=t_vec_extend & t_vec_extend<=(2*s_tmp)^2) +
+      (0)*1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
+    ## Clus 4
+    s_tmp = u_0*(1/8)*1; mu_tmp = -u_0*(1/2) 
+    center_density_array_true[4,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
+    
+    s_tmp = sqrt(u_1)*(1/4/sqrt(2))*sqrt(clus_sep^2); mu_tmp = u_1/2+s_tmp; 
+    center_density_array_true[4,2, ] = (1)*1/(2*s_tmp)^2*( 1 + cos(((sqrt(abs(t_vec_extend)) - s_tmp)/s_tmp)*pi) ) * I(0<=t_vec_extend & t_vec_extend<=(2*s_tmp)^2) +
+      (0)*1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
+    
+    ### Add weights (prop to N_spks) for two components
+    for (id_clus in 1:N_clus){
+      center_density_array_true[id_clus,1,] = center_density_array_true[id_clus,1,]*center_N_spks_mat[id_clus,1]/sum(center_N_spks_mat[id_clus,1:2])
+      center_density_array_true[id_clus,2,] = center_density_array_true[id_clus,2,]*center_N_spks_mat[id_clus,2]/sum(center_N_spks_mat[id_clus,1:2])
+    }
+    
   } else {
     stop("TODO: specify center_density_array_true")
   }
@@ -124,16 +172,9 @@ generate_data = function(SEED=NULL,
   
   # Generate spike intensity functions --------------------------------------------      
   center_intensity_array_true = array(dim = c(N_clus, 2, length(t_vec_extend)))
-  if (N_clus==2) {
-    center_intensity_array_true[1,1, ] = center_density_array_true[1,1,]*sum(center_N_spks_mat[1,1:2])
-    center_intensity_array_true[1,2, ] = center_density_array_true[1,2,]*sum(center_N_spks_mat[1,1:2])    
-    center_intensity_array_true[2,1, ] = center_density_array_true[2,1,]*sum(center_N_spks_mat[2,1:2])   
-    center_intensity_array_true[2,2, ] = center_density_array_true[2,2,]*sum(center_N_spks_mat[2,1:2])
-  } else if (N_clus==1){
-    center_intensity_array_true[1,1, ] = center_density_array_true[1,1,]*sum(center_N_spks_mat[1,1:2])
-    center_intensity_array_true[1,2, ] = center_density_array_true[1,2,]*sum(center_N_spks_mat[1,1:2])    
-  } else {
-    stop("TODO: specify center_density_array_true")
+  for (id_clus in 1:N_clus){
+    center_intensity_array_true[id_clus,1, ] = center_density_array_true[id_clus,1,]*sum(center_N_spks_mat[id_clus,1:2])
+    center_intensity_array_true[id_clus,2, ] = center_density_array_true[id_clus,2,]*sum(center_N_spks_mat[id_clus,1:2])    
   }
   
   
@@ -211,4 +252,3 @@ generate_data = function(SEED=NULL,
   ))
   
 }
-

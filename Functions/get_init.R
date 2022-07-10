@@ -11,6 +11,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
                     fix_comp1_timeshift_only=FALSE,
                     use_true_timeshift=FALSE, v_true_list = NULL,
                     jitter_prop_true_timeshift=0,
+                    fix_membership=FALSE,
                     rmv_conn_prob=FALSE,
                     default_timeshift=0
 )
@@ -116,76 +117,83 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     
     
     # Initialize clusters -------------
-    node_intensity_array = array(dim=c(N_node, 1, length(t_vec)))
-    node_density_array = array(dim=c(N_node, 1, length(t_vec)))
-    node_Nspks_mat = matrix(nrow=N_node, ncol=1)
-    for (id_node in 1:N_node) {
-      intensity_tmp = rep(0, length(t_vec))
-      density_tmp = rep(0, length(t_vec))
-      F_hat_tmp = 0
-      
-      
-      spks_time_vec_tmp = c()
-      N_spks_nodetrial_vec_tmp = c()
-      for (id_trial in 1:N_trial) {
-        spks_time_tmp = unlist(spks_time_mlist[id_node,id_trial]) - stim_onset_vec[id_trial]
-        spks_time_tmp_1 = spks_time_tmp[which(spks_time_tmp>=(min(t_vec)+v_vec_list[[1]][id_node]) & 
-                                                spks_time_tmp<=(0+v_vec_list[[2]][id_node]))]
-        spks_time_tmp_1_shifted = spks_time_tmp_1 - v_vec_list[[1]][id_node]
-        
-        spks_time_tmp_2 = spks_time_tmp[which(spks_time_tmp>(0+v_vec_list[[2]][id_node]) & 
-                                                spks_time_tmp<=max(t_vec))]
-        spks_time_tmp_2_shifted = spks_time_tmp_2 - v_vec_list[[2]][id_node]
+    if (fix_membership) {
+      membership_vec = rep(1:N_clus, rep(N_node/N_clus,N_clus))      
+      clusters_list = mem2clus(membership_vec, N_clus_min = N_clus)
+    } else {
+      node_intensity_array = array(dim=c(N_node, 1, length(t_vec)))
+      node_density_array = array(dim=c(N_node, 1, length(t_vec)))
+      node_Nspks_mat = matrix(nrow=N_node, ncol=1)
+      for (id_node in 1:N_node) {
+        intensity_tmp = rep(0, length(t_vec))
+        density_tmp = rep(0, length(t_vec))
+        F_hat_tmp = 0
         
         
-        spks_time_tmp = c(spks_time_tmp_1_shifted, spks_time_tmp_2_shifted)
+        spks_time_vec_tmp = c()
+        N_spks_nodetrial_vec_tmp = c()
+        for (id_trial in 1:N_trial) {
+          spks_time_tmp = unlist(spks_time_mlist[id_node,id_trial]) - stim_onset_vec[id_trial]
+          spks_time_tmp_1 = spks_time_tmp[which(spks_time_tmp>=(min(t_vec)+v_vec_list[[1]][id_node]) & 
+                                                  spks_time_tmp<=(0+v_vec_list[[2]][id_node]))]
+          spks_time_tmp_1_shifted = spks_time_tmp_1 - v_vec_list[[1]][id_node]
+          
+          spks_time_tmp_2 = spks_time_tmp[which(spks_time_tmp>(0+v_vec_list[[2]][id_node]) & 
+                                                  spks_time_tmp<=max(t_vec))]
+          spks_time_tmp_2_shifted = spks_time_tmp_2 - v_vec_list[[2]][id_node]
+          
+          
+          spks_time_tmp = c(spks_time_tmp_1_shifted, spks_time_tmp_2_shifted)
+          
+          spks_time_vec_tmp = c(spks_time_vec_tmp, spks_time_tmp)
+          N_spks_nodetrial_vec_tmp = c(N_spks_nodetrial_vec_tmp, length(spks_time_tmp))
+        }
         
-        spks_time_vec_tmp = c(spks_time_vec_tmp, spks_time_tmp)
-        N_spks_nodetrial_vec_tmp = c(N_spks_nodetrial_vec_tmp, length(spks_time_tmp))
+        
+        if (length(spks_time_vec_tmp)>0) {
+          fft_res = get_adaptive_fft(event_time_vec = spks_time_vec_tmp, 
+                                     freq_trun_max = Inf, 
+                                     t_vec = t_vec)
+          fft_tmp = fft_res$fft_vec_best
+        } else{
+          fft_tmp = rep(0,length(t_vec))
+        }
+        intensity_tmp = Re(fft(fft_tmp, inverse = TRUE))
+        
+        N_spks_q = length(spks_time_vec_tmp)
+        if (N_spks_q>0) {
+          density_tmp = intensity_tmp / N_spks_q
+        } else{
+          density_tmp = intensity_tmp*0
+        }
+        
+        F_hat_tmp = sqrt( mean(N_spks_nodetrial_vec_tmp^2) )
+        
+        intensity_tmp = density_tmp*F_hat_tmp
+        
+        
+        
+        node_intensity_array[id_node,1,] = intensity_tmp
+        node_density_array[id_node,1,] = density_tmp
+        node_Nspks_mat[id_node,1] = F_hat_tmp
       }
       
-      
-      if (length(spks_time_vec_tmp)>0) {
-        fft_res = get_adaptive_fft(event_time_vec = spks_time_vec_tmp, 
-                                   freq_trun_max = Inf, 
-                                   t_vec = t_vec)
-        fft_tmp = fft_res$fft_vec_best
+      if (rmv_conn_prob){
+        membership = kmeans(x=node_density_array[,1,], centers = N_clus, nstart = 5)$cluster
       } else{
-        fft_tmp = rep(0,length(t_vec))
-      }
-      intensity_tmp = Re(fft(fft_tmp, inverse = TRUE))
-      
-      N_spks_q = length(spks_time_vec_tmp)
-      if (N_spks_q>0) {
-        density_tmp = intensity_tmp / N_spks_q
-      } else{
-        density_tmp = intensity_tmp*0
+        membership = kmeans(x=node_intensity_array[,1,], centers = N_clus, nstart = 5)$cluster
       }
       
-      F_hat_tmp = sqrt( mean(N_spks_nodetrial_vec_tmp^2) )
-      
-      intensity_tmp = density_tmp*F_hat_tmp
-      
-      
-      
-      node_intensity_array[id_node,1,] = intensity_tmp
-      node_density_array[id_node,1,] = density_tmp
-      node_Nspks_mat[id_node,1] = F_hat_tmp
+      clusters = mem2clus(membership = membership, N_clus_min = N_clus)
+      clusters_list = clusters
+      membership_vec = membership
       
     }
     
     
-    if (rmv_conn_prob){
-      membership = kmeans(x=node_density_array[,1,], centers = N_clus, nstart = 5)$cluster
-    } else{
-      membership = kmeans(x=node_intensity_array[,1,], centers = N_clus, nstart = 5)$cluster
-    }
     
     
-    clusters = mem2clus(membership = membership, N_clus_min = N_clus)
-    clusters_list = clusters
-    membership_vec = membership
-    
+    ### Force minimum time shifts in each (cluster, component) to be zero
     if (!fix_timeshift) {
       for (id_clus in 1:N_clus) {
         v_vec_list[[1]][clusters_list[[id_clus]]] = v_vec_list[[1]][clusters_list[[id_clus]]] - (quantile(v_vec_list[[1]][clusters_list[[id_clus]]], 0.0)-0)
@@ -204,9 +212,9 @@ get_init = function(spks_time_mlist, stim_onset_vec,
   }
   
   
-  return(list(membership_vec=membership_vec, 
-              v_vec=v_vec,
+  return(list(v_vec=v_vec,
               v_vec_list=v_vec_list,
+              membership_vec=membership_vec, 
               clusters_list=clusters_list))
 }
 

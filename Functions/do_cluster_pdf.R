@@ -16,6 +16,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
                           MaxIter=10, conv_thres=5e-3, 
                           fix_timeshift=FALSE,
                           fix_comp1_timeshift_only=FALSE,
+                          fix_membership=FALSE,
                           gamma=0.06,
                           # Unused arguments
                           n0_vec_list_init=NULL,
@@ -184,6 +185,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
                                t_vec = t_vec,
                                fix_timeshift=fix_timeshift,
                                fix_comp1_timeshift_only=fix_comp1_timeshift_only,
+                               fix_membership=fix_membership,
                                gamma=gamma,
                                ...
       )
@@ -268,8 +270,8 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
         center_intensity_array_extend[id_clus, 2, ] = intensity_q_2
         center_Nspks_mat_extend[id_clus, 1] = N_spks_q_1
         center_Nspks_mat_extend[id_clus, 2] = N_spks_q_2
-        center_density_array_extend[id_clus, 1, ] = intensity_q_1/(N_spks_q_1+N_spks_q_2)
-        center_density_array_extend[id_clus, 2, ] = intensity_q_2/(N_spks_q_1+N_spks_q_2)
+        center_density_array_extend[id_clus, 1, ] = intensity_q_1/(N_spks_q_1+N_spks_q_2+.Machine$double.eps)
+        center_density_array_extend[id_clus, 2, ] = intensity_q_2/(N_spks_q_1+N_spks_q_2+.Machine$double.eps)
       }
       center_intensity_array = center_intensity_array_extend
       center_Nspks_mat = center_Nspks_mat_extend

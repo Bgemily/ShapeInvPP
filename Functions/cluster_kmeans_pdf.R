@@ -12,6 +12,7 @@ cluster_kmeans_pdf = function(spks_time_mlist,
                               t_vec=seq(0, v0, by=0.01),
                               fix_timeshift=FALSE,
                               fix_comp1_timeshift_only=FALSE,
+                              fix_membership=FALSE,
                               gamma=0.06,
                               # Unused arguments
                               order_list=NULL, 
@@ -218,31 +219,31 @@ cluster_kmeans_pdf = function(spks_time_mlist,
       dist_mat[,id_clus] = dist_vec
     }
     
-    ### Debug
-    # dist_to_centr_vec = numeric(N_node)
-    # mem = clus2mem(clusters_list)
-    # for (i in 1:N_node) {
-    #   mem_tmp = mem[i]
-    #   dist_to_centr_vec[i] = dist_mat[i, mem_tmp]
-    # }
-    # l2_loss_2 = sum(dist_to_centr_vec)
-    # print(l2_loss_2)
-    
-    
+
     ### Choose memberships 
-    membership = numeric(N_node)
-    dist_to_centr_vec = numeric(N_node)
-    for (i in 1:N_node) {
-      dist_vec_tmp = dist_mat[i, ]
-      mem_tmp = which.min(dist_vec_tmp)
-      if(length(mem_tmp)>1){
-        mem_tmp = sample(mem_tmp, 1)
+    if(fix_membership==TRUE){
+      dist_to_centr_vec = numeric(N_node)
+      for(id_clus in 1:N_clus){
+        dist_to_centr_vec[clusters_list[[id_clus]]] = dist_mat[clusters_list[[id_clus]], id_clus]
       }
-      membership[i] = mem_tmp
-      dist_to_centr_vec[i] = min(dist_vec_tmp)
+      clusters_list = clusters_list
+      l2_loss = sum(dist_to_centr_vec)
+    } else {
+      membership = numeric(N_node)
+      dist_to_centr_vec = numeric(N_node)
+      for (i in 1:N_node) {
+        dist_vec_tmp = dist_mat[i, ]
+        mem_tmp = which.min(dist_vec_tmp)
+        if(length(mem_tmp)>1){
+          mem_tmp = sample(mem_tmp, 1)
+        }
+        membership[i] = mem_tmp
+        dist_to_centr_vec[i] = min(dist_vec_tmp)
+      }
+      clusters_list = mem2clus(membership = membership, N_clus_min = N_clus)
+      l2_loss = sum(dist_to_centr_vec)
     }
-    clusters_list = mem2clus(membership = membership, N_clus_min = N_clus)
-    l2_loss = sum(dist_to_centr_vec)
+    
     ### Debug:
     # print(l2_loss)
     

@@ -16,32 +16,32 @@ results[[id_res]]$v_mean_sq_err_vec
 results[[3]]$data_param
 results[[3]]$data_param$SEED -> SEED
 
-res = main_v5_pdf(SEED = SEED,
-                  N_node = 100, 
-                  N_clus = 1, 
+
+res = main_v5_pdf(SEED = 831,
+                  N_node = 40, 
+                  N_clus = 4, 
                   u_1 = 1, u_0 = 1, 
                   t_vec = seq(-1, 1, by=0.01),
                   t_vec_extend = seq(-3/2, 1, by=0.01),
+                  clus_sep=1,
                   ### params when N_clus==1:
                   N_spks_total = 1000,
                   N_spks_ratio = 1,
                   sd_shrinkage = 2.5,
-                  c_1 = 0.2, delta_1 = 0.4,
-                  # c_2 = 0.1, delta_2 = 0.2,
-                  # c_3 = 0.2, delta_3 = 0.4,
-                  # identical_components = TRUE,
                   ### params when N_clus==2:
                   clus_mixture = 0,
                   ### Parameters for algorithms
+                  fix_membership = TRUE,
                   fix_timeshift=FALSE,
                   use_true_timeshift = TRUE,
                   jitter_prop_true_timeshift = 0,
                   save_center_pdf_array=TRUE )
 
+
 res$F_mse_squarel2_ratio_vec
 res$F_mean_sq_err_vec
 res$v_mean_sq_err_vec
-
+res$ARI
 
 tmp = plot_intensity_array(center_intensity_array = res$center_density_array_est_permn,
                            center_Nspks_mat = res$center_Nspks_mat_est_permn,

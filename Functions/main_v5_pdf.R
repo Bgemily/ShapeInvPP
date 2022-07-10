@@ -3,12 +3,15 @@
 main_v5_pdf = function(### Parameters for generative model
                         SEED, 
                         N_node = 100,
+                        N_replicate = 1,
                         N_clus=2, 
                         u_1 = 1, u_0 = 1,
                         t_vec = seq(-u_0,u_1,by=0.01),
                         t_vec_extend = t_vec,
+                        N_spks_total = 1000,
+                        ### params when N_clus==4:
+                        clus_sep = 2,
                         ### params when N_clus==1:
-                        N_spks_total = 60*10+40*10,
                         N_spks_ratio = 3/2,
                         sd_shrinkage = 1,
                         c_1 = 0, delta_1 = 0,
@@ -26,6 +29,7 @@ main_v5_pdf = function(### Parameters for generative model
                         fix_comp1_timeshift_only=FALSE,
                         use_true_timeshift=FALSE,
                         jitter_prop_true_timeshift=0,
+                        fix_membership=FALSE,
                         save_center_pdf_array=FALSE,
                         ### Unused
                         jitter_time_rad = 10, max_iter=50,
@@ -39,11 +43,13 @@ main_v5_pdf = function(### Parameters for generative model
   ### Extract network related parameters 
   data_param = list(SEED=SEED,
                     N_node=N_node,
+                    N_replicate=N_replicate,
                     N_clus=N_clus, 
                     u_1=u_1, u_0=u_0,
                     t_vec=t_vec,
                     t_vec_extend=t_vec_extend,
                     N_spks_total = N_spks_total,
+                    clus_sep = clus_sep,
                     N_spks_ratio = N_spks_ratio,
                     sd_shrinkage = sd_shrinkage,
                     c_1 = c_1, delta_1 = delta_1,
@@ -83,6 +89,7 @@ main_v5_pdf = function(### Parameters for generative model
                    fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                    use_true_timeshift = use_true_timeshift, 
                    jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
+                   fix_membership = fix_membership,
                    v_true_list = v_true_list)
     clusters_list_init = res$clusters_list
     v_vec_list_init = res$v_vec_list
@@ -105,6 +112,7 @@ main_v5_pdf = function(### Parameters for generative model
                          t_vec_extend=t_vec_extend,
                          fix_timeshift = fix_timeshift, 
                          fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                         fix_membership = fix_membership,
                          conv_thres = conv_thres,
                          ...)
     time_end = Sys.time()
@@ -167,6 +175,7 @@ main_v5_pdf = function(### Parameters for generative model
     center_density_array_est_permn = center_density_array_est[permn, , ,drop=FALSE]
     center_intensity_array_est_permn = center_intensity_array_est[permn, , ,drop=FALSE]
     center_Nspks_mat_est_permn = center_Nspks_mat_est[permn, ,drop=FALSE]
+    clusters_list_est_permn = clusters_list_est[permn]
     
     
     ### Calculate distance 
@@ -184,11 +193,15 @@ main_v5_pdf = function(### Parameters for generative model
     F_l2_squared_norm_mat = apply(center_density_array_true, 1:2, function(density){
       sum(density^2 * t_unit)
     })
-    F_mse_squarel2_ratio_vec = colMeans( dist_mse_mat / F_l2_squared_norm_mat )
+    F_mse_squarel2_ratio_mat =  dist_mse_mat / F_l2_squared_norm_mat 
+    
+    weight_vec = sapply(clusters_list_est_permn, length) / length(unlist(clusters_list_est_permn))
+    F_mse_squarel2_ratio = sum( rowMeans(F_mse_squarel2_ratio_mat) * weight_vec )
+    
+    # F_mse_squarel2_ratio_vec = colMeans( dist_mse_mat / F_l2_squared_norm_mat )
     
     
     # Compute errors of clusters, i.e. Z ------------------------------------
-    clusters_list_est_permn = clusters_list_est[permn]
     ARI = get_one_ARI(memb_est_vec = clus2mem(clusters_list_est), 
                       memb_true_vec = mem_true_vec)
     
@@ -205,7 +218,8 @@ main_v5_pdf = function(### Parameters for generative model
   }
   else{
     ARI=NA 
-    F_mean_sq_err=F_mean_sq_err_vec=F_mse_squarel2_ratio_vec=NA 
+    F_mean_sq_err=F_mean_sq_err_vec=F_mse_squarel2_ratio=NA
+    F_mse_squarel2_ratio_mat = dist_mse_mat = NA
     v_mean_sq_err=v_mean_sq_err_vec=NA
     clusters_list_est_permn=NA
     center_density_array_est_permn=NA
@@ -245,7 +259,9 @@ main_v5_pdf = function(### Parameters for generative model
               ARI=ARI, 
               F_mean_sq_err=F_mean_sq_err, 
               F_mean_sq_err_vec=F_mean_sq_err_vec, 
-              F_mse_squarel2_ratio_vec=F_mse_squarel2_ratio_vec,
+              F_mse_squarel2_ratio=F_mse_squarel2_ratio,
+              F_mse_squarel2_ratio_mat =  F_mse_squarel2_ratio_mat,
+              dist_mse_mat = dist_mse_mat,
               v_mean_sq_err=v_mean_sq_err,
               v_mean_sq_err_vec=v_mean_sq_err_vec,
               # other
