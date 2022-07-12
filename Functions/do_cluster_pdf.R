@@ -1,15 +1,16 @@
-### Input: spks_time_mlist: N_node * N_trial with each element being a list of spike times
+### Input: spks_time_mlist: N_node * N_replicate with each element being a list of spike times
 ### Perform algorithm based on intensities 
 do_cluster_pdf = function(spks_time_mlist, stim_onset_vec, 
                           reaction_time_vec=NULL,
                           # Initial values
                           clusters_list_init,
                           v_vec_init=NULL,
-                          v_vec_list_init=NULL,
+                          v_mat_list_init=NULL,
                           # Tuning parameter
                           N_clus=length(clusters_list_init), 
                           N_component=1,
                           freq_trun=5, 
+                          bw = 0,
                           v0 = 0.15, v1 = 0.1,
                           t_vec=seq(0, v0, length.out=200),
                           t_vec_extend=t_vec,
@@ -30,10 +31,10 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
   
   t_unit = t_vec[2] - t_vec[1]
   N_node = nrow(spks_time_mlist)
-  N_trial = ncol(spks_time_mlist)
+  N_replicate = ncol(spks_time_mlist)
   
   v_vec_init->v_vec
-  v_vec_list_init->v_vec_list
+  v_mat_list_init->v_mat_list
   if(N_component==1){
     clusters_history = list()
     loss_history = c()
@@ -146,7 +147,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
     # Update cluster-specific intensities and clusters ---------------------
     ### Get init values
     clusters_list = clusters_list_init
-    v_vec_list = v_vec_list_init
+    v_mat_list = v_mat_list_init
     
     ### Save estimation
     clusters_history = c(clusters_history, list(clusters_list))
@@ -156,20 +157,21 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
     res = get_center_intensity_array(spks_time_mlist = spks_time_mlist, 
                                      stim_onset_vec = stim_onset_vec, 
                                      clusters_list = clusters_list, 
-                                     v_vec_list = v_vec_list,
+                                     v_mat_list = v_mat_list,
                                      N_component = N_component,
-                                     freq_trun = freq_trun,
+                                     freq_trun = Inf,
+                                     bw = bw,
                                      v0 = v0, v1 = v1,
                                      t_vec = t_vec,
                                      rmv_conn_prob = TRUE)
     center_density_array = res$center_density_array
     center_Nspks_mat = res$center_Nspks_mat
     center_intensity_array = res$center_intensity_array
-    v_vec_list = res$v_vec_list
+    v_mat_list = res$v_mat_list
     
     center_density_array_update = center_density_array_current = center_density_array
     center_Nspks_mat_update = center_Nspks_mat_current = center_Nspks_mat
-    v_vec_list_update = v_vec_list_current = v_vec_list
+    v_mat_list_update = v_mat_list_current = v_mat_list
     
     n_iter = 1
     stopping = FALSE
@@ -178,9 +180,10 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
       res = cluster_kmeans_pdf(spks_time_mlist = spks_time_mlist,
                                stim_onset_vec = stim_onset_vec, 
                                clusters_list = clusters_list_current, 
-                               v_vec_list = v_vec_list_current,
+                               v_mat_list = v_mat_list_current,
                                N_component = N_component, 
                                freq_trun = freq_trun, 
+                               bw = bw,
                                v0 = v0, v1 = v1,
                                t_vec = t_vec,
                                fix_timeshift=fix_timeshift,
@@ -193,7 +196,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
       center_density_array_update = res$center_density_array
       center_Nspks_mat_update = res$center_Nspks_mat
       center_intensity_array = res$center_intensity_array
-      v_vec_list_update = res$v_vec_list
+      v_mat_list_update = res$v_mat_list
       
       l2_loss = res$l2_loss
       loss_history = c(loss_history, l2_loss)
@@ -215,8 +218,8 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
       } )
       
       delta_v_vec = sapply(1:N_component, function(id_component){
-        sqrt( sum((v_vec_list_update[[id_component]]-v_vec_list_current[[id_component]])^2) / 
-                (sum((v_vec_list_current[[id_component]])^2) + .Machine$double.eps) )
+        sqrt( sum((v_mat_list_update[[id_component]]-v_mat_list_current[[id_component]])^2) / 
+                (sum((v_mat_list_current[[id_component]])^2) + .Machine$double.eps) )
       })
         
       stopping = mean(c(delta_clusters,delta_center_density_vec,delta_center_Nspks_vec,delta_v_vec)) < conv_thres
@@ -227,7 +230,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
       clusters_list_update -> clusters_list_current
       center_density_array_update -> center_density_array_current 
       center_Nspks_mat_update -> center_Nspks_mat_current
-      v_vec_list_update -> v_vec_list_current
+      v_mat_list_update -> v_mat_list_current
       
       clusters_history = c(clusters_history, list(clusters_list_current))
     }
@@ -245,7 +248,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
     center_density_array_current -> center_density_array
     center_Nspks_mat_current -> center_Nspks_mat
     center_intensity_array = center_intensity_array
-    v_vec_list_current -> v_vec_list
+    v_mat_list_current -> v_mat_list
     
     
     ### Extend estimated densities and intensities to t_vec_extend
@@ -289,7 +292,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
               center_Nspks_mat=center_Nspks_mat,
               center_intensity_array = center_intensity_array,
               v_vec=v_vec,
-              v_vec_list=v_vec_list,
+              v_mat_list=v_mat_list,
               t_vec=t_vec,
               t_vec_extend=t_vec_extend,
               N_iteration=N_iteration))

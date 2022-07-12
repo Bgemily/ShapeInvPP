@@ -21,6 +21,8 @@ main_v5_pdf = function(### Parameters for generative model
                         ### params when N_clus==2:
                         clus_mixture = 0,
                         ### Parameters for algorithms
+                        freq_trun=5,
+                        bw = 0,
                         N_component=2,
                         gamma=0,
                         MaxIter=10,
@@ -34,7 +36,6 @@ main_v5_pdf = function(### Parameters for generative model
                         ### Unused
                         jitter_time_rad = 10, max_iter=50,
                         conv_thres=5e-3, 
-                        freq_trun_vec=NULL,
                         opt_radius=total_time/2,
                         ...)
 {
@@ -68,7 +69,7 @@ main_v5_pdf = function(### Parameters for generative model
   center_intensity_array_true = network_list$center_intensity_array_true
   mem_true_vec = network_list$mem_true_vec
   clus_true_list = network_list$clus_true_list
-  v_true_list = network_list$v_vec_list
+  v_true_mat_list = network_list$v_mat_list
   
 
   # Fit model for various cluster number ------------------------------------
@@ -85,14 +86,16 @@ main_v5_pdf = function(### Parameters for generative model
                    N_component = N_component,
                    v0 = u_1, v1 = u_0,
                    t_vec = t_vec, 
+                   freq_trun = freq_trun,
+                   bw = bw,
                    fix_timeshift = fix_timeshift, 
                    fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                    use_true_timeshift = use_true_timeshift, 
                    jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
                    fix_membership = fix_membership,
-                   v_true_list = v_true_list)
+                   v_true_mat_list = v_true_mat_list)
     clusters_list_init = res$clusters_list
-    v_vec_list_init = res$v_vec_list
+    v_mat_list_init = res$v_mat_list
     
     
     # Apply algorithm ---------
@@ -102,9 +105,10 @@ main_v5_pdf = function(### Parameters for generative model
     res = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
                          stim_onset_vec = stim_onset_vec,
                          clusters_list_init = clusters_list_init,
-                         v_vec_list_init = v_vec_list_init,
+                         v_mat_list_init = v_mat_list_init,
                          N_component = N_component, 
-                         freq_trun = Inf,
+                         freq_trun = freq_trun,
+                         bw = bw,
                          MaxIter = MaxIter, 
                          gamma=gamma,
                          v0 = u_1, v1= u_0,
@@ -120,7 +124,7 @@ main_v5_pdf = function(### Parameters for generative model
     time_estimation = as.numeric(time_estimation, units='secs')
     
     res$clusters_list -> clusters_list_est
-    res$v_vec_list -> v_vec_list_est
+    res$v_mat_list -> v_mat_list_est
     res$loss_history -> loss_history
     res$N_iteration -> N_iteration
     res$center_intensity_array -> center_intensity_array_est
@@ -151,7 +155,7 @@ main_v5_pdf = function(### Parameters for generative model
   res = res_list[[res_select_model$id_best_res]]
   
   res$clusters_list -> clusters_list_est
-  res$v_vec_list -> v_vec_list_est
+  res$v_mat_list -> v_mat_list_est
   res$center_intensity_array -> center_intensity_array_est
   res$center_density_array -> center_density_array_est
   res$center_Nspks_mat -> center_Nspks_mat_est
@@ -207,9 +211,9 @@ main_v5_pdf = function(### Parameters for generative model
     
 
     # Compute error of time shifts, i.e. w, v --------------------------------------------
-    v_mean_sq_err = mean((unlist(v_true_list)-unlist(v_vec_list_est))^2) 
+    v_mean_sq_err = mean((unlist(v_true_mat_list)-unlist(v_mat_list_est))^2) 
     v_mean_sq_err_vec = sapply(1:N_component, function(id_component){
-      mean((unlist(v_true_list[[id_component]])-unlist(v_vec_list_est[[id_component]]))^2) 
+      mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2) 
     })
       
     
@@ -240,7 +244,7 @@ main_v5_pdf = function(### Parameters for generative model
               penalty_vec=penalty_vec,
               # parameter estimates of best cluster number
               clusters_list_est=clusters_list_est,
-              v_vec_list_est=v_vec_list_est,
+              v_mat_list_est=v_mat_list_est,
               clusters_list_est_permn=clusters_list_est_permn,
               center_density_array_est_permn=switch(save_center_pdf_array, 
                                                 "TRUE"=center_density_array_est_permn,

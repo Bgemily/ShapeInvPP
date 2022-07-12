@@ -9,12 +9,7 @@ get_adaptive_fft = function(event_time_vec,
   t_unit = t_vec[2]-t_vec[1]
   
   loss_min = Inf
-  ### Get empirical intensity of event times
-  ## V1
-  # breaks = c(t_vec[1]-t_unit,t_vec)+t_unit/2
-  # emp_intens_vec = hist(event_time_vec, breaks=breaks, plot=FALSE)$counts
-  # emp_intens_vec = emp_intens_vec/t_unit
-  ## V2
+  ### Use kernel smoothing to get empirical intensity of event times
   if(bw==0){
     breaks = c(t_vec[1]-t_unit,t_vec)+t_unit/2
     emp_intens_vec = hist(event_time_vec, breaks=breaks, plot=FALSE)$counts / t_unit

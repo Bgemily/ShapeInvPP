@@ -5,11 +5,12 @@ get_init = function(spks_time_mlist, stim_onset_vec,
                     N_clus,
                     N_component=1,
                     freq_trun=5, 
+                    bw=0,
                     v0 = 0.15, v1 = 0.1,
                     t_vec=seq(0, v0, by=0.01),
                     fix_timeshift=FALSE,
                     fix_comp1_timeshift_only=FALSE,
-                    use_true_timeshift=FALSE, v_true_list = NULL,
+                    use_true_timeshift=FALSE, v_true_mat_list = NULL,
                     jitter_prop_true_timeshift=0,
                     fix_membership=FALSE,
                     rmv_conn_prob=FALSE,
@@ -19,9 +20,9 @@ get_init = function(spks_time_mlist, stim_onset_vec,
   
   t_unit = t_vec[2] - t_vec[1]
   N_node = nrow(spks_time_mlist)
-  N_trial = ncol(spks_time_mlist)
+  N_replicate = ncol(spks_time_mlist)
   
-  v_vec = v_vec_list = NULL
+  v_vec = v_mat_list = NULL
   if (N_component==1) {
     # Initialize time shifts --------------------------------------------------
     if (fix_timeshift) {
@@ -31,8 +32,8 @@ get_init = function(spks_time_mlist, stim_onset_vec,
       spks_time_vec_list = list()
       for (id_node in 1:N_node) {
         spks_time_vec = c()
-        for (id_trial in 1:N_trial) {
-          spks_time_tmp = spks_time_mlist[id_node, id_trial][[1]]-stim_onset_vec[id_trial]
+        for (id_replicate in 1:N_replicate) {
+          spks_time_tmp = spks_time_mlist[id_node, id_replicate][[1]]-stim_onset_vec[id_replicate]
           spks_time_tmp = spks_time_tmp[which(spks_time_tmp<=max(t_vec) & spks_time_tmp>=min(t_vec))]
           spks_time_vec = c(spks_time_vec, spks_time_tmp)
         }
@@ -72,46 +73,44 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     # Initialize time shifts -------------
     if (fix_timeshift) {
       if(use_true_timeshift){
-        v_vec_list = v_true_list
+        v_mat_list = v_true_mat_list
         ### Jitter true time shift
         if(jitter_prop_true_timeshift>0){
           u_0 = v1; u_1 = v0;
-          v_vec_list[[1]] = jitter(v_vec_list[[1]], amount = jitter_prop_true_timeshift*(u_0/2-0))
-          v_vec_list[[2]] = jitter(v_vec_list[[2]], amount = jitter_prop_true_timeshift*(u_1-u_0/2-0))
+          v_mat_list[[1]] = jitter(v_mat_list[[1]], amount = jitter_prop_true_timeshift*(u_0/2-0))
+          v_mat_list[[2]] = jitter(v_mat_list[[2]], amount = jitter_prop_true_timeshift*(u_1-u_0/2-0))
         }
       } else{
-        v_vec = rep(default_timeshift, N_node)
-        v_vec_list = list(v_vec, v_vec)
+        v_vec = matrix(default_timeshift, nrow = N_node, ncol = N_replicate)
+        v_mat_list = list(v_vec, v_vec)
       }
     } else{
-      v_vec_list = list(rep(0,N_node), rep(0,N_node))
+      v_mat_list = list(matrix(0, nrow = N_node, ncol = N_replicate), 
+                        matrix(0, nrow = N_node, ncol = N_replicate))
       spks_time_vec_list = list()
       for (id_node in 1:N_node) {
-        spks_time_vec_1 = c()
-        spks_time_vec_2 = c()
-        for (id_trial in 1:N_trial) {
-          spks_time_tmp = spks_time_mlist[id_node, id_trial][[1]]-stim_onset_vec[id_trial]
-          spks_time_tmp_1 = spks_time_tmp[which(spks_time_tmp<=0 & spks_time_tmp>=min(t_vec))]
-          spks_time_vec_1 = c(spks_time_vec_1, spks_time_tmp_1)
-          spks_time_tmp_2 = spks_time_tmp[which(spks_time_tmp<=max(t_vec) & spks_time_tmp>=0)]
-          spks_time_vec_2 = c(spks_time_vec_2, spks_time_tmp_2)
+        for (id_replicate in 1:N_replicate) {
+          spks_time_tmp = spks_time_mlist[id_node, id_replicate][[1]]-stim_onset_vec[id_replicate]
+          spks_time_vec_1 = spks_time_tmp[which(spks_time_tmp<=0 & spks_time_tmp>=min(t_vec))]
+          spks_time_vec_2 = spks_time_tmp[which(spks_time_tmp<=max(t_vec) & spks_time_tmp>=0)]
+          if(length(spks_time_vec_1)>0){
+            v_mat_list[[1]][id_node, id_replicate] = median(spks_time_vec_1) 
+          }
+          if(length(spks_time_vec_2)>0){
+            v_mat_list[[2]][id_node, id_replicate] = median(spks_time_vec_2) 
+          }
         }
-        if(length(spks_time_vec_1)>0){
-          v_vec_list[[1]][id_node] = median(spks_time_vec_1) 
-        }
-        if(length(spks_time_vec_2)>0){
-          v_vec_list[[2]][id_node] = median(spks_time_vec_2) 
-        }
+        
       }
-      v_vec_list[[1]] = v_vec_list[[1]] - min(v_vec_list[[1]])
-      v_vec_list[[2]] = v_vec_list[[2]] - min(v_vec_list[[2]])
+      v_mat_list[[1]] = v_mat_list[[1]] - min(v_mat_list[[1]])
+      v_mat_list[[2]] = v_mat_list[[2]] - min(v_mat_list[[2]])
       
-      v_vec_list[[1]] = round(v_vec_list[[1]]/t_unit)*t_unit
-      v_vec_list[[2]] = round(v_vec_list[[2]]/t_unit)*t_unit
+      v_mat_list[[1]] = round(v_mat_list[[1]]/t_unit)*t_unit
+      v_mat_list[[2]] = round(v_mat_list[[2]]/t_unit)*t_unit
       
       ### Force time shifts of first component to be truth
       if( (!fix_timeshift) & fix_comp1_timeshift_only ){
-        v_vec_list[[1]] = v_true_list[[1]]
+        v_mat_list[[1]] = v_true_mat_list[[1]]
       }
     }
     
@@ -129,18 +128,17 @@ get_init = function(spks_time_mlist, stim_onset_vec,
         density_tmp = rep(0, length(t_vec))
         F_hat_tmp = 0
         
-        
         spks_time_vec_tmp = c()
         N_spks_nodetrial_vec_tmp = c()
-        for (id_trial in 1:N_trial) {
-          spks_time_tmp = unlist(spks_time_mlist[id_node,id_trial]) - stim_onset_vec[id_trial]
-          spks_time_tmp_1 = spks_time_tmp[which(spks_time_tmp>=(min(t_vec)+v_vec_list[[1]][id_node]) & 
-                                                  spks_time_tmp<=(0+v_vec_list[[2]][id_node]))]
-          spks_time_tmp_1_shifted = spks_time_tmp_1 - v_vec_list[[1]][id_node]
+        for (id_replicate in 1:N_replicate) {
+          spks_time_tmp = unlist(spks_time_mlist[id_node,id_replicate]) - stim_onset_vec[id_replicate]
+          spks_time_tmp_1 = spks_time_tmp[which(spks_time_tmp>=(min(t_vec)+v_mat_list[[1]][id_node,id_replicate]) & 
+                                                  spks_time_tmp<=(0+v_mat_list[[2]][id_node,id_replicate]))]
+          spks_time_tmp_1_shifted = spks_time_tmp_1 - v_mat_list[[1]][id_node,id_replicate]
           
-          spks_time_tmp_2 = spks_time_tmp[which(spks_time_tmp>(0+v_vec_list[[2]][id_node]) & 
+          spks_time_tmp_2 = spks_time_tmp[which(spks_time_tmp>(0+v_mat_list[[2]][id_node,id_replicate]) & 
                                                   spks_time_tmp<=max(t_vec))]
-          spks_time_tmp_2_shifted = spks_time_tmp_2 - v_vec_list[[2]][id_node]
+          spks_time_tmp_2_shifted = spks_time_tmp_2 - v_mat_list[[2]][id_node,id_replicate]
           
           
           spks_time_tmp = c(spks_time_tmp_1_shifted, spks_time_tmp_2_shifted)
@@ -149,16 +147,13 @@ get_init = function(spks_time_mlist, stim_onset_vec,
           N_spks_nodetrial_vec_tmp = c(N_spks_nodetrial_vec_tmp, length(spks_time_tmp))
         }
         
-        
-        if (length(spks_time_vec_tmp)>0) {
-          fft_res = get_adaptive_fft(event_time_vec = spks_time_vec_tmp, 
-                                     freq_trun_max = Inf, 
-                                     t_vec = t_vec)
-          fft_tmp = fft_res$fft_vec_best
-        } else{
-          fft_tmp = rep(0,length(t_vec))
-        }
-        intensity_tmp = Re(fft(fft_tmp, inverse = TRUE))
+        ### Smooth the point process 
+        tmp = get_smoothed_pp(event_time_vec = spks_time_vec_tmp, 
+                              freq_trun = freq_trun, 
+                              t_vec = t_vec, 
+                              bw=bw)
+        intensity_tmp = tmp$intens_vec
+
         
         N_spks_q = length(spks_time_vec_tmp)
         if (N_spks_q>0) {
@@ -196,16 +191,16 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     ### Force minimum time shifts in each (cluster, component) to be zero
     if (!fix_timeshift) {
       for (id_clus in 1:N_clus) {
-        v_vec_list[[1]][clusters_list[[id_clus]]] = v_vec_list[[1]][clusters_list[[id_clus]]] - (quantile(v_vec_list[[1]][clusters_list[[id_clus]]], 0.0)-0)
-        v_vec_list[[1]] = round(v_vec_list[[1]]/t_unit)*t_unit
+        v_mat_list[[1]][clusters_list[[id_clus]], ] = v_mat_list[[1]][clusters_list[[id_clus]], ] - (quantile(v_mat_list[[1]][clusters_list[[id_clus]], ], 0.0)-0)
+        v_mat_list[[1]] = round(v_mat_list[[1]]/t_unit)*t_unit
         
-        v_vec_list[[2]][clusters_list[[id_clus]]] = v_vec_list[[2]][clusters_list[[id_clus]]] - (quantile(v_vec_list[[2]][clusters_list[[id_clus]]], 0.0)-0)
-        v_vec_list[[2]] = round(v_vec_list[[2]]/t_unit)*t_unit
+        v_mat_list[[2]][clusters_list[[id_clus]], ] = v_mat_list[[2]][clusters_list[[id_clus]], ] - (quantile(v_mat_list[[2]][clusters_list[[id_clus]], ], 0.0)-0)
+        v_mat_list[[2]] = round(v_mat_list[[2]]/t_unit)*t_unit
         
       }
       ### Force time shifts of first component to be truth
       if( (!fix_timeshift) & fix_comp1_timeshift_only ){
-        v_vec_list[[1]] = v_true_list[[1]]
+        v_mat_list[[1]] = v_true_mat_list[[1]]
       }
     }
     
@@ -213,7 +208,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
   
   
   return(list(v_vec=v_vec,
-              v_vec_list=v_vec_list,
+              v_mat_list=v_mat_list,
               membership_vec=membership_vec, 
               clusters_list=clusters_list))
 }

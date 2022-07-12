@@ -29,15 +29,17 @@ generate_data = function(SEED=NULL,
   
   
   # Generate time shifts ----------------------------------------------------
-  v_vec_list = list()
-  v_vec_list[[1]] = runif(n=N_node, 
+  v_mat_list = list()
+  v_mat_list[[1]] = runif(n=N_node*N_replicate, 
                           min = 0,
-                          max = u_0/2)    
-  v_vec_list[[2]] = runif(n = N_node,
+                          max = u_0/2)  
+  v_mat_list[[1]] = matrix(v_mat_list[[1]], nrow = N_node, ncol = N_replicate)
+  v_mat_list[[2]] = runif(n = N_node*N_replicate,
                           min = 0,
                           max = u_1-u_0/2 )
+  v_mat_list[[2]] = matrix(v_mat_list[[2]], nrow = N_node, ncol = N_replicate)
   for(id_clus in 1:N_clus){
-    v_vec_list[[1]][clus_true_list[[id_clus]]] = v_vec_list[[1]][clus_true_list[[id_clus]]] - min(v_vec_list[[1]][clus_true_list[[id_clus]]])
+    v_mat_list[[1]][clus_true_list[[id_clus]], ] = v_mat_list[[1]][clus_true_list[[id_clus]], ] - min(v_mat_list[[1]][clus_true_list[[id_clus]], ])
   }
   
   
@@ -208,26 +210,26 @@ generate_data = function(SEED=NULL,
   }
   
   
-  stim_onset_vec = 0
-  spks_time_mlist = matrix(list(),N_node,1)
+  stim_onset_vec = rep(0, N_replicate)
+  spks_time_mlist = matrix(list(), nrow = N_node, ncol = N_replicate)
   for (id_clus in 1:N_clus) {
     for (id_node in clus_true_list[[id_clus]]) {
-      for (j in 1:1) {
-        v_tmp_1 = v_vec_list[[1]][id_node]
-        v_tmp_2 = v_vec_list[[2]][id_node]
-        spks_time_mlist[id_node,j] = list(c( rejection_sampling(density_vec = center_density_array_true[id_clus,1,], 
+      for (id_replicate in 1:N_replicate) {
+        v_tmp_1 = v_mat_list[[1]][id_node, id_replicate]
+        v_tmp_2 = v_mat_list[[2]][id_node, id_replicate]
+        spks_time_mlist[id_node, id_replicate] = list(c( rejection_sampling(density_vec = center_density_array_true[id_clus,1,], 
                                                                 t_vec = t_vec_extend, 
                                                                 N_sample = 0*center_N_spks_mat[id_clus,1]+
                                                                   1*rpois(n=1, lambda=center_N_spks_mat[id_clus,1]) )+
-                                               stim_onset_vec[j]+v_tmp_1,
+                                               stim_onset_vec[id_replicate]+v_tmp_1,
                                              rejection_sampling(density_vec = center_density_array_true[id_clus,2,], 
                                                                 t_vec = t_vec_extend, 
                                                                 N_sample = 0*center_N_spks_mat[id_clus,2]+
                                                                   1*rpois(n=1, lambda=center_N_spks_mat[id_clus,2]) )+
-                                               stim_onset_vec[j]+v_tmp_2 ))
+                                               stim_onset_vec[id_replicate]+v_tmp_2 ))
         ### Only keep spike times during [-u_0, u_1] 
-        spks_time_vec = spks_time_mlist[id_node,j][[1]]
-        spks_time_mlist[id_node,j][[1]] = spks_time_vec[which(spks_time_vec >= -u_0 & 
+        spks_time_vec = spks_time_mlist[id_node,id_replicate][[1]]
+        spks_time_mlist[id_node,id_replicate][[1]] = spks_time_vec[which(spks_time_vec >= -u_0 & 
                                                                 spks_time_vec <= u_1)]
       }
     }
@@ -243,7 +245,7 @@ generate_data = function(SEED=NULL,
               stim_onset_vec=stim_onset_vec,
               mem_true_vec=mem_true_vec, 
               clus_true_list=clus_true_list,
-              v_vec_list=v_vec_list, 
+              v_mat_list=v_mat_list, 
               center_density_array_true=center_density_array_true,
               center_N_spks_mat=center_N_spks_mat,
               center_intensity_array_true=center_intensity_array_true,

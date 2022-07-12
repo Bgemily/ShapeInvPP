@@ -5,9 +5,10 @@ cluster_kmeans_pdf = function(spks_time_mlist,
                               reaction_time_vec=NULL, 
                               clusters_list, 
                               v_vec=NULL,
-                              v_vec_list=NULL,
+                              v_mat_list=NULL,
                               N_component=1,
                               freq_trun=5, 
+                              bw = 0,
                               v0 = 0.15, v1 = 0.1,
                               t_vec=seq(0, v0, by=0.01),
                               fix_timeshift=FALSE,
@@ -23,7 +24,7 @@ cluster_kmeans_pdf = function(spks_time_mlist,
   
   t_unit = t_vec[2]-t_vec[1]
   N_node = nrow(spks_time_mlist)
-  N_trial = ncol(spks_time_mlist)
+  N_replicate = ncol(spks_time_mlist)
   N_clus = length(clusters_list)
   
   if(N_component==1){
@@ -65,11 +66,11 @@ cluster_kmeans_pdf = function(spks_time_mlist,
     for (id_clus in 1:N_clus) {
       v_vec_tmp = v_mat_tmp[,id_clus]
       
-      N_spks_mat = matrix(nrow=N_node, ncol=N_trial)
-      dNN_array = array(dim = c(N_node,N_trial,length(t_vec)))
+      N_spks_mat = matrix(nrow=N_node, ncol=N_replicate)
+      dNN_array = array(dim = c(N_node,N_replicate,length(t_vec)))
       for (id_node in 1:N_node) {
-        for (id_trial in 1:N_trial) {
-          spks_time_mi_vec = spks_time_mlist[id_node, id_trial][[1]] - stim_onset_vec[id_trial] 
+        for (id_replicate in 1:N_replicate) {
+          spks_time_mi_vec = spks_time_mlist[id_node, id_replicate][[1]] - stim_onset_vec[id_replicate] 
           spks_time_mi_vec = spks_time_mi_vec[which(spks_time_mi_vec<=max(t_vec) &
                                                       spks_time_mi_vec>=min(t_vec))]
           spks_time_mi_vec = spks_time_mi_vec - v_vec_tmp[id_node]
@@ -80,26 +81,26 @@ cluster_kmeans_pdf = function(spks_time_mlist,
                        plot=FALSE)$counts
           dNN_mi = dN_mi/(N_spks_mi+.Machine$double.eps)
           
-          N_spks_mat[id_node, id_trial] = N_spks_mi
-          dNN_array[id_node, id_trial, ] = dNN_mi
+          N_spks_mat[id_node, id_replicate] = N_spks_mi
+          dNN_array[id_node, id_replicate, ] = dNN_mi
         }
       }
       
       ### Compute distance between each node and current cluster
       dist_vec = rep(0, N_node)
-      for (id_trial in 1:N_trial) {
+      for (id_replicate in 1:N_replicate) {
         ### Def of dist_1: N_spks_mi*(sum(density_zi^2)*t_unit - 2*sum(density_zi*dNN_mi))
         dist_1_vec = rep(0, N_node)
         dist_2_vec = rep(0, N_node)
         
-        N_spks_vec = N_spks_mat[ , id_trial]
-        dNN_mat = dNN_array[ , id_trial, ]
+        N_spks_vec = N_spks_mat[ , id_replicate]
+        dNN_mat = dNN_array[ , id_replicate, ]
         center_density_vec = center_density_array[id_clus, 1, ]
         inner_prod_vec = dNN_mat %*% center_density_vec
         center_density_L2norm = sum(center_density_vec^2)*t_unit
         dist_1_vec = N_spks_vec * center_density_L2norm - N_spks_vec * 2*inner_prod_vec
         
-        N_spks_vec = N_spks_mat[ , id_trial]
+        N_spks_vec = N_spks_mat[ , id_replicate]
         center_Nspks_vec = rep(center_Nspks_mat[id_clus,1], N_node)
         center_Nspks_invrs_vec = center_Nspks_vec^(-1)
         center_Nspks_invrs_vec[which(center_Nspks_vec==0)] = 0
@@ -151,9 +152,10 @@ cluster_kmeans_pdf = function(spks_time_mlist,
                                      stim_onset_vec = stim_onset_vec, 
                                      reaction_time_vec = reaction_time_vec, 
                                      clusters_list = clusters_list, 
-                                     v_vec_list = v_vec_list,
+                                     v_mat_list = v_mat_list,
                                      N_component = N_component,
-                                     freq_trun = freq_trun, 
+                                     freq_trun = Inf, 
+                                     bw = bw,
                                      t_vec = t_vec,
                                      v0 = v0, v1 = v1,
                                      fix_timeshift = fix_timeshift,
@@ -161,7 +163,7 @@ cluster_kmeans_pdf = function(spks_time_mlist,
     center_density_array = tmp$center_density_array
     center_Nspks_mat = tmp$center_Nspks_mat
     center_intensity_array = tmp$center_intensity_array
-    v_vec_list = tmp$v_vec_list
+    v_mat_list = tmp$v_mat_list
     
     
     #Update time shifts and clusters--------------------------------------------------------------------------
@@ -170,15 +172,16 @@ cluster_kmeans_pdf = function(spks_time_mlist,
     tmp = est_timeshift(spks_time_mlist = spks_time_mlist, 
                         stim_onset_vec = stim_onset_vec, 
                         center_density_array = center_density_array,
-                        v_vec_list = v_vec_list,
+                        v_mat_list = v_mat_list,
                         N_component = N_component,
                         freq_trun = freq_trun, 
+                        bw = bw,
                         v0 = v0, v1 = v1,
                         t_vec = t_vec,
                         fix_timeshift = fix_timeshift,
                         fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                         ...)
-    v_mat_list_tmp = tmp$v_mat_list
+    v_array_list_tmp = tmp$v_array_list
     dist_mat_tmp = tmp$dist_mat
     
     
@@ -186,35 +189,23 @@ cluster_kmeans_pdf = function(spks_time_mlist,
     dist_mat = matrix(0, nrow=N_node, ncol=N_clus)
     for (id_clus in 1:N_clus) {
       
-      N_spks_mat = matrix(nrow=N_node, ncol=N_trial)
+      N_spks_mat = matrix(nrow=N_node, ncol=N_replicate)
       for (id_node in 1:N_node) {
-        for (id_trial in 1:N_trial) {
-          spks_time_mi_vec = spks_time_mlist[id_node, id_trial][[1]] - stim_onset_vec[id_trial] 
+        for (id_replicate in 1:N_replicate) {
+          spks_time_mi_vec = spks_time_mlist[id_node, id_replicate][[1]] - stim_onset_vec[id_replicate] 
           spks_time_mi_vec = spks_time_mi_vec[which(spks_time_mi_vec<=max(t_vec) &
                                                       spks_time_mi_vec>=min(t_vec))]
           N_spks_mi = length(spks_time_mi_vec)
-          N_spks_mat[id_node, id_trial] = N_spks_mi
+          N_spks_mat[id_node, id_replicate] = N_spks_mi
         }
       }
       
       ### Compute distance between each node and current cluster
-      dist_vec = rep(0, N_node)
-      for (id_trial in 1:N_trial) {
-        ### Def of dist_1: N_spks_mi*(sum(density_zi^2)*t_unit - 2*sum(density_zi*dNN_mi))
-        dist_1_vec = rep(0, N_node)
-        dist_2_vec = rep(0, N_node)
-        
-        N_spks_vec = N_spks_mat[ , id_trial]
-        dist_1_vec = dist_mat_tmp[, id_clus] * N_spks_vec
-        
-        N_spks_vec = N_spks_mat[ , id_trial]
-        center_Nspks_vec = rep(sum(center_Nspks_mat[id_clus,]), N_node)
-        center_Nspks_invrs_vec = center_Nspks_vec^(-1)
-        center_Nspks_invrs_vec[which(center_Nspks_vec==0)] = 0
-        dist_2_vec = gamma * center_Nspks_invrs_vec * (N_spks_vec - center_Nspks_vec)^2
-        
-        dist_vec = dist_vec + dist_1_vec + dist_2_vec
-      }
+      dist_1_vec = dist_mat_tmp[, id_clus]
+      center_Nspks_q_scalar = sum(center_Nspks_mat[id_clus,1:N_component])
+      dist_2_vec = gamma * rowSums( (center_Nspks_q_scalar+.Machine$double.eps)^(-1) * 
+                                      (N_spks_mat - center_Nspks_q_scalar)^2 )
+      dist_vec = dist_1_vec + dist_2_vec
       
       dist_mat[,id_clus] = dist_vec
     }
@@ -248,15 +239,16 @@ cluster_kmeans_pdf = function(spks_time_mlist,
     # print(l2_loss)
     
     for (id_clus in 1:N_clus) {
-      v_vec_list[[1]][clusters_list[[id_clus]]] = v_mat_list_tmp[[1]][clusters_list[[id_clus]], id_clus]
-      v_vec_list[[2]][clusters_list[[id_clus]]] = v_mat_list_tmp[[2]][clusters_list[[id_clus]], id_clus]
+      v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate] = v_array_list_tmp[[1]][clusters_list[[id_clus]], 1:N_replicate, id_clus]
+      v_mat_list[[2]][clusters_list[[id_clus]], 1:N_replicate] = v_array_list_tmp[[2]][clusters_list[[id_clus]], 1:N_replicate, id_clus]
     }
     
     ### For each cluster, force the minimum time shifts to be zero
     if ( (!fix_timeshift) & (!fix_comp1_timeshift_only) ) {
       for (id_clus in 1:N_clus) {
-        v_vec_list[[1]][clusters_list[[id_clus]]] = v_vec_list[[1]][clusters_list[[id_clus]]] - (quantile(v_vec_list[[1]][clusters_list[[id_clus]]], 0.0)-0)
-        v_vec_list[[1]] = round(v_vec_list[[1]]/t_unit)*t_unit
+        v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate] = v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate] - 
+                                                                    min(v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate])
+        v_mat_list[[1]] = round(v_mat_list[[1]]/t_unit)*t_unit
       }
     }
     
@@ -267,7 +259,7 @@ cluster_kmeans_pdf = function(spks_time_mlist,
   
   return(list(clusters_list=clusters_list, 
               v_vec=v_vec,
-              v_vec_list=v_vec_list,
+              v_mat_list=v_mat_list,
               l2_loss=l2_loss,
               t_vec=t_vec,
               center_density_array=center_density_array,

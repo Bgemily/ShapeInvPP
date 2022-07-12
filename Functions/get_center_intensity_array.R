@@ -4,14 +4,13 @@ get_center_intensity_array = function(spks_time_mlist,
                                       stim_onset_vec, 
                                       clusters_list, 
                                       v_vec=NULL,
-                                      v_vec_list=NULL,
+                                      v_mat_list=NULL,
                                       N_component=1,
                                       freq_trun=5,
                                       v0 = 0.15, v1 = 0.1,
                                       t_vec=seq(0, v0, by=0.01),
                                       n0_mat_list=NULL,
-                                      # bw=0.015,
-                                      bw=0.01,
+                                      bw=0,
                                       align_density=FALSE,
                                       fix_timeshift=FALSE,
                                       # Unused arguments
@@ -21,7 +20,7 @@ get_center_intensity_array = function(spks_time_mlist,
   t_unit = t_vec[2]-t_vec[1]
   N_clus = length(clusters_list)
   N_node = nrow(spks_time_mlist)
-  N_trial = ncol(spks_time_mlist)
+  N_replicate = ncol(spks_time_mlist)
   
   if(N_component==1){
     center_intensity_array = array(dim=c(N_clus, N_component, length(t_vec)))
@@ -34,8 +33,8 @@ get_center_intensity_array = function(spks_time_mlist,
       if(length(clusters_list[[q]])>0){
         spks_time_q = c()
         for (id_node in clusters_list[[q]]) {
-          for (id_trial in 1:N_trial) {
-            spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_trial]) - stim_onset_vec[id_trial]
+          for (id_replicate in 1:N_replicate) {
+            spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_replicate]) - stim_onset_vec[id_replicate]
             spks_time_nodetrial = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
                                                               spks_time_nodetrial<=max(t_vec))]
             spks_time_nodetrial = spks_time_nodetrial - v_vec[id_node]
@@ -54,8 +53,8 @@ get_center_intensity_array = function(spks_time_mlist,
         
         N_spks_nodetrial_vec_q = c()
         for (id_node in clusters_list[[q]]) {
-          for (id_trial in 1:N_trial) {
-            spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_trial]) - stim_onset_vec[id_trial]
+          for (id_replicate in 1:N_replicate) {
+            spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_replicate]) - stim_onset_vec[id_replicate]
             spks_time_nodetrial = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
                                                               spks_time_nodetrial<=max(t_vec))]
             spks_time_nodetrial = spks_time_nodetrial - v_vec[id_node]
@@ -108,46 +107,42 @@ get_center_intensity_array = function(spks_time_mlist,
       intensity_q_1 = intensity_q_2 = rep(0, length(t_vec))
       density_q_1 = density_q_2 = rep(0, length(t_vec))
       F_hat_q = 0
-      if (length(clusters_list[[q]])>=2) {
+      if (length(clusters_list[[q]])*N_replicate>=2) {
         ### Temporarily force the minimum time shift of second component to be zero
         if (!fix_timeshift) {
-          v_vec_list[[2]][clusters_list[[q]]] = v_vec_list[[2]][clusters_list[[q]]] - min(v_vec_list[[2]][clusters_list[[q]]])
+          v_mat_list[[2]][clusters_list[[q]], ] = v_mat_list[[2]][clusters_list[[q]], ] - min(v_mat_list[[2]][clusters_list[[q]], ])
         }
         
-        Y_mat_q = matrix(nrow=length(t_vec), ncol=length(clusters_list[[q]]))
-        X_array_q = array(dim = c(length(t_vec), length(clusters_list[[q]]), 2))
+        Y_mat_q = matrix(nrow=length(t_vec), ncol=length(clusters_list[[q]])*N_replicate )
+        X_array_q = array(dim = c(length(t_vec), length(clusters_list[[q]])*N_replicate, 2))
         N_spks_nodetrial_vec_q = c()
         mid = length(t_vec)%/%2
         l_vec = c( 0:mid, (mid+1-length(t_vec)):(-1))
         for(id_node_tmp in 1:length(clusters_list[[q]])){
           id_node = clusters_list[[q]][id_node_tmp]    
-          spks_time_vec = c()
-          for (id_trial in 1:N_trial) {
-            spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_trial]) - stim_onset_vec[id_trial]
-            spks_time_nodetrial = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
+          for (id_replicate in 1:N_replicate) {
+            spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_replicate]) - stim_onset_vec[id_replicate]
+            spks_time_vec = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
                                                               spks_time_nodetrial<=max(t_vec))]
-            spks_time_vec = c(spks_time_vec, spks_time_nodetrial)
-            N_spks_nodetrial_vec_q = c(N_spks_nodetrial_vec_q, length(spks_time_nodetrial))
+            N_spks_nodetrial_vec_q = c(N_spks_nodetrial_vec_q, length(spks_time_vec))
+            
+            ### Smooth point process of id_node in id_replicate
+            tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
+                                  freq_trun = freq_trun, 
+                                  t_vec = t_vec, 
+                                  bw=bw)
+            intensity = tmp$intens_vec
+            density = intensity/length(spks_time_vec)
+            
+            ### Save terms in the analytical solution of least-squares-estimator 
+            Y_mat_q[ , (id_node_tmp-1)*N_replicate+id_replicate] = fft(density) / length(t_vec)
+            X_array_q[ , (id_node_tmp-1)*N_replicate+id_replicate, 1] = exp(-1i*2*pi*l_vec*v_mat_list[[1]][id_node, id_replicate]/(max(t_vec)-min(t_vec)))
+            X_array_q[ , (id_node_tmp-1)*N_replicate+id_replicate, 2] = exp(-1i*2*pi*l_vec*v_mat_list[[2]][id_node, id_replicate]/(max(t_vec)-min(t_vec)))
           }
         
-          if(length(spks_time_vec)>=2){
-            density = density(spks_time_vec,
-                              bw=bw,
-                              from=min(t_vec), to=max(t_vec),
-                              n=length(t_vec))$y
-          } else if(length(spks_time_vec)==0) {
-            density = 0*t_vec
-          } else if(length(spks_time_vec)==1) {
-            density = density(rep(spks_time_vec,2),
-                              bw=bw,
-                              from=min(t_vec), to=max(t_vec),
-                              n=length(t_vec))$y
-          }
-          
-          Y_mat_q[ , id_node_tmp] = fft(density) / length(t_vec)
-          X_array_q[ , id_node_tmp, 1] = exp(-1i*2*pi*l_vec*v_vec_list[[1]][id_node]/(max(t_vec)-min(t_vec)))
-          X_array_q[ , id_node_tmp, 2] = exp(-1i*2*pi*l_vec*v_vec_list[[2]][id_node]/(max(t_vec)-min(t_vec)))
         }
+        
+        ### Get the least-squares estimator
         if(length(N_spks_nodetrial_vec_q)>1){
           W_mat_q = diag(N_spks_nodetrial_vec_q)
           theta_list = lapply( 2:length(l_vec), function(l){
@@ -168,8 +163,6 @@ get_center_intensity_array = function(spks_time_mlist,
           theta_list = lapply( 2:length(l_vec), function(l){
             c((X_array_q[l, , 1])^(-1)*Y_mat_q[l, ], 0) } )
         }
-        
-        
         alpha_vec = sapply(theta_list, "[", 1)
         beta_vec = sapply(theta_list, "[", 2)
         alpha_beta_0 = sum(N_spks_nodetrial_vec_q*Y_mat_q[1,]) / sum(N_spks_nodetrial_vec_q)
@@ -189,9 +182,9 @@ get_center_intensity_array = function(spks_time_mlist,
           density_q_1 = Re(fft(alpha_vec, inverse = TRUE))
           density_q_2 = Re(fft(beta_vec, inverse = TRUE))
           
-          v_vec_list[[1]][clusters_list[[q]]] -> tmp
-          v_vec_list[[1]][clusters_list[[q]]] = v_vec_list[[2]][clusters_list[[q]]]
-          v_vec_list[[2]][clusters_list[[q]]] = tmp
+          v_mat_list[[1]][clusters_list[[q]], ] -> tmp
+          v_mat_list[[1]][clusters_list[[q]], ] = v_mat_list[[2]][clusters_list[[q]], ]
+          v_mat_list[[2]][clusters_list[[q]], ] = tmp
         }
         
         ### Force second density to be zero when t<=0
@@ -205,14 +198,14 @@ get_center_intensity_array = function(spks_time_mlist,
           length_rmv = min(t_vec[which(density_q_2>=max(density_q_2)*0.05)]) / t_unit
           density_q_2 = c( tail(density_q_2,length(t_vec)-length_rmv), rep(tail(density_q_2,1),length_rmv) )
           if (!fix_timeshift) {
-            v_vec_list[[2]][clusters_list[[q]]] = v_vec_list[[2]][clusters_list[[q]]] + length_rmv*t_unit
+            v_mat_list[[2]][clusters_list[[q]], ] = v_mat_list[[2]][clusters_list[[q]], ] + length_rmv*t_unit
           }
         }
         
         ### Force the tails of densities to be zero
         u_1 = v0; u_0 = v1
-        density_q_1 = density_q_1 * I(t_vec<=u_1-max(v_vec_list[[1]]))
-        density_q_2 = density_q_2 * I(t_vec<=u_1-max(v_vec_list[[2]]))
+        density_q_1 = density_q_1 * I(t_vec<=u_1-max(v_mat_list[[1]]))
+        density_q_2 = density_q_2 * I(t_vec<=u_1-max(v_mat_list[[2]]))
         
         
         F_hat_q = sqrt( mean(N_spks_nodetrial_vec_q^2) )
@@ -220,39 +213,34 @@ get_center_intensity_array = function(spks_time_mlist,
         intensity_q_1 = density_q_1*F_hat_q
         intensity_q_2 = density_q_2*F_hat_q
         
-      } else if (length(clusters_list[[q]])==1){
+      } else if (length(clusters_list[[q]])*N_replicate==1){
         id_node_tmp = 1
         id_node = clusters_list[[q]][id_node_tmp]    
-        spks_time_vec = c()
-        N_spks_nodetrial_vec_q = c()
-        for (id_trial in 1:N_trial) {
-          spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_trial]) - stim_onset_vec[id_trial]
-          spks_time_nodetrial = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
-                                                            spks_time_nodetrial<=max(t_vec))]
-          spks_time_vec = c(spks_time_vec, spks_time_nodetrial)
-          N_spks_nodetrial_vec_q = c(N_spks_nodetrial_vec_q, length(spks_time_nodetrial))
-        }
+        id_replicate = 1
         
-        if(length(spks_time_vec)>=2){
-          density = density(spks_time_vec,
-                            bw=bw,
-                            from=min(t_vec), to=max(t_vec),
-                            n=length(t_vec))$y
-        } else if(length(spks_time_vec)==0) {
-          density = 0*t_vec
-        } else if(length(spks_time_vec)==1) {
-          density = density(rep(spks_time_vec,2),
-                            bw=bw,
-                            from=min(t_vec), to=max(t_vec),
-                            n=length(t_vec))$y
-        }
+        ### The the only one point process
+        spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_replicate]) - stim_onset_vec[id_replicate]
+        spks_time_vec = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
+                                                          spks_time_nodetrial<=max(t_vec))]
+        N_spks_nodetrial_vec_q = length(spks_time_nodetrial)
         
+        
+        ### Smooth the point process 
+        tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
+                              freq_trun = freq_trun, 
+                              t_vec = t_vec, 
+                              bw=bw)
+        intensity = tmp$intens_vec
+        density = intensity/length(spks_time_vec)
+        
+        
+        ### Let the first density to be the smoothed point process, the second density to be zero
         density_q_1 = density
         density_q_2 = 0*density
         ### Force the tails of densities to be zero
         u_1 = v0; u_0 = v1
-        density_q_1 = density_q_1 * I(t_vec<=u_1-max(v_vec_list[[1]]))
-        density_q_2 = density_q_2 * I(t_vec<=u_1-max(v_vec_list[[2]]))
+        density_q_1 = density_q_1 * I(t_vec<=u_1-max(v_mat_list[[1]]))
+        density_q_2 = density_q_2 * I(t_vec<=u_1-max(v_mat_list[[2]]))
         
         F_hat_q = sqrt( mean(N_spks_nodetrial_vec_q^2) )
         
@@ -276,7 +264,7 @@ get_center_intensity_array = function(spks_time_mlist,
               center_density_array=center_density_array,
               center_Nspks_mat=center_Nspks_mat,
               v_vec=v_vec,
-              v_vec_list=v_vec_list))
+              v_mat_list=v_mat_list))
 }
 
 
