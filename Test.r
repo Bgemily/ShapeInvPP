@@ -26,16 +26,19 @@ res = main_v5_pdf(SEED = 831,
                   t_vec_extend = seq(-3/2, 1, by=0.01),
                   clus_sep=2,
                   ### params when N_clus==1:
-                  N_spks_total = 50,
+                  N_spks_total = 500,
                   N_spks_ratio = 1,
                   sd_shrinkage = 2.5,
                   ### params when N_clus==2:
                   clus_mixture = 0,
                   ### Parameters for algorithms
-                  freq_trun = 5,
+                  rand_init = FALSE,
+                  N_restart = 1,
+                  freq_trun = 10, 
                   bw = 0,
+                  N_clus_min = 1, N_clus_max = 1,
                   fix_membership = FALSE,
-                  fix_timeshift=TRUE,
+                  fix_timeshift=FALSE,
                   use_true_timeshift = TRUE,
                   jitter_prop_true_timeshift = 0,
                   save_center_pdf_array=TRUE )

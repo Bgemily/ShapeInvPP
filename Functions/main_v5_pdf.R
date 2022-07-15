@@ -21,22 +21,24 @@ main_v5_pdf = function(### Parameters for generative model
                         ### params when N_clus==2:
                         clus_mixture = 0,
                         ### Parameters for algorithms
-                        freq_trun=5,
+                        freq_trun = 5,
                         bw = 0,
-                        N_component=2,
-                        gamma=0,
-                        MaxIter=10,
-                        N_clus_min=N_clus, N_clus_max=N_clus,
-                        fix_timeshift=FALSE,
-                        fix_comp1_timeshift_only=FALSE,
-                        use_true_timeshift=FALSE,
-                        jitter_prop_true_timeshift=0,
-                        fix_membership=FALSE,
-                        save_center_pdf_array=FALSE,
+                        N_component = 2,
+                        gamma = 0,
+                        MaxIter = 10,
+                        N_clus_min = N_clus, N_clus_max = N_clus,
+                        fix_timeshift = FALSE,
+                        fix_comp1_timeshift_only = FALSE,
+                        use_true_timeshift = FALSE,
+                        jitter_prop_true_timeshift = 0,
+                        fix_membership = FALSE,
+                        save_center_pdf_array = FALSE,
+                        rand_init = FALSE,
+                        N_restart = 1,
                         ### Unused
-                        jitter_time_rad = 10, max_iter=50,
-                        conv_thres=5e-3, 
-                        opt_radius=total_time/2,
+                        jitter_time_rad = 10, max_iter = 50,
+                        conv_thres = 5e-3, 
+                        opt_radius = total_time/2,
                         ...)
 {
   t_unit = t_vec[2]-t_vec[1]
@@ -80,20 +82,39 @@ main_v5_pdf = function(### Parameters for generative model
     N_clus_tmp = c(N_clus_min:N_clus_max)[ind_N_clus]
     
     ### Get initialization -----------
-    res = get_init(spks_time_mlist = spks_time_mlist, 
-                   stim_onset_vec = stim_onset_vec,
-                   N_clus = N_clus_tmp,
-                   N_component = N_component,
-                   v0 = u_1, v1 = u_0,
-                   t_vec = t_vec, 
-                   freq_trun = freq_trun,
-                   bw = bw,
-                   fix_timeshift = fix_timeshift, 
-                   fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                   use_true_timeshift = use_true_timeshift, 
-                   jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
-                   fix_membership = fix_membership,
-                   v_true_mat_list = v_true_mat_list)
+    if(rand_init) {
+      res = get_init_random(spks_time_mlist = spks_time_mlist, 
+                            stim_onset_vec = stim_onset_vec,
+                            N_clus = N_clus_tmp,
+                            N_component = N_component,
+                            v0 = u_1, v1 = u_0,
+                            t_vec = t_vec, 
+                            N_restart = 1,
+                            freq_trun = freq_trun,
+                            bw = bw,
+                            fix_timeshift = fix_timeshift, 
+                            fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                            use_true_timeshift = use_true_timeshift, 
+                            jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
+                            fix_membership = fix_membership,
+                            v_true_mat_list = v_true_mat_list)
+    } else {
+      res = get_init(spks_time_mlist = spks_time_mlist, 
+                     stim_onset_vec = stim_onset_vec,
+                     N_clus = N_clus_tmp,
+                     N_component = N_component,
+                     v0 = u_1, v1 = u_0,
+                     t_vec = t_vec, 
+                     freq_trun = freq_trun,
+                     bw = bw,
+                     fix_timeshift = fix_timeshift, 
+                     fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                     use_true_timeshift = use_true_timeshift, 
+                     jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
+                     fix_membership = fix_membership,
+                     v_true_mat_list = v_true_mat_list)
+    }
+    
     clusters_list_init = res$clusters_list
     v_mat_list_init = res$v_mat_list
     
@@ -123,14 +144,67 @@ main_v5_pdf = function(### Parameters for generative model
     time_estimation = time_end - time_start
     time_estimation = as.numeric(time_estimation, units='secs')
     
-    res$clusters_list -> clusters_list_est
-    res$v_mat_list -> v_mat_list_est
-    res$loss_history -> loss_history
-    res$N_iteration -> N_iteration
-    res$center_intensity_array -> center_intensity_array_est
-    res$center_density_array -> center_density_array_est
-    res$center_Nspks_mat -> center_Nspks_mat_est
-    
+    if(rand_init==TRUE & N_restart>1){
+      ### Initialize best estimator as current estimator
+      res_best = res
+      ### Initialize best loss as loss for current estimator
+      res = select_model(spks_time_mlist, 
+                         stim_onset_vec, 
+                         result_list = list(res_best))
+      compl_log_lik_best = res$compl_log_lik_vec[1]
+      
+      for (ind_restart in 1:(N_restart-1)) {
+        ### Get init
+        res = get_init_random(spks_time_mlist = spks_time_mlist, 
+                              stim_onset_vec = stim_onset_vec,
+                              N_clus = N_clus_tmp,
+                              N_component = N_component,
+                              v0 = u_1, v1 = u_0,
+                              t_vec = t_vec, 
+                              N_restart = 1,
+                              freq_trun = freq_trun,
+                              bw = bw,
+                              fix_timeshift = fix_timeshift, 
+                              fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                              use_true_timeshift = use_true_timeshift, 
+                              jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
+                              fix_membership = fix_membership,
+                              v_true_mat_list = v_true_mat_list)
+        clusters_list_init = res$clusters_list
+        v_mat_list_init = res$v_mat_list
+        
+        ### Apply algorithm
+        res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
+                                 stim_onset_vec = stim_onset_vec,
+                                 clusters_list_init = clusters_list_init,
+                                 v_mat_list_init = v_mat_list_init,
+                                 N_component = N_component, 
+                                 freq_trun = freq_trun,
+                                 bw = bw,
+                                 MaxIter = MaxIter, 
+                                 gamma=gamma,
+                                 v0 = u_1, v1= u_0,
+                                 t_vec=t_vec, 
+                                 t_vec_extend=t_vec_extend,
+                                 fix_timeshift = fix_timeshift, 
+                                 fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                                 fix_membership = fix_membership,
+                                 conv_thres = conv_thres,
+                                 ...)
+        ### Calculate log likelihood
+        res = select_model(spks_time_mlist, 
+                           stim_onset_vec, 
+                           result_list = list(res_new))
+        compl_log_lik_new = res$compl_log_lik_vec[1]
+        
+        ### Update best estimation
+        if(compl_log_lik_new > compl_log_lik_best){
+          compl_log_lik_best = compl_log_lik_new
+          res_best = res_new
+        }
+      }
+      res = res_best
+    }
     
     # Save results of N_clus_tmp ----------------------------------------------
     res_list[[ind_N_clus]] = res
@@ -269,6 +343,7 @@ main_v5_pdf = function(### Parameters for generative model
               v_mean_sq_err=v_mean_sq_err,
               v_mean_sq_err_vec=v_mean_sq_err_vec,
               # other
+              cand_N_clus_vec=cand_N_clus_vec,
               t_vec=t_vec, t_vec_extend=t_vec_extend,
               time_estimation=time_estimation,
               N_iteration=N_iteration,

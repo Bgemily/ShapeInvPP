@@ -1,78 +1,51 @@
 ### Initialize of cluster memberships and time shifts randomly
-get_init_random = function(edge_time_mat_list, N_clus, 
-                       N_restart=1,
-                       gamma=0.1,
-                       t_vec=seq(0, 200, length.out=1000))
+get_init_random = function(spks_time_mlist, 
+                           stim_onset_vec,
+                           N_clus,
+                           N_component = 2,
+                           v0 = 1, v1 = 1,
+                           t_vec = seq(-v1, v0, by=0.01), 
+                           freq_trun = 10,
+                           bw = 0,
+                           ### unused arguments:
+                           N_restart = 1,
+                           fix_timeshift = FALSE, 
+                           fix_comp1_timeshift_only = FALSE,
+                           use_true_timeshift = TRUE, 
+                           jitter_prop_true_timeshift = 0, 
+                           fix_membership = FALSE,
+                           v_true_mat_list = NULL)
 {
-  time_unit = t_vec[2] - t_vec[1]
-  N_subj = length(edge_time_mat_list)
-  N_node_vec = sapply(edge_time_mat_list, nrow)
+  t_unit = t_vec[2] - t_vec[1]
+  N_node = nrow(spks_time_mlist)
+  N_replicate = ncol(spks_time_mlist)
+  u_0 = v1
+  u_1 = v0
   
-  v_vec_list_best = list()
-  n0_vec_list_best = list()
-  membership_list_best = list()
-  clusters_list_best = list()
-  loss_best = Inf
-  for (ind_restart in 1:N_restart) {
-    ### Get init
-    v_vec_list = list()
-    n0_vec_list = list()
-    membership_list = list()
-    clusters_list = list()
-    for (m in 1:N_subj) {
-      
-      # Initialize time shifts -------------------------------------------------------
-      edge_time_mat = edge_time_mat_list[[m]]
-      earliest_edge_time = apply(edge_time_mat, 1, function(row) min(row[which(row>1)]))
-      
-      n0_vec = (earliest_edge_time)/time_unit
-      n0_vec[n0_vec==Inf] = 0
-      n0_vec = runif(length(n0_vec), min=0, max=n0_vec)
-      n0_vec = round(n0_vec)
-      
-      n0_vec_list[[m]] = n0_vec
-      v_vec_list[[m]] = n0_vec*time_unit
-      
-      
-      # Initialize clusters -----------------------------------------------------
-      membership = sample(1:N_clus, size=N_node_vec[m], replace = TRUE)
-      membership_list[[m]] = membership
-      
-      clusters = mem2clus(membership = membership, N_clus_min = N_clus)
-      clusters_list[[m]] = clusters
-      
-    }
-    
-    ### Calculate loss
-    if (N_restart==1) {
-      loss = 0 ### When N_restart==1, no need to calculate loss
-    } else {
-      n0_mat_list = n0_vec2mat(n0_vec = n0_vec_list)
-      center_cdf_array = get_center_cdf_array_v2(edge_time_mat_list = edge_time_mat_list, 
-                                                 clusters_list = clusters_list, 
-                                                 n0_mat_list = n0_mat_list, 
-                                                 t_vec = t_vec)
-      loss = eval_loss_v2(edge_time_mat_list = edge_time_mat_list, 
-                          n0_mat_list = n0_mat_list, 
-                          clusters_list = clusters_list, 
-                          center_cdf_array = center_cdf_array, 
-                          gamma = gamma,
-                          t_vec = t_vec)$loss
-    }
-    
-    ### Update init_best
-    if(loss < loss_best){
-      v_vec_list_best = v_vec_list
-      n0_vec_list_best = n0_vec_list
-      membership_list_best = membership_list
-      clusters_list_best = clusters_list
-      loss_best = loss
-    }
+  # Initialize clusters -----------------------------------------------------
+  membership_vec = sample(1:N_clus, size = N_node, replace = TRUE)
+  clusters_list = mem2clus(membership = membership_vec, N_clus_min = N_clus)
+  
+  
+  # Initialize time shifts -------------------------------------------------------
+  v_mat_list = list()
+  v_mat_list[[1]] = runif(n=N_node*N_replicate, 
+                          min = 0,
+                          max = u_0/2)  
+  v_mat_list[[1]] = matrix(v_mat_list[[1]], nrow = N_node, ncol = N_replicate)
+  v_mat_list[[2]] = runif(n = N_node*N_replicate,
+                          min = 0,
+                          max = u_1-u_0/2 )
+  v_mat_list[[2]] = matrix(v_mat_list[[2]], nrow = N_node, ncol = N_replicate)
+  for(id_clus in 1:N_clus){
+    v_mat_list[[1]][clusters_list[[id_clus]], ] = v_mat_list[[1]][clusters_list[[id_clus]], ] - 
+      min(v_mat_list[[1]][clusters_list[[id_clus]], ])
   }
   
+  
+  
 
-  return(list(membership_list=membership_list_best, 
-              clusters_list=clusters_list_best, 
-              n0_vec_list=n0_vec_list_best,
-              v_vec_list=v_vec_list_best))
+  return(list(v_mat_list=v_mat_list,
+              membership_vec=membership_vec, 
+              clusters_list=clusters_list))
 }
