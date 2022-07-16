@@ -19,14 +19,14 @@ results[[3]]$data_param$SEED -> SEED
 
 res = main_v5_pdf(SEED = 831,
                   N_node = 100, 
-                  N_replicate = 3,
+                  N_replicate = 1,
                   N_clus = 4, 
                   u_1 = 1, u_0 = 1, 
                   t_vec = seq(-1, 1, by=0.01),
                   t_vec_extend = seq(-3/2, 1, by=0.01),
                   clus_sep=2,
                   ### params when N_clus==1:
-                  N_spks_total = 500,
+                  N_spks_total = 50,
                   N_spks_ratio = 1,
                   sd_shrinkage = 2.5,
                   ### params when N_clus==2:
@@ -36,7 +36,6 @@ res = main_v5_pdf(SEED = 831,
                   N_restart = 1,
                   freq_trun = 10, 
                   bw = 0,
-                  N_clus_min = 1, N_clus_max = 1,
                   fix_membership = FALSE,
                   fix_timeshift=FALSE,
                   use_true_timeshift = TRUE,
@@ -47,6 +46,7 @@ res = main_v5_pdf(SEED = 831,
 res$F_mse_squarel2_ratio
 res$F_mean_sq_err_vec
 res$v_mean_sq_err_vec
+res$v_mean_sq_err
 res$ARI
 
 

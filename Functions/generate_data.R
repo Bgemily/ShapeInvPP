@@ -133,31 +133,31 @@ generate_data = function(SEED=NULL,
     
   } else if (N_clus==4) {
     ## Clus 1
-    s_tmp = u_0*(1/8)*1; mu_tmp = -u_0*(1/2) 
+    s_tmp = u_0*(1/2)*(1/(clus_sep^2)); mu_tmp = -u_0*(1/2); 
     center_density_array_true[1,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
-    s_tmp = sqrt(u_1)*(1/4/sqrt(2))*1; mu_tmp = u_1/2+s_tmp 
+    s_tmp = sqrt(u_1)*(1/2/sqrt(2))*(1/clus_sep); mu_tmp = u_1/2+s_tmp; 
     center_density_array_true[1,2, ] = (1)*1/(2*s_tmp)^2*( 1 + cos(((sqrt(abs(t_vec_extend)) - s_tmp)/s_tmp)*pi) ) * I(0<=t_vec_extend & t_vec_extend<=(2*s_tmp)^2) +
       (0)*1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
     ## Clus 2
-    s_tmp = u_0*(1/8)*clus_sep; mu_tmp = -u_0*(1/2); 
+    s_tmp = u_0*(1/2)*(1/clus_sep); mu_tmp = -u_0*(1/2); 
     center_density_array_true[2,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
-    s_tmp = sqrt(u_1)*(1/4/sqrt(2))*sqrt(clus_sep); mu_tmp = u_1/2+s_tmp; 
+    s_tmp = sqrt(u_1)*(1/2/sqrt(2))*(1/sqrt(clus_sep)); mu_tmp = u_1/2+s_tmp; 
     center_density_array_true[2,2, ] = (1)*1/(2*s_tmp)^2*( 1 + cos(((sqrt(abs(t_vec_extend)) - s_tmp)/s_tmp)*pi) ) * I(0<=t_vec_extend & t_vec_extend<=(2*s_tmp)^2) +
       (0)*1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
     ## Clus 3
-    s_tmp = u_0*(1/8)*(clus_sep^2); mu_tmp = -u_0*(1/2); 
+    s_tmp = u_0*(1/2)*1; mu_tmp = -u_0*(1/2) 
     center_density_array_true[3,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
-    s_tmp = sqrt(u_1)*(1/4/sqrt(2))*sqrt(clus_sep^2); mu_tmp = u_1/2+s_tmp; 
+    s_tmp = sqrt(u_1)*(1/2/sqrt(2))*1; mu_tmp = u_1/2+s_tmp 
     center_density_array_true[3,2, ] = (1)*1/(2*s_tmp)^2*( 1 + cos(((sqrt(abs(t_vec_extend)) - s_tmp)/s_tmp)*pi) ) * I(0<=t_vec_extend & t_vec_extend<=(2*s_tmp)^2) +
       (0)*1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
     ## Clus 4
-    s_tmp = u_0*(1/8)*1; mu_tmp = -u_0*(1/2) 
+    s_tmp = u_0*(1/2)*(1/(clus_sep^2)); mu_tmp = -u_0*(1/2); 
     center_density_array_true[4,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
-    s_tmp = sqrt(u_1)*(1/4/sqrt(2))*sqrt(clus_sep^2); mu_tmp = u_1/2+s_tmp; 
+    s_tmp = sqrt(u_1)*(1/2/sqrt(2))*1; mu_tmp = u_1/2+s_tmp 
     center_density_array_true[4,2, ] = (1)*1/(2*s_tmp)^2*( 1 + cos(((sqrt(abs(t_vec_extend)) - s_tmp)/s_tmp)*pi) ) * I(0<=t_vec_extend & t_vec_extend<=(2*s_tmp)^2) +
       (0)*1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
     
@@ -218,19 +218,19 @@ generate_data = function(SEED=NULL,
         v_tmp_1 = v_mat_list[[1]][id_node, id_replicate]
         v_tmp_2 = v_mat_list[[2]][id_node, id_replicate]
         spks_time_mlist[id_node, id_replicate] = list(c( rejection_sampling(density_vec = center_density_array_true[id_clus,1,], 
-                                                                t_vec = t_vec_extend, 
-                                                                N_sample = 0*center_N_spks_mat[id_clus,1]+
-                                                                  1*rpois(n=1, lambda=center_N_spks_mat[id_clus,1]) )+
-                                               stim_onset_vec[id_replicate]+v_tmp_1,
-                                             rejection_sampling(density_vec = center_density_array_true[id_clus,2,], 
-                                                                t_vec = t_vec_extend, 
-                                                                N_sample = 0*center_N_spks_mat[id_clus,2]+
-                                                                  1*rpois(n=1, lambda=center_N_spks_mat[id_clus,2]) )+
-                                               stim_onset_vec[id_replicate]+v_tmp_2 ))
+                                                                            t_vec = t_vec_extend, 
+                                                                            N_sample = 0*center_N_spks_mat[id_clus,1]+
+                                                                              1*rpois(n=1, lambda=center_N_spks_mat[id_clus,1]) )+
+                                                           stim_onset_vec[id_replicate]+v_tmp_1,
+                                                         rejection_sampling(density_vec = center_density_array_true[id_clus,2,], 
+                                                                            t_vec = t_vec_extend, 
+                                                                            N_sample = 0*center_N_spks_mat[id_clus,2]+
+                                                                              1*rpois(n=1, lambda=center_N_spks_mat[id_clus,2]) )+
+                                                           stim_onset_vec[id_replicate]+v_tmp_2 ))
         ### Only keep spike times during [-u_0, u_1] 
         spks_time_vec = spks_time_mlist[id_node,id_replicate][[1]]
         spks_time_mlist[id_node,id_replicate][[1]] = spks_time_vec[which(spks_time_vec >= -u_0 & 
-                                                                spks_time_vec <= u_1)]
+                                                                           spks_time_vec <= u_1)]
       }
     }
   }

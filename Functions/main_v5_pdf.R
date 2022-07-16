@@ -285,10 +285,11 @@ main_v5_pdf = function(### Parameters for generative model
     
 
     # Compute error of time shifts, i.e. w, v --------------------------------------------
-    v_mean_sq_err = mean((unlist(v_true_mat_list)-unlist(v_mat_list_est))^2) 
     v_mean_sq_err_vec = sapply(1:N_component, function(id_component){
-      mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2) 
+      mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2) /
+        (ifelse(N_component == 1, yes = u_0/4, no = (u_1 - u_0/2)/2 ) )^2
     })
+    v_mean_sq_err = mean(v_mean_sq_err_vec)
       
     
     
