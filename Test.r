@@ -5,49 +5,24 @@ sapply(file.sources, source)
 
 library(tidyverse)
 
-
-load("/Users/ztzhang/Documents/Academic/SC/ShapeInvPP/Results/Rdata/Nclus1/timeshifts_est_v4.1.2/N_node=10,N_spks_total=100/N_spks_ratio/0.2/N_trial10_20220626_113035.Rdata")
-
-id_res = 8
-
-results[[id_res]]$F_mse_squarel2_ratio_vec
-results[[id_res]]$v_mean_sq_err_vec
-
-results[[3]]$data_param
-results[[3]]$data_param$SEED -> SEED
-
-
-res = main_v5_pdf(SEED = 831,
-                  N_node = 100, 
-                  N_replicate = 1,
-                  N_clus = 4, 
-                  u_1 = 1, u_0 = 1, 
-                  t_vec = seq(-1, 1, by=0.01),
-                  t_vec_extend = seq(-3/2, 1, by=0.01),
-                  clus_sep=2,
-                  ### params when N_clus==1:
-                  N_spks_total = 50,
-                  N_spks_ratio = 1,
-                  sd_shrinkage = 2.5,
-                  ### params when N_clus==2:
-                  clus_mixture = 0,
-                  ### Parameters for algorithms
-                  rand_init = FALSE,
-                  N_restart = 1,
-                  freq_trun = 10, 
-                  bw = 0,
-                  fix_membership = FALSE,
-                  fix_timeshift=FALSE,
-                  use_true_timeshift = TRUE,
-                  jitter_prop_true_timeshift = 0,
-                  save_center_pdf_array=TRUE )
-
-
-res$F_mse_squarel2_ratio
-res$F_mean_sq_err_vec
-res$v_mean_sq_err_vec
-res$v_mean_sq_err
-res$ARI
+N_restart_list = list(1,3)
+tmp = lapply(N_restart_list, function(N_restart){
+  main_v5_pdf(SEED = 831,
+              N_node = 100,
+              N_clus = 4,
+              u_1 = 1, u_0 = 1,
+              t_vec = seq(-1, 1, by=0.01),
+              t_vec_extend = seq(-3/2, 1, by=0.01),
+              ### params when N_clus==4:
+              N_spks_total = 50,
+              clus_sep = 2,
+              ### Parameters for algorithms
+              rand_init = TRUE,
+              N_restart = N_restart,
+              freq_trun = 10,
+              fix_timeshift=FALSE,
+              save_center_pdf_array=TRUE )
+})
 
 
 tmp = plot_intensity_array(center_intensity_array = res$center_density_array_est_permn,

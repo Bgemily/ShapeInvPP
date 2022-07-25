@@ -194,8 +194,8 @@ get_center_intensity_array = function(spks_time_mlist,
         density_q_2[which(t_vec<=0)] = 0
         
         ### Force the second density to be non-zero right after t=0
-        if(density_q_2[which(t_vec>0)[1]]<max(density_q_2)*0.05){
-          length_rmv = min(t_vec[which(density_q_2>=max(density_q_2)*0.05)]) / t_unit
+        if(abs(density_q_2[which(t_vec>0)[1]])<max(abs(density_q_2))*0.05){
+          length_rmv = min(t_vec[which(abs(density_q_2)>=max(abs(density_q_2))*0.05)]) / t_unit
           density_q_2 = c( tail(density_q_2,length(t_vec)-length_rmv), rep(tail(density_q_2,1),length_rmv) )
           if (!fix_timeshift) {
             v_mat_list[[2]][clusters_list[[q]], ] = v_mat_list[[2]][clusters_list[[q]], ] + length_rmv*t_unit

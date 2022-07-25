@@ -345,6 +345,7 @@ main_v5_pdf = function(### Parameters for generative model
               v_mean_sq_err_vec=v_mean_sq_err_vec,
               # other
               cand_N_clus_vec=cand_N_clus_vec,
+              N_restart = N_restart,
               t_vec=t_vec, t_vec_extend=t_vec_extend,
               time_estimation=time_estimation,
               N_iteration=N_iteration,
