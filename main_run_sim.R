@@ -16,8 +16,8 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_trial_total = 500
-split = 50
+N_trial_total = 20
+split = 2
 
 N_trial = N_trial_total/split
 
@@ -643,12 +643,12 @@ N_node_list = list(100, 200, 300, 400, 500)
 clus_sep_list = list(1.5, 1.6, 1.7, 1.8, 1.9, 2.0)
 
 top_level_folder = "../Results/Rdata"
-setup = 'Nclus4_v1.1'
+setup = 'Nclus4_v1.3'
 default_setting = 'N_spks_total=50,N_node=100,clus_sep=1.5'
 
 ### Save estimated densities
 for (. in 1:1) {
-  method = 'timeshifts_est_v1.2'
+  method = 'timeshifts_est_v1.4'
   for (freq_trun in c(10)){
     ### N_spks_total
     for (id_N_spks_total in 1:length(N_spks_total_list)) {
@@ -788,7 +788,7 @@ for (. in 1:1) {
 
   }
 
-  method = 'timeshifts_true_v1.2'
+  method = 'timeshifts_true_v1.4'
   for (freq_trun in c(10)){
     ### N_spks_ratio
     for (id_N_spks_total in 1:length(N_spks_total_list)) {
@@ -932,7 +932,7 @@ for (. in 1:1) {
 
   }
 
-  method = 'membership_true_v1.2'
+  method = 'membership_true_v1.4'
   for (freq_trun in c(10)){
     ### N_spks_ratio
     for (id_N_spks_total in 1:length(N_spks_total_list)) {
@@ -1079,7 +1079,7 @@ for (. in 1:1) {
 
 ### NOT save estimated densities
 for (. in 1:split) {
-  method = 'timeshifts_est_v1.2'
+  method = 'timeshifts_est_v1.4'
   for (freq_trun in c(10)){
     ### N_spks_total
     for (id_N_spks_total in 1:length(N_spks_total_list)) {
@@ -1219,7 +1219,7 @@ for (. in 1:split) {
 
   }
 
-  method = 'timeshifts_true_v1.2'
+  method = 'timeshifts_true_v1.4'
   for (freq_trun in c(10)){
     ### N_spks_ratio
     for (id_N_spks_total in 1:length(N_spks_total_list)) {
@@ -1363,7 +1363,7 @@ for (. in 1:split) {
 
   }
 
-  method = 'membership_true_v1.2'
+  method = 'membership_true_v1.4'
   for (freq_trun in c(10)){
     ### N_spks_ratio
     for (id_N_spks_total in 1:length(N_spks_total_list)) {
