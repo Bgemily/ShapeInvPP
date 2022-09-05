@@ -110,7 +110,7 @@ get_center_intensity_array = function(spks_time_mlist,
       if (length(clusters_list[[q]])*N_replicate>=2) {
         ### Temporarily force the minimum time shift of second component to be zero
         if (!fix_timeshift) {
-          v_mat_list[[2]][clusters_list[[q]], ] = v_mat_list[[2]][clusters_list[[q]], ] - min(v_mat_list[[2]][clusters_list[[q]], ])
+          v_mat_list[[2]][clusters_list[[q]], ] = v_mat_list[[2]][clusters_list[[q]], ] - quantile(v_mat_list[[2]][clusters_list[[q]], ], 0.05)
         }
         
         Y_mat_q = matrix(nrow=length(t_vec), ncol=length(clusters_list[[q]])*N_replicate )

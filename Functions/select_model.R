@@ -49,10 +49,10 @@ select_model = function(spks_time_mlist,
         for (id_replicate in 1:N_replicate) {
           w_tmp = v_mat_list_tmp[[1]][id_node, id_replicate]
           v_tmp = v_mat_list_tmp[[2]][id_node, id_replicate]
-          Sw_f_tmp = c(rep(0, round(w_tmp/t_unit) ),
-                       head(f_tmp, length(t_vec)-round(w_tmp/t_unit)) )
-          Sv_g_tmp = c(rep(0, round(v_tmp/t_unit) ),
-                       head(g_tmp, length(t_vec)-round(v_tmp/t_unit)) )
+          Sw_f_tmp = c(rep(0, max(0,round(w_tmp/t_unit)) ),
+                       head(f_tmp, length(t_vec)-max(0,round(w_tmp/t_unit))) )
+          Sv_g_tmp = c(rep(0, max(0,round(v_tmp/t_unit)) ),
+                       head(g_tmp, length(t_vec)-max(0,round(v_tmp/t_unit))) )
           log_Sw_f_Sv_g_tmp = rep(0, length(t_vec))
           log_Sw_f_Sv_g_tmp[which(Sw_f_tmp+Sv_g_tmp>0)] = log( (Sw_f_tmp+Sv_g_tmp)[which(Sw_f_tmp+Sv_g_tmp>0)] )
           
