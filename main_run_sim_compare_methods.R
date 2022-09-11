@@ -1,0 +1,115 @@
+#!/usr/bin/env Rscript
+
+# Import all functions ----------------------------------------------------
+
+rm(list=ls())
+file_path = "./Functions"
+file.sources = list.files(path = file_path, pattern = "*.R$", full.names = TRUE)
+sapply(file.sources, source)
+library(Matrix)
+library(fdapace)
+
+# Load libraries ----------------------------------------------------------
+
+library(foreach)
+library(doParallel)
+
+
+# User input setup --------------------------------------------------------
+
+N_trial_total = 20
+split = 2
+
+N_trial = N_trial_total/split
+
+
+# Parallel computing setup ------------------------------------------------
+
+N_cores = 10
+registerDoParallel(cores=N_cores)
+
+
+# Run simulations ---------------------------------------------------------
+
+### Compare with FPCA. ###########
+### Parameters' possible values:
+timeshift_max_vec_list = list(c(1/8, 1/32), c(1/8, 1/32)*1.5, c(1/8, 1/32)*2,
+                              c(1/8, 1/32)*0.5, c(1/8, 1/32)*0.25, c(1/8, 1/32)*0.125,
+                              c(1/8, 1/32*1.5), c(1/8, 1/32*2), c(1/8, 1/32*2.5), c(1/8, 1/32*3))
+
+top_level_folder = "../Results/Rdata"
+setup = 'Compare_FPCA'
+default_setting = 'N_spks_total=1000,N_node=100,N_clus=1'
+
+### Save estimated densities
+for (. in 1:1) {
+  method = 'fpca'
+  ### timeshift_max_vec
+  for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
+    timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
+    results <- foreach(j = 1:N_trial) %dopar% {
+      SEED = sample(1:1e7,1)
+      tryCatch(main_fpca(SEED = SEED, 
+                         N_node = 100,
+                         N_clus=1, 
+                         N_spks_total = 1000,
+                         timeshift_max_vec = timeshift_max_vec,
+                         ### Parameters for algorithms
+                         bw = 'SJ',
+                         N_component = 2, 
+                         save_center_pdf_array = TRUE),
+               error = function(x) print(SEED))
+    }
+    param_name = "timeshift_max_vec"
+    param_value = paste0(timeshift_max_vec, collapse = '_')
+    folder_path = paste0(top_level_folder,
+                         '/', setup,
+                         '/', method, 
+                         '/', default_setting,
+                         '/', param_name, '/', param_value)
+    dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
+    
+    now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+    rm(results)
+  }
+  
+}
+
+
+### NOT save estimated densities
+for (. in 1:split) {
+  method = 'fpca'
+  ### timeshift_max_vec
+  for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
+    timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
+    results <- foreach(j = 1:N_trial) %dopar% {
+      SEED = sample(1:1e7,1)
+      tryCatch(main_fpca(SEED = SEED, 
+                         N_node = 100,
+                         N_clus = 1, 
+                         N_spks_total = 1000,
+                         timeshift_max_vec = timeshift_max_vec,
+                         ### Parameters for algorithms
+                         bw = 'SJ',
+                         N_component = 2, 
+                         save_center_pdf_array = FALSE),
+               error = function(x) print(SEED))
+    }
+    param_name = "timeshift_max_vec"
+    param_value = paste0(timeshift_max_vec, collapse = '_')
+    folder_path = paste0(top_level_folder,
+                         '/', setup,
+                         '/', method, 
+                         '/', default_setting,
+                         '/', param_name, '/', param_value)
+    dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
+    
+    now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+    rm(results)
+  }
+  
+}
+
+
