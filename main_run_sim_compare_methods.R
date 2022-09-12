@@ -43,21 +43,21 @@ default_setting = 'N_spks_total=1000,N_node=100,N_clus=1'
 
 ### Save estimated densities
 for (. in 1:1) {
-  method = 'fpca'
-  ### timeshift_max_vec
+  method = 'shape_inv_pp'
   for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
     timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
     results <- foreach(j = 1:N_trial) %dopar% {
       SEED = sample(1:1e7,1)
-      tryCatch(main_fpca(SEED = SEED, 
-                         N_node = 100,
-                         N_clus=1, 
-                         N_spks_total = 1000,
-                         timeshift_max_vec = timeshift_max_vec,
-                         ### Parameters for algorithms
-                         bw = 'SJ',
-                         N_component = 2, 
-                         save_center_pdf_array = TRUE),
+      tryCatch(main_v5_pdf(SEED = SEED, 
+                           N_node = 100,
+                           N_clus=1, 
+                           N_spks_total = 1000,
+                           timeshift_max_vec = timeshift_max_vec,
+                           ### Parameters for algorithms
+                           freq_trun = 10,
+                           fix_timeshift=FALSE,
+                           fix_membership = FALSE,
+                           save_center_pdf_array=TRUE),
                error = function(x) print(SEED))
     }
     param_name = "timeshift_max_vec"
@@ -74,26 +74,56 @@ for (. in 1:1) {
     rm(results)
   }
   
+  # method = 'fpca'
+  # for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
+  #   timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
+  #   results <- foreach(j = 1:N_trial) %dopar% {
+  #     SEED = sample(1:1e7,1)
+  #     tryCatch(main_fpca(SEED = SEED, 
+  #                        N_node = 100,
+  #                        N_clus=1, 
+  #                        N_spks_total = 1000,
+  #                        timeshift_max_vec = timeshift_max_vec,
+  #                        ### Parameters for algorithms
+  #                        bw = 'SJ',
+  #                        N_component = 2, 
+  #                        save_center_pdf_array = TRUE),
+  #              error = function(x) print(SEED))
+  #   }
+  #   param_name = "timeshift_max_vec"
+  #   param_value = paste0(timeshift_max_vec, collapse = '_')
+  #   folder_path = paste0(top_level_folder,
+  #                        '/', setup,
+  #                        '/', method, 
+  #                        '/', default_setting,
+  #                        '/', param_name, '/', param_value)
+  #   dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
+  #   
+  #   now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
+  #   save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+  #   rm(results)
+  # }
+
 }
 
 
 ### NOT save estimated densities
 for (. in 1:split) {
-  method = 'fpca'
-  ### timeshift_max_vec
+  method = 'shape_inv_pp'
   for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
     timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
     results <- foreach(j = 1:N_trial) %dopar% {
       SEED = sample(1:1e7,1)
-      tryCatch(main_fpca(SEED = SEED, 
-                         N_node = 100,
-                         N_clus = 1, 
-                         N_spks_total = 1000,
-                         timeshift_max_vec = timeshift_max_vec,
-                         ### Parameters for algorithms
-                         bw = 'SJ',
-                         N_component = 2, 
-                         save_center_pdf_array = FALSE),
+      tryCatch(main_v5_pdf(SEED = SEED, 
+                           N_node = 100,
+                           N_clus=1, 
+                           N_spks_total = 1000,
+                           timeshift_max_vec = timeshift_max_vec,
+                           ### Parameters for algorithms
+                           freq_trun = 10,
+                           fix_timeshift=FALSE,
+                           fix_membership = FALSE,
+                           save_center_pdf_array=FALSE),
                error = function(x) print(SEED))
     }
     param_name = "timeshift_max_vec"
@@ -109,6 +139,38 @@ for (. in 1:split) {
     save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
     rm(results)
   }
+  
+  
+  # method = 'fpca'
+  # ### timeshift_max_vec
+  # for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
+  #   timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
+  #   results <- foreach(j = 1:N_trial) %dopar% {
+  #     SEED = sample(1:1e7,1)
+  #     tryCatch(main_fpca(SEED = SEED, 
+  #                        N_node = 100,
+  #                        N_clus = 1, 
+  #                        N_spks_total = 1000,
+  #                        timeshift_max_vec = timeshift_max_vec,
+  #                        ### Parameters for algorithms
+  #                        bw = 'SJ',
+  #                        N_component = 2, 
+  #                        save_center_pdf_array = FALSE),
+  #              error = function(x) print(SEED))
+  #   }
+  #   param_name = "timeshift_max_vec"
+  #   param_value = paste0(timeshift_max_vec, collapse = '_')
+  #   folder_path = paste0(top_level_folder,
+  #                        '/', setup,
+  #                        '/', method, 
+  #                        '/', default_setting,
+  #                        '/', param_name, '/', param_value)
+  #   dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
+  #   
+  #   now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
+  #   save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+  #   rm(results)
+  # }
   
 }
 
