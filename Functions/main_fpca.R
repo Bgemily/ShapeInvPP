@@ -97,14 +97,7 @@ main_fpca = function(### Parameters for generative model
   calculate_antideriv = function(x_vec, gradient_vec){
     dx_vec = c(0, diff(x_vec))
     f_vec = cumsum(gradient_vec*dx_vec)
-    if (mean(f_vec)<0){
-      sign = -1
-    } else{
-      sign = 1
-    }
-    f_vec = sign*f_vec
-    
-    return(list(f_vec=f_vec, sign=sign))
+    return(f_vec)
   }
   
   center_density_array_est = array(dim = c(N_clus, N_component, length(t_vec)))
@@ -114,15 +107,11 @@ main_fpca = function(### Parameters for generative model
     eigen_func_vec = eigenfuncs_mat[,id_component]
     inner_prod = sum( derivative_mean_density_vec * eigen_func_vec ) * (t_fpca_vec[2]-t_fpca_vec[1])
     derivative_density_vec = eigen_func_vec * inner_prod
-    res_antideriv = calculate_antideriv(x_vec = t_fpca_vec, gradient_vec = derivative_density_vec)
-    density_vec = res_antideriv$f_vec
-    sign = res_antideriv$sign
-    
+    density_vec = calculate_antideriv(x_vec = t_fpca_vec, gradient_vec = derivative_density_vec)
     density_vec = approx(x = t_fpca_vec, y = density_vec, xout = t_vec)$y
     center_density_array_est[1, id_component, ] = density_vec
     
     v_fpca_vec = -fpc_scores_mat[, id_component] * (inner_prod^(-1))
-    v_fpca_vec = sign * v_fpca_vec
     v_mat_list_est[[id_component]] = matrix(data = v_fpca_vec, nrow = N_node, ncol = N_replicate)
   }
   center_density_array_est = round(center_density_array_est, digits = 4)
