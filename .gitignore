@@ -1,3 +1,8 @@
+*.html
+*.ipynb
+.ipynb_checkpoints/
+.DS_Store
+
 # History files
 .Rhistory
 .Rapp.history
@@ -17,7 +22,8 @@
 # Output files from R CMD check
 /*.Rcheck/
 
-# RStudio files
+# RStudio file
+*.Rproj
 .Rproj.user/
 
 # produced vignettes
