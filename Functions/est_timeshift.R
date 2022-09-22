@@ -117,8 +117,8 @@ est_timeshift = function(spks_time_mlist,
             # u_0 = v1, u_1 = v0
             n0_max_vec = c(round((v1/2)/t_unit),
                            round((v0-v1/2)/t_unit) )
-            n0_min_vec = c(0,
-                           0 )
+            n0_min_vec = c(-round((v1/2)/t_unit),
+                           -round((v0-v1/2)/t_unit) )
             n0_tmp_vec = align_two_components(f_target = f_target,
                                               f_origin_1 = f_origin_1,
                                               f_origin_2 = f_origin_2,
