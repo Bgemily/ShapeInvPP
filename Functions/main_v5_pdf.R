@@ -238,39 +238,6 @@ main_v5_pdf = function(### Parameters for generative model
   res$loss_history -> loss_history
   res$N_iteration -> N_iteration
   
-  ### Force average time shifts for any component to be zero #######
-  for (id_clus in 1:N_clus) {
-    current_clus = clusters_list_est[[id_clus]]
-    if (length(current_clus)>=1){
-      for (id_component in 1:N_component) {
-        mean_time_shift = mean(v_mat_list_est[[id_component]][current_clus, ])
-        v_mat_list_est[[id_component]][current_clus, ] = v_mat_list_est[[id_component]][current_clus, ] - mean_time_shift
-        ### Shift density component accordingly
-        N_timegrid_shift = round(mean_time_shift/t_unit)
-        N_timegrid_total = length(center_density_array_est[id_clus, id_component, ])
-        if (N_timegrid_shift<=0) {
-          center_density_array_est[id_clus, id_component, ] = c(center_density_array_est[id_clus, id_component, (abs(N_timegrid_shift)+1):N_timegrid_total], 
-                                                                rep(0, abs(N_timegrid_shift)))
-        }
-        else {
-          center_density_array_est[id_clus, id_component, ] = c(rep(0, abs(N_timegrid_shift)), 
-                                                                center_density_array_est[id_clus, id_component, 1:(N_timegrid_total-abs(N_timegrid_shift))] )
-        }
-        ### Shift intensity component accordingly
-        if (N_timegrid_shift<=0) {
-          center_intensity_array_est[id_clus, id_component, ] = c(center_intensity_array_est[id_clus, id_component, (abs(N_timegrid_shift)+1):N_timegrid_total], 
-                                                                  rep(0, abs(N_timegrid_shift)))
-        }
-        else {
-          center_intensity_array_est[id_clus, id_component, ] = c(rep(0, abs(N_timegrid_shift)), 
-                                                                  center_intensity_array_est[id_clus, id_component, 1:(N_timegrid_total-abs(N_timegrid_shift))] )
-        }
-        
-      }
-    }
-  }
-  
-  
   
   
   # Compute estimation error ------------------------------------------------
