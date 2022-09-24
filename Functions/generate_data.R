@@ -38,6 +38,10 @@ generate_data = function(SEED=NULL,
                           min = 0,
                           max = timeshift_max_vec[2] )
   v_mat_list[[2]] = matrix(v_mat_list[[2]], nrow = N_node, ncol = N_replicate)
+  for(id_clus in 1:N_clus){
+    v_mat_list[[1]][clus_true_list[[id_clus]], ] = v_mat_list[[1]][clus_true_list[[id_clus]], ] - min(v_mat_list[[1]][clus_true_list[[id_clus]], ])
+    v_mat_list[[2]][clus_true_list[[id_clus]], ] = v_mat_list[[2]][clus_true_list[[id_clus]], ] - min(v_mat_list[[2]][clus_true_list[[id_clus]], ])
+  }
   
   # Generate expected number of spikes --------------------------------------------
   center_N_spks_mat = matrix(nrow=N_clus,ncol=2)
