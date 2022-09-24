@@ -108,6 +108,11 @@ get_center_intensity_array = function(spks_time_mlist,
       density_q_1 = density_q_2 = rep(0, length(t_vec))
       F_hat_q = 0
       if (length(clusters_list[[q]])*N_replicate>=2) {
+        ### Temporarily force the minimum time shift of second component to be zero
+        if (!fix_timeshift) {
+          v_mat_list[[2]][clusters_list[[q]], ] = v_mat_list[[2]][clusters_list[[q]], ] - quantile(v_mat_list[[2]][clusters_list[[q]], ], 0.05)
+        }
+        
         Y_mat_q = matrix(nrow=length(t_vec), ncol=length(clusters_list[[q]])*N_replicate )
         X_array_q = array(dim = c(length(t_vec), length(clusters_list[[q]])*N_replicate, 2))
         N_spks_nodetrial_vec_q = c()
@@ -189,7 +194,7 @@ get_center_intensity_array = function(spks_time_mlist,
         density_q_2[which(t_vec<=0)] = 0
         
         ### Force the second density to be non-zero right after t=0
-        if(FALSE & abs(density_q_2[which(t_vec>0)[1]])<max(abs(density_q_2))*0.05){
+        if(abs(density_q_2[which(t_vec>0)[1]])<max(abs(density_q_2))*0.05){
           length_rmv = min(t_vec[which(abs(density_q_2)>=max(abs(density_q_2))*0.05)]) / t_unit
           density_q_2 = c( tail(density_q_2,length(t_vec)-length_rmv), rep(tail(density_q_2,1),length_rmv) )
           if (!fix_timeshift) {

@@ -189,13 +189,13 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     
     
     
-    ### Force median time shifts in each (cluster, component) to be zero
+    ### Force minimum time shifts in each (cluster, component) to be zero
     if (!fix_timeshift) {
       for (id_clus in 1:N_clus) {
-        v_mat_list[[1]][clusters_list[[id_clus]], ] = v_mat_list[[1]][clusters_list[[id_clus]], ] - (quantile(v_mat_list[[1]][clusters_list[[id_clus]], ], 0.5)-0)
+        v_mat_list[[1]][clusters_list[[id_clus]], ] = v_mat_list[[1]][clusters_list[[id_clus]], ] - (quantile(v_mat_list[[1]][clusters_list[[id_clus]], ], 0.0)-0)
         v_mat_list[[1]] = round(v_mat_list[[1]]/t_unit)*t_unit
         
-        v_mat_list[[2]][clusters_list[[id_clus]], ] = v_mat_list[[2]][clusters_list[[id_clus]], ] - (quantile(v_mat_list[[2]][clusters_list[[id_clus]], ], 0.5)-0)
+        v_mat_list[[2]][clusters_list[[id_clus]], ] = v_mat_list[[2]][clusters_list[[id_clus]], ] - (quantile(v_mat_list[[2]][clusters_list[[id_clus]], ], 0.0)-0)
         v_mat_list[[2]] = round(v_mat_list[[2]]/t_unit)*t_unit
         
       }
