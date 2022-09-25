@@ -77,20 +77,10 @@ main_kcfc = function(### Parameters for generative model
                  optnsCS = list(dataType='Dense', maxK=N_component, FVEthreshold = 1))
   
   # Find the best permutation of cluster labels
-  the_permn = c()
-  memb_est_vec_permn = c()
+  clusters_list_true = data_generated$clus_true_list
   clusters_list_est = mem2clus(as.numeric(kcfcObj$cluster))
-  permn_list = combinat::permn(1:N_clus)  
-  accuracy_max = 0
-  for (permn in permn_list) {
-    memb_est_vec_permn = clus2mem(clusters_list_est[permn])
-    memb_true_vec = data_generated$mem_true_vec
-    accuracy_tmp = sum(memb_est_vec_permn==memb_true_vec) / length(memb_true_vec)
-    if (accuracy_tmp > accuracy_max){
-      the_permn = permn
-      accuracy_max = accuracy_tmp
-    }
-  }  
+  the_permn = find_permn_clus_label(clusters_list_true = clusters_list_true, 
+                                    clusters_list_est = clusters_list_est)
   memb_est_vec_permn = clus2mem(clusters_list_est[the_permn])
   fpcaList_permn = kcfcObj$fpcaList[the_permn]    
   
