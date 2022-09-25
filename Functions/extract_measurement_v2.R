@@ -55,9 +55,10 @@ extract_measurement_v2 = function(folder_path, param_name=NULL, measurement=c("A
         if (is.list(results[[idx_res]])) {
           SEED_vec[idx_res] = results[[idx_res]]$data_param$SEED
         } else{
-          SEED_vec[idx_res] = results[[idx_res]]
+          SEED_vec[idx_res] = NA
         }
       }
+      SEED_vec = SEED_vec[!is.na(SEED_vec)]
       meas_value_df = dplyr::bind_cols(SEED=SEED_vec, meas_value_df)
       
       # Append result to large data frame

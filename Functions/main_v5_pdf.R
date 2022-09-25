@@ -63,17 +63,17 @@ main_v5_pdf = function(### Parameters for generative model
                     identical_components = identical_components,
                     clus_mixture = clus_mixture)
   
-  network_list = do.call(what = generate_data, args = data_param)
+  data_generated = do.call(what = generate_data, args = data_param)
   
   
-  spks_time_mlist = network_list$spks_time_mlist
-  stim_onset_vec = network_list$stim_onset_vec
+  spks_time_mlist = data_generated$spks_time_mlist
+  stim_onset_vec = data_generated$stim_onset_vec
   
-  center_density_array_true = network_list$center_density_array_true
-  center_intensity_array_true = network_list$center_intensity_array_true
-  mem_true_vec = network_list$mem_true_vec
-  clus_true_list = network_list$clus_true_list
-  v_true_mat_list = network_list$v_mat_list
+  center_density_array_true = data_generated$center_density_array_true
+  center_intensity_array_true = data_generated$center_intensity_array_true
+  mem_true_vec = data_generated$mem_true_vec
+  clus_true_list = data_generated$clus_true_list
+  v_true_mat_list = data_generated$v_mat_list
   
 
   # Fit model for various cluster number ------------------------------------
@@ -238,37 +238,6 @@ main_v5_pdf = function(### Parameters for generative model
   res$loss_history -> loss_history
   res$N_iteration -> N_iteration
   
-  ### Force average time shifts for any component to be zero #######
-  for (id_clus in 1:N_clus) {
-    current_clus = clusters_list_est[[id_clus]]
-    for (id_component in 1:N_component) {
-      mean_time_shift = mean(v_mat_list_est[[id_component]][current_clus, ])
-      v_mat_list_est[[id_component]][current_clus, ] = v_mat_list_est[[id_component]][current_clus, ] - mean_time_shift
-      ### Shift density component accordingly
-      N_timegrid_shift = round(mean_time_shift/t_unit)
-      N_timegrid_total = length(center_density_array_est[id_clus, id_component, ])
-      if (N_timegrid_shift<=0) {
-        center_density_array_est[id_clus, id_component, ] = c(center_density_array_est[id_clus, id_component, (abs(N_timegrid_shift)+1):N_timegrid_total], 
-                                                              rep(0, abs(N_timegrid_shift)))
-      }
-      else {
-        center_density_array_est[id_clus, id_component, ] = c(rep(0, abs(N_timegrid_shift)), 
-                                                              center_density_array_est[id_clus, id_component, 1:(N_timegrid_total-abs(N_timegrid_shift))] )
-      }
-      ### Shift intensity component accordingly
-      if (N_timegrid_shift<=0) {
-        center_intensity_array_est[id_clus, id_component, ] = c(center_intensity_array_est[id_clus, id_component, (abs(N_timegrid_shift)+1):N_timegrid_total], 
-                                                                rep(0, abs(N_timegrid_shift)))
-      }
-      else {
-        center_intensity_array_est[id_clus, id_component, ] = c(rep(0, abs(N_timegrid_shift)), 
-                                                                center_intensity_array_est[id_clus, id_component, 1:(N_timegrid_total-abs(N_timegrid_shift))] )
-      }
-
-    }
-  }
-  
-  
   
   
   # Compute estimation error ------------------------------------------------
@@ -277,9 +246,8 @@ main_v5_pdf = function(### Parameters for generative model
     
     ### Match clusters 
     if(N_clus>=2){
-      res = find_permn(center_density_array_from = center_density_array_est,
-                       center_density_array_to = center_density_array_true)
-      permn = res$permn
+      permn = find_permn_clus_label(clusters_list_true = data_generated$clus_true_list, 
+                                        clusters_list_est = clusters_list_est)
     } else{
       permn = 1
     }
@@ -365,8 +333,8 @@ main_v5_pdf = function(### Parameters for generative model
                                                 "TRUE"=center_Nspks_mat_est_permn,
                                                 "FALSE"=NULL),
               # generated data
-              network_list=switch(save_center_pdf_array, 
-                                  "TRUE"=network_list,
+              data_generated=switch(save_center_pdf_array, 
+                                  "TRUE"=data_generated,
                                   "FALSE"=NULL),
               # estimation error
               ARI=ARI, 
