@@ -38,7 +38,7 @@ registerDoParallel(cores=N_cores)
 clus_sep_list = list(2, 1.9, 1.8, 1.7, 1.6, 1.5)
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v1.2'
+setup = 'Compare_methods_v1.3'
 default_setting = 'N_spks_total=100,N_node=100,N_clus=4'
 
 ### Save estimated densities
