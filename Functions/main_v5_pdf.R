@@ -246,9 +246,8 @@ main_v5_pdf = function(### Parameters for generative model
     
     ### Match clusters 
     if(N_clus>=2){
-      res = find_permn(center_density_array_from = center_density_array_est,
-                       center_density_array_to = center_density_array_true)
-      permn = res$permn
+      permn = find_permn_clus_label(clusters_list_true = data_generated$clus_true_list, 
+                                        clusters_list_est = clusters_list_est)
     } else{
       permn = 1
     }
