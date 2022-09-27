@@ -48,17 +48,17 @@ main_fpca = function(### Parameters for generative model
                     identical_components = identical_components,
                     clus_mixture = clus_mixture)
   
-  network_list = do.call(what = generate_data, args = data_param)
+  data_generated = do.call(what = generate_data, args = data_param)
   
   
-  spks_time_mlist = network_list$spks_time_mlist
-  stim_onset_vec = network_list$stim_onset_vec
+  spks_time_mlist = data_generated$spks_time_mlist
+  stim_onset_vec = data_generated$stim_onset_vec
   
-  center_density_array_true = network_list$center_density_array_true
-  center_intensity_array_true = network_list$center_intensity_array_true
-  mem_true_vec = network_list$mem_true_vec
-  clus_true_list = network_list$clus_true_list
-  v_true_mat_list = network_list$v_mat_list
+  center_density_array_true = data_generated$center_density_array_true
+  center_intensity_array_true = data_generated$center_intensity_array_true
+  mem_true_vec = data_generated$mem_true_vec
+  clus_true_list = data_generated$clus_true_list
+  v_true_mat_list = data_generated$v_mat_list
   
   # Prepare data for FPCA ######
   yList = list()
@@ -206,8 +206,8 @@ main_fpca = function(### Parameters for generative model
                                                 "TRUE"=center_Nspks_mat_est_permn,
                                                 "FALSE"=NULL),
               # generated data
-              network_list=switch(save_center_pdf_array, 
-                                  "TRUE"=network_list,
+              data_generated=switch(save_center_pdf_array, 
+                                  "TRUE"=data_generated,
                                   "FALSE"=NULL),
               # estimation error
               ARI=ARI, 
