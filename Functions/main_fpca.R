@@ -113,6 +113,7 @@ main_fpca = function(### Parameters for generative model
     
     v_fpca_vec = -fpc_scores_mat[, id_component] * (inner_prod^(-1))
     v_fpca_vec = sign(inner_prod) * v_fpca_vec
+    v_fpca_vec = v_fpca_vec - min(v_fpca_vec)
     v_mat_list_est[[id_component]] = matrix(data = v_fpca_vec, nrow = N_node, ncol = N_replicate)
   }
   center_density_array_est = round(center_density_array_est, digits = 4)
