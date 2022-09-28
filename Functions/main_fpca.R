@@ -130,14 +130,7 @@ main_fpca = function(### Parameters for generative model
   if (TRUE) {
     # Compute errors of conn patts, i.e. F ---------
     
-    ### Match clusters 
-    if(N_clus>=2){
-      res = find_permn(center_density_array_from = center_density_array_est,
-                       center_density_array_to = center_density_array_true)
-      permn = res$permn
-    } else{
-      permn = 1
-    }
+    permn = 1
     
     center_density_array_est_permn = center_density_array_est[permn, , ,drop=FALSE]
     center_intensity_array_est_permn = NA
