@@ -1,6 +1,8 @@
 
 select_model = function(spks_time_mlist, 
                         stim_onset_vec, 
+                        N_component,
+                        key_times_vec,
                         result_list)
 {
   ICL_vec = rep(0,length(result_list))
@@ -36,42 +38,41 @@ select_model = function(spks_time_mlist,
     t_unit = t_vec[2]-t_vec[1]
     
     # First term of log likelihood: \sum_{i,r} ( -\sum_{q} (F_{q}(T)+G_{q}(T))*tau_{i,r,q} )
-    F_q_T = center_Nspks_mat_tmp[,1] + center_Nspks_mat_tmp[,2]
+    F_q_T = rowSums(center_Nspks_mat_tmp)
     tau_F = tau_mat %*% F_q_T 
     log_lik_tmp_1 = sum(-tau_F)
     
     # Second term of log likelihood: \sum_{q}{ \sum_{i,r}\sum_{t} \log{S^{w_{i,r}}f_{q}(t)+S^{v_{i,r}}g_{q}(t)} *tau_{i,r,q} }
     log_lik_tmp_2 = 0
     for (id_clus in 1:N_clus_tmp) {
-      f_tmp = center_intensity_array_tmp[id_clus,1,]
-      g_tmp = center_intensity_array_tmp[id_clus,2,]
       for (id_node in clusters_list_tmp[[id_clus]]){
         for (id_replicate in 1:N_replicate) {
-          w_tmp = v_mat_list_tmp[[1]][id_node, id_replicate]
-          v_tmp = v_mat_list_tmp[[2]][id_node, id_replicate]
-          Sw_f_tmp = c(rep(0, max(0,round(w_tmp/t_unit)) ),
-                       head(f_tmp, length(t_vec)-max(0,round(w_tmp/t_unit))) )
-          Sv_g_tmp = c(rep(0, max(0,round(v_tmp/t_unit)) ),
-                       head(g_tmp, length(t_vec)-max(0,round(v_tmp/t_unit))) )
-          log_Sw_f_Sv_g_tmp = rep(0, length(t_vec))
-          log_Sw_f_Sv_g_tmp[which(Sw_f_tmp+Sv_g_tmp>0)] = log( (Sw_f_tmp+Sv_g_tmp)[which(Sw_f_tmp+Sv_g_tmp>0)] )
+          ### Calculate estimated intensity for current (node, replicate)
+          intensity_est = rep(0, length(t_vec))
+          for (id_component in 1:N_component) {
+            time_shift_tmp = v_mat_list_tmp[[id_component]][id_node, id_replicate]
+            n0_shift_tmp = round(time_shift_tmp / t_unit)
+            intensity_tmp = center_intensity_array_tmp[id_clus, id_component, ]
+            intensity_shifted_curr_comp = c(rep(0, max(0, n0_shift_tmp) ),
+                                      head(intensity_tmp, length(t_vec) - max(0, n0_shift_tmp)) )
+            intensity_est = intensity_est + intensity_shifted_curr_comp
+          }
+          log_intensity_est = rep(0, length(t_vec))
+          log_intensity_est[which(intensity_est>0)] = log(intensity_est[which(intensity_est>0)])
           
+          ### Calculate observed intensity for current (node, replicate)
           event_time_vec_tmp = unlist(spks_time_mlist[id_node, id_replicate])
           if(length(event_time_vec_tmp)==0){
             next
           }
-          ### counts: number of spikes whose (adjusted) edge time is close to each breakpoint in t_vec
           breaks = c(t_vec[1]-t_unit, t_vec)
           counts_tmp = hist(event_time_vec_tmp, breaks=breaks, plot=FALSE, right=FALSE)$counts
-          ### Add by: \sum_{s} \log[ S^w_{i,r}f(t_{i,r,s})+S^v_{/i,r}g(t_{i,r,s}) ] 
-          log_lik_tmp_2 = log_lik_tmp_2 + sum(log_Sw_f_Sv_g_tmp*counts_tmp)
+          
+          ### Add log-likelihood: \sum_{s} \log[ S^w_{i,r}f(t_{i,r,s})+S^v_{/i,r}g(t_{i,r,s}) ] 
+          log_lik_tmp_2 = log_lik_tmp_2 + sum(log_intensity_est*counts_tmp)
         }
       }
-      
-      
     }
-    
-    
     log_lik_tmp = log_lik_tmp_1 + log_lik_tmp_2
     
     ### Fuzzy clustering entropy: \sum_{i}\sum_{q} \tau^{i,q} * \log(\pi_q)
@@ -81,10 +82,15 @@ select_model = function(spks_time_mlist,
     
     ### Compute penalty
     u_0 = -min(res_tmp$t_vec); u_1 = max(res_tmp$t_vec)
-    penalty_tmp = 1/2*(N_clus_tmp-1+N_clus_tmp*length(which(-u_0<=t_vec & t_vec<=u_1-max(v_mat_list_tmp[[1]])))+
-                         N_clus_tmp*length(which(0<=t_vec & t_vec<=u_1-max(v_mat_list_tmp[[2]]))) )*
-      log(N_node*N_replicate) 
-    
+    degr_free_vec = c()
+    for (id_component in 1:N_component) {
+      ### TODO: Check whether degr_free_curr_comp is reasonable
+      degr_free_curr_comp = length(which( (key_times_vec[id_component]<=t_vec) & (t_vec<=u_1-max(v_mat_list_tmp[[id_component]])) ))
+      degr_free_vec[id_component] = degr_free_curr_comp
+    }
+    penalty_tmp = 1/2 * log(N_node*N_replicate) * 
+      ( (N_clus_tmp - 1) + N_clus_tmp * sum(degr_free_vec) ) 
+      
     ### Compute ICL
     compl_log_lik_tmp = log_lik_tmp + clus_entropy
     ICL_tmp = compl_log_lik_tmp - penalty_tmp 
