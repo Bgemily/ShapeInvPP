@@ -8,6 +8,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
                     bw=0,
                     v0 = 0.15, v1 = 0.1,
                     t_vec=seq(0, v0, by=0.01),
+                    key_times_vec = c(min(t_vec),0,max(t_vec)),
                     fix_timeshift=FALSE,
                     fix_comp1_timeshift_only=FALSE,
                     use_true_timeshift=FALSE, 
@@ -24,188 +25,144 @@ get_init = function(spks_time_mlist, stim_onset_vec,
   N_replicate = ncol(spks_time_mlist)
   
   v_vec = v_mat_list = NULL
-  if (N_component==1) {
-    # Initialize time shifts --------------------------------------------------
-    if (fix_timeshift) {
-      v_vec = rep(default_timeshift, N_node)
-    } else{
-      v_vec = rep(0,N_node)
-      spks_time_vec_list = list()
-      for (id_node in 1:N_node) {
-        spks_time_vec = c()
-        for (id_replicate in 1:N_replicate) {
-          spks_time_tmp = spks_time_mlist[id_node, id_replicate][[1]]-stim_onset_vec[id_replicate]
-          spks_time_tmp = spks_time_tmp[which(spks_time_tmp<=max(t_vec) & spks_time_tmp>=min(t_vec))]
-          spks_time_vec = c(spks_time_vec, spks_time_tmp)
+  
+  # Initialize time shifts -------------
+  if (fix_timeshift) {
+    if (use_true_timeshift) {
+      v_mat_list = v_true_mat_list
+      ### Jitter true time shift
+      if(jitter_prop_true_timeshift>0){
+        u_0 = v1; u_1 = v0;
+        for (id_component in 1:N_component) {
+          v_mat_list[[id_component]] = jitter(v_mat_list[[id_component]], amount = jitter_prop_true_timeshift*(u_0/2-0))
         }
-        if(length(spks_time_vec)>0){
-          v_vec[id_node] = median(spks_time_vec) - median(t_vec)
-        }
-        spks_time_vec_list[id_node] = list(spks_time_vec)
       }
-      # v_vec = v_vec - min(v_vec) - length(t_vec)%/%10*t_unit
+    } else{
+      v_vec = matrix(default_timeshift, nrow = N_node, ncol = N_replicate)
+      v_mat_list = rep(list(v_vec), N_component)
+    }
+  } else{
+    ### Use median of spike times as time shifts
+    v_mat_list = rep(list(matrix(0, nrow = N_node, ncol = N_replicate)), N_component)
+    for (id_node in 1:N_node) {
+      for (id_replicate in 1:N_replicate) {
+        spks_time_tmp = spks_time_mlist[id_node, id_replicate][[1]]-stim_onset_vec[id_replicate]
+        for (id_component in 1:N_component){
+          time_start_curr_comp = key_times_vec[id_component]
+          time_end_curr_comp = key_times_vec[id_component + 1]
+          spks_time_curr_comp_vec = spks_time_tmp[which(spks_time_tmp >= time_start_curr_comp &
+                                                          spks_time_tmp <= time_end_curr_comp)]
+          if (length(spks_time_curr_comp_vec) > 0) {
+            v_mat_list[[id_component]][id_node, id_replicate] = median(spks_time_curr_comp_vec) 
+          }
+        }
+      }
     }
     
+    ### Force minimum time shifts in each component to be zero
+    for (id_component in 1:N_component){
+      v_mat_list[[id_component]] = v_mat_list[[id_component]] - min(v_mat_list[[id_component]])
+      v_mat_list[[id_component]] = round(v_mat_list[[id_component]]/t_unit)*t_unit
+    }
     
-    # Initialize clusters -----------------------------------------------------
-    tmp = get_center_intensity_array(spks_time_mlist = spks_time_mlist,
-                                     stim_onset_vec = stim_onset_vec,
-                                     reaction_time_vec = reaction_time_vec,
-                                     clusters_list = mem2clus(1:N_node),
-                                     v_vec = v_vec,
-                                     N_component = N_component,
-                                     freq_trun = freq_trun,
-                                     v0 = v0, v1 = v1,
-                                     t_vec = t_vec,
-                                     rmv_conn_prob = TRUE)
+    ### Force time shifts of first component to be truth
+    if( (!fix_timeshift) & fix_comp1_timeshift_only ){
+      v_mat_list[[1]] = v_true_mat_list[[1]]
+    }
+  }
+  
+  
+  # Initialize clusters -------------
+  if (fix_membership) {
+    membership_vec = rep(1:N_clus, rep(N_node/N_clus,N_clus))      
+    clusters_list = mem2clus(membership_vec, N_clus_min = N_clus)
+  } else {
+    node_intensity_array = array(dim=c(N_node, 1, length(t_vec)))
+    node_density_array = array(dim=c(N_node, 1, length(t_vec)))
+    node_Nspks_mat = matrix(nrow=N_node, ncol=1)
+    for (id_node in 1:N_node) {
+      intensity_tmp = rep(0, length(t_vec))
+      density_tmp = rep(0, length(t_vec))
+      F_hat_tmp = 0
+      
+      spks_time_vec_tmp = c()
+      N_spks_nodetrial_vec_tmp = c()
+      for (id_replicate in 1:N_replicate) {
+        spks_time_shifted_tmp = c()
+        spks_time_tmp = unlist(spks_time_mlist[id_node,id_replicate]) - stim_onset_vec[id_replicate]
+        for (id_component in 1:N_component) {
+          time_start_tmp = key_times_vec[id_component] + v_mat_list[[id_component]][id_node,id_replicate]
+          ### TODO: Make time_end_tmp more reasonable
+          if (id_component < N_component) {
+            time_end_tmp = key_times_vec[id_component+1] + v_mat_list[[id_component+1]][id_node,id_replicate]
+          } else {
+            time_end_tmp = key_times_vec[id_component+1] 
+          }
+          spks_time_tmp_curr_comp = spks_time_tmp[which(spks_time_tmp >= time_start_tmp & 
+                                                          spks_time_tmp <= time_end_tmp)]
+          spks_time_tmp_curr_comp_shifted = spks_time_tmp_curr_comp - v_mat_list[[id_component]][id_node,id_replicate]
+          spks_time_shifted_tmp = c(spks_time_shifted_tmp, spks_time_tmp_curr_comp_shifted)
+        }
+        
+        spks_time_vec_tmp = c(spks_time_vec_tmp, spks_time_shifted_tmp)
+        N_spks_nodetrial_vec_tmp = c(N_spks_nodetrial_vec_tmp, length(spks_time_shifted_tmp))
+      }
+      
+      ### Smooth the point process 
+      tmp = get_smoothed_pp(event_time_vec = spks_time_vec_tmp, 
+                            freq_trun = freq_trun, 
+                            t_vec = t_vec, 
+                            bw=bw)
+      intensity_tmp = tmp$intens_vec
+      
+      
+      N_spks_q = length(spks_time_vec_tmp)
+      if (N_spks_q>0) {
+        density_tmp = intensity_tmp / N_spks_q
+      } else{
+        density_tmp = intensity_tmp*0
+      }
+      
+      F_hat_tmp = sqrt( mean(N_spks_nodetrial_vec_tmp^2) )
+      
+      intensity_tmp = density_tmp*F_hat_tmp
+      
+      
+      
+      node_intensity_array[id_node,1,] = intensity_tmp
+      node_density_array[id_node,1,] = density_tmp
+      node_Nspks_mat[id_node,1] = F_hat_tmp
+    }
     
     if (rmv_conn_prob){
-      node_intensity_array = tmp$center_density_array
+      membership = kmeans(x=node_density_array[,1,], centers = N_clus, nstart = 5)$cluster
     } else{
-      node_intensity_array = tmp$center_intensity_array
+      membership = kmeans(x=node_intensity_array[,1,], centers = N_clus, nstart = 5)$cluster
     }
-    membership = kmeans(x=node_intensity_array[,1,], centers = N_clus, nstart = 5)$cluster
     
     clusters = mem2clus(membership = membership, N_clus_min = N_clus)
     clusters_list = clusters
     membership_vec = membership
     
-  } else if (N_component==2) {
-    # Initialize time shifts -------------
-    if (fix_timeshift) {
-      if(use_true_timeshift){
-        v_mat_list = v_true_mat_list
-        ### Jitter true time shift
-        if(jitter_prop_true_timeshift>0){
-          u_0 = v1; u_1 = v0;
-          v_mat_list[[1]] = jitter(v_mat_list[[1]], amount = jitter_prop_true_timeshift*(u_0/2-0))
-          v_mat_list[[2]] = jitter(v_mat_list[[2]], amount = jitter_prop_true_timeshift*(u_1-u_0/2-0))
-        }
-      } else{
-        v_vec = matrix(default_timeshift, nrow = N_node, ncol = N_replicate)
-        v_mat_list = list(v_vec, v_vec)
-      }
-    } else{
-      v_mat_list = list(matrix(0, nrow = N_node, ncol = N_replicate), 
-                        matrix(0, nrow = N_node, ncol = N_replicate))
-      spks_time_vec_list = list()
-      for (id_node in 1:N_node) {
-        for (id_replicate in 1:N_replicate) {
-          spks_time_tmp = spks_time_mlist[id_node, id_replicate][[1]]-stim_onset_vec[id_replicate]
-          spks_time_vec_1 = spks_time_tmp[which(spks_time_tmp<=0 & spks_time_tmp>=min(t_vec))]
-          spks_time_vec_2 = spks_time_tmp[which(spks_time_tmp<=max(t_vec) & spks_time_tmp>=0)]
-          if(length(spks_time_vec_1)>0){
-            v_mat_list[[1]][id_node, id_replicate] = median(spks_time_vec_1) 
-          }
-          if(length(spks_time_vec_2)>0){
-            v_mat_list[[2]][id_node, id_replicate] = median(spks_time_vec_2) 
-          }
-        }
-        
-      }
-      v_mat_list[[1]] = v_mat_list[[1]] - min(v_mat_list[[1]])
-      v_mat_list[[2]] = v_mat_list[[2]] - min(v_mat_list[[2]])
-      
-      v_mat_list[[1]] = round(v_mat_list[[1]]/t_unit)*t_unit
-      v_mat_list[[2]] = round(v_mat_list[[2]]/t_unit)*t_unit
-      
-      ### Force time shifts of first component to be truth
-      if( (!fix_timeshift) & fix_comp1_timeshift_only ){
-        v_mat_list[[1]] = v_true_mat_list[[1]]
-      }
-    }
-    
-    
-    # Initialize clusters -------------
-    if (fix_membership) {
-      membership_vec = rep(1:N_clus, rep(N_node/N_clus,N_clus))      
-      clusters_list = mem2clus(membership_vec, N_clus_min = N_clus)
-    } else {
-      node_intensity_array = array(dim=c(N_node, 1, length(t_vec)))
-      node_density_array = array(dim=c(N_node, 1, length(t_vec)))
-      node_Nspks_mat = matrix(nrow=N_node, ncol=1)
-      for (id_node in 1:N_node) {
-        intensity_tmp = rep(0, length(t_vec))
-        density_tmp = rep(0, length(t_vec))
-        F_hat_tmp = 0
-        
-        spks_time_vec_tmp = c()
-        N_spks_nodetrial_vec_tmp = c()
-        for (id_replicate in 1:N_replicate) {
-          spks_time_tmp = unlist(spks_time_mlist[id_node,id_replicate]) - stim_onset_vec[id_replicate]
-          spks_time_tmp_1 = spks_time_tmp[which(spks_time_tmp>=(min(t_vec)+v_mat_list[[1]][id_node,id_replicate]) & 
-                                                  spks_time_tmp<=(0+v_mat_list[[2]][id_node,id_replicate]))]
-          spks_time_tmp_1_shifted = spks_time_tmp_1 - v_mat_list[[1]][id_node,id_replicate]
-          
-          spks_time_tmp_2 = spks_time_tmp[which(spks_time_tmp>(0+v_mat_list[[2]][id_node,id_replicate]) & 
-                                                  spks_time_tmp<=max(t_vec))]
-          spks_time_tmp_2_shifted = spks_time_tmp_2 - v_mat_list[[2]][id_node,id_replicate]
-          
-          
-          spks_time_tmp = c(spks_time_tmp_1_shifted, spks_time_tmp_2_shifted)
-          
-          spks_time_vec_tmp = c(spks_time_vec_tmp, spks_time_tmp)
-          N_spks_nodetrial_vec_tmp = c(N_spks_nodetrial_vec_tmp, length(spks_time_tmp))
-        }
-        
-        ### Smooth the point process 
-        tmp = get_smoothed_pp(event_time_vec = spks_time_vec_tmp, 
-                              freq_trun = freq_trun, 
-                              t_vec = t_vec, 
-                              bw=bw)
-        intensity_tmp = tmp$intens_vec
-
-        
-        N_spks_q = length(spks_time_vec_tmp)
-        if (N_spks_q>0) {
-          density_tmp = intensity_tmp / N_spks_q
-        } else{
-          density_tmp = intensity_tmp*0
-        }
-        
-        F_hat_tmp = sqrt( mean(N_spks_nodetrial_vec_tmp^2) )
-        
-        intensity_tmp = density_tmp*F_hat_tmp
-        
-        
-        
-        node_intensity_array[id_node,1,] = intensity_tmp
-        node_density_array[id_node,1,] = density_tmp
-        node_Nspks_mat[id_node,1] = F_hat_tmp
-      }
-      
-      if (rmv_conn_prob){
-        membership = kmeans(x=node_density_array[,1,], centers = N_clus, nstart = 5)$cluster
-      } else{
-        membership = kmeans(x=node_intensity_array[,1,], centers = N_clus, nstart = 5)$cluster
-      }
-      
-      clusters = mem2clus(membership = membership, N_clus_min = N_clus)
-      clusters_list = clusters
-      membership_vec = membership
-      
-    }
-    
-    
-    
-    
-    ### Force minimum time shifts in each (cluster, component) to be zero
-    if (!fix_timeshift) {
-      for (id_clus in 1:N_clus) {
-        v_mat_list[[1]][clusters_list[[id_clus]], ] = v_mat_list[[1]][clusters_list[[id_clus]], ] - (quantile(v_mat_list[[1]][clusters_list[[id_clus]], ], 0.0)-0)
-        v_mat_list[[1]] = round(v_mat_list[[1]]/t_unit)*t_unit
-        
-        v_mat_list[[2]][clusters_list[[id_clus]], ] = v_mat_list[[2]][clusters_list[[id_clus]], ] - (quantile(v_mat_list[[2]][clusters_list[[id_clus]], ], 0.0)-0)
-        v_mat_list[[2]] = round(v_mat_list[[2]]/t_unit)*t_unit
-        
-      }
-      ### Force time shifts of first component to be truth
-      if( (!fix_timeshift) & fix_comp1_timeshift_only ){
-        v_mat_list[[1]] = v_true_mat_list[[1]]
-      }
-    }
-    
   }
+  
+  
+  
+  
+  ### Force minimum time shifts in each (cluster, component) to be zero
+  if (!fix_timeshift) {
+    for (id_clus in 1:N_clus) {
+      for (id_component in 1:N_component){
+        v_mat_list[[id_component]][clusters_list[[id_clus]], ] = v_mat_list[[id_component]][clusters_list[[id_clus]], ] - (quantile(v_mat_list[[id_component]][clusters_list[[id_clus]], ], 0.0)-0)
+        v_mat_list[[id_component]] = round(v_mat_list[[id_component]]/t_unit)*t_unit
+      }
+    }
+    ### Force time shifts of first component to be truth
+    if( (!fix_timeshift) & fix_comp1_timeshift_only ){
+      v_mat_list[[1]] = v_true_mat_list[[1]]
+    }
+  }
+  
   
   
   return(list(v_vec=v_vec,

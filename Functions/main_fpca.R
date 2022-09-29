@@ -2,30 +2,31 @@
 # library(fdapace)
 
 main_fpca = function(### Parameters for generative model
-  SEED, 
-  N_node = 100,
-  N_replicate = 1,
-  N_clus=2, 
-  u_1 = 1, u_0 = 1,
-  t_vec = seq(-u_0,u_1,by=0.01),
-  t_vec_extend = t_vec,
-  N_spks_total = 1000,
-  timeshift_max_vec = c(1/8, 1/32),
-  ### params when N_clus==4:
-  clus_sep = 2,
-  ### params when N_clus==1:
-  N_spks_ratio = 3/2,
-  sd_shrinkage = 1,
-  c_1 = 0, delta_1 = 0,
-  c_2 = 0, delta_2 = 0,
-  c_3 = 0, delta_3 = 0,
-  identical_components = FALSE,
-  ### params when N_clus==2:
-  clus_mixture = 0,
-  ### Parameters for algorithms
-  bw = 0,
-  N_component = 2,
-  save_center_pdf_array = FALSE)
+                      SEED, 
+                      N_node = 100,
+                      N_replicate = 1,
+                      N_clus=2, 
+                      N_component_true = 2,
+                      u_1 = 1, u_0 = 1,
+                      t_vec = seq(-u_0,u_1,by=0.01),
+                      t_vec_extend = t_vec,
+                      N_spks_total = 1000,
+                      timeshift_max_vec = c(1/8, 1/32),
+                      ### params when N_clus==4:
+                      clus_sep = 2,
+                      ### params when N_clus==1:
+                      N_spks_ratio = 3/2,
+                      sd_shrinkage = 1,
+                      c_1 = 0, delta_1 = 0,
+                      c_2 = 0, delta_2 = 0,
+                      c_3 = 0, delta_3 = 0,
+                      identical_components = FALSE,
+                      ### params when N_clus==2:
+                      clus_mixture = 0,
+                      ### Parameters for algorithms
+                      bw = 0,
+                      N_component = 2,
+                      save_center_pdf_array = FALSE)
 {
   t_unit = t_vec[2]-t_vec[1]
   # Generate data -------------------------------------------------------
@@ -47,18 +48,21 @@ main_fpca = function(### Parameters for generative model
                     c_3 = c_3, delta_3 = delta_3,
                     identical_components = identical_components,
                     clus_mixture = clus_mixture)
+  if (N_component_true == 1) {
+    data_generated = do.call(what = generate_data_Ncomp_1, args = data_param)
+  } else if (N_component_true == 2) {
+    data_generated = do.call(what = generate_data, args = data_param)
+  }
   
-  network_list = do.call(what = generate_data, args = data_param)
   
+  spks_time_mlist = data_generated$spks_time_mlist
+  stim_onset_vec = data_generated$stim_onset_vec
   
-  spks_time_mlist = network_list$spks_time_mlist
-  stim_onset_vec = network_list$stim_onset_vec
-  
-  center_density_array_true = network_list$center_density_array_true
-  center_intensity_array_true = network_list$center_intensity_array_true
-  mem_true_vec = network_list$mem_true_vec
-  clus_true_list = network_list$clus_true_list
-  v_true_mat_list = network_list$v_mat_list
+  center_density_array_true = data_generated$center_density_array_true
+  center_intensity_array_true = data_generated$center_intensity_array_true
+  mem_true_vec = data_generated$mem_true_vec
+  clus_true_list = data_generated$clus_true_list
+  v_true_mat_list = data_generated$v_mat_list
   
   # Prepare data for FPCA ######
   yList = list()
@@ -73,8 +77,8 @@ main_fpca = function(### Parameters for generative model
   # Fit FPCA ------------------------------------
   FPCAobj = FPCA(Ly=yList, Lt=tList, optns=list(dataType='Dense', maxK=N_component))
   mean_density_vec = FPCAobj$mu
-  eigenfuncs_mat = FPCAobj$phi[,1:N_component] # len(t_vec) x N_component
-  fpc_scores_mat = FPCAobj$xiEst[,1:N_component] # N_node x N_component
+  eigenfuncs_mat = FPCAobj$phi[ , 1:N_component, drop=FALSE] # len(t_vec) x N_component
+  fpc_scores_mat = FPCAobj$xiEst[ , 1:N_component, drop=FALSE] # N_node x N_component
   t_fpca_vec = FPCAobj$workGrid
   
   
@@ -112,6 +116,7 @@ main_fpca = function(### Parameters for generative model
     center_density_array_est[1, id_component, ] = density_vec
     
     v_fpca_vec = -fpc_scores_mat[, id_component] * (inner_prod^(-1))
+    v_fpca_vec = v_fpca_vec - min(v_fpca_vec)
     v_mat_list_est[[id_component]] = matrix(data = v_fpca_vec, nrow = N_node, ncol = N_replicate)
   }
   center_density_array_est = round(center_density_array_est, digits = 4)
@@ -129,14 +134,7 @@ main_fpca = function(### Parameters for generative model
   if (TRUE) {
     # Compute errors of conn patts, i.e. F ---------
     
-    ### Match clusters 
-    if(N_clus>=2){
-      res = find_permn(center_density_array_from = center_density_array_est,
-                       center_density_array_to = center_density_array_true)
-      permn = res$permn
-    } else{
-      permn = 1
-    }
+    permn = 1
     
     center_density_array_est_permn = center_density_array_est[permn, , ,drop=FALSE]
     center_intensity_array_est_permn = NA
@@ -205,8 +203,8 @@ main_fpca = function(### Parameters for generative model
                                                 "TRUE"=center_Nspks_mat_est_permn,
                                                 "FALSE"=NULL),
               # generated data
-              network_list=switch(save_center_pdf_array, 
-                                  "TRUE"=network_list,
+              data_generated=switch(save_center_pdf_array, 
+                                  "TRUE"=data_generated,
                                   "FALSE"=NULL),
               # estimation error
               ARI=ARI, 

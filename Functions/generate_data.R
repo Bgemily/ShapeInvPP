@@ -62,9 +62,7 @@ generate_data = function(SEED=NULL,
     center_N_spks_mat[3,2] = N_spks_total*0.5
     center_N_spks_mat[4,1] = N_spks_total*0.5
     center_N_spks_mat[4,2] = N_spks_total*0.5
-  } else{
-    stop("TODO: specify center_density_array_true")
-  }
+  } 
   
   
   # Generate spike density functions --------------------------------------------  
@@ -137,10 +135,7 @@ generate_data = function(SEED=NULL,
       center_density_array_true[id_clus,2,] = center_density_array_true[id_clus,2,]*center_N_spks_mat[id_clus,2]/sum(center_N_spks_mat[id_clus,1:2])
     }
     
-  } else {
-    stop("TODO: specify center_density_array_true")
-  }
-  
+  } 
   
   # Generate spike intensity functions --------------------------------------------      
   center_intensity_array_true = array(dim = c(N_clus, 2, length(t_vec_extend)))

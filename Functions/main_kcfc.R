@@ -103,15 +103,9 @@ main_kcfc = function(### Parameters for generative model
   calculate_antideriv = function(x_vec, gradient_vec){
     dx_vec = c(0, diff(x_vec))
     f_vec = cumsum(gradient_vec*dx_vec)
-    if (mean(f_vec)<0){
-      sign = -1
-    } else{
-      sign = 1
-    }
-    f_vec = sign*f_vec
-    
-    return(list(f_vec=f_vec, sign=sign))
+    return(f_vec)
   }
+  
   center_density_fpca_array_permn = array(dim = c(N_clus, N_component, length(t_vec_extend)))
   for (idx_clus in 1:N_clus){
     FPCAobj = fpcaList_permn[[idx_clus]]    
@@ -126,8 +120,7 @@ main_kcfc = function(### Parameters for generative model
       eigen_func_vec = eigenfuncs_mat[,id_component]
       inner_prod = sum( derivative_mean_density_vec * eigen_func_vec ) * (t_fpca_vec[2]-t_fpca_vec[1])
       derivative_density_vec = eigen_func_vec * inner_prod
-      res_antideriv = calculate_antideriv(x_vec = t_fpca_vec, gradient_vec = derivative_density_vec)
-      density_vec = res_antideriv$f_vec
+      density_vec = calculate_antideriv(x_vec = t_fpca_vec, gradient_vec = derivative_density_vec)
       density_vec = approx(x = t_fpca_vec, xout = data_generated$t_vec_extend,
                            y = density_vec)$y
       center_density_fpca_array_permn[idx_clus, id_component, ] = density_vec
@@ -148,11 +141,7 @@ main_kcfc = function(### Parameters for generative model
       derivative_mean_density_vec = calculate_deriv(x_vec = t_fpca_vec, f_vec = mean_density_vec)
       eigen_func_vec = eigenfuncs_mat[,id_component]
       inner_prod = sum( derivative_mean_density_vec * eigen_func_vec ) * (t_fpca_vec[2]-t_fpca_vec[1])        
-      derivative_density_vec = eigen_func_vec * inner_prod
-      res_antideriv = calculate_antideriv(x_vec = t_fpca_vec, gradient_vec = derivative_density_vec)
-      sign = res_antideriv$sign
       v_fpca_vec = -fpc_scores_mat[, id_component] * (inner_prod^(-1))
-      v_fpca_vec = sign * v_fpca_vec
       v_fpca_mat[current_cluster, id_component] = v_fpca_vec
       ### Force minimum time shift to be 0
       v_fpca_mat[current_cluster, id_component] = v_fpca_mat[current_cluster, id_component] - min(v_fpca_mat[current_cluster, id_component])
