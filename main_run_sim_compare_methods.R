@@ -40,7 +40,7 @@ timeshift_max_vec_list = list(c(1/8, 1/32), c(1/8, 1/32)*1.5, c(1/8, 1/32)*2,
                               c(1/8, 1/32*1.5), c(1/8, 1/32*2), c(1/8, 1/32*2.5), c(1/8, 1/32*3))
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_FPCA_v1.2'
+setup = 'Compare_methods_v1.4'
 default_setting = 'N_spks_total=1000,N_node=100,N_clus=1,N_comp=1'
 
 ### Save estimated densities
@@ -122,7 +122,7 @@ for (. in 1:split) {
       SEED = sample(1:1e7,1)
       tryCatch(main_v5_pdf(SEED = SEED, 
                            N_node = 100,
-                           N_clus=1, 
+                           N_clus = 1, 
                            N_component_true = 1,
                            N_spks_total = 1000,
                            timeshift_max_vec = timeshift_max_vec,
