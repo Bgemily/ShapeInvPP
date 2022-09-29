@@ -6,6 +6,7 @@ main_kcfc = function(### Parameters for generative model
   N_node = 100,
   N_replicate = 1,
   N_clus=2, 
+  N_component_true = 2,
   u_1 = 1, u_0 = 1,
   t_vec = seq(-u_0,u_1,by=0.01),
   t_vec_extend = t_vec,
@@ -48,8 +49,11 @@ main_kcfc = function(### Parameters for generative model
                     identical_components = identical_components,
                     clus_mixture = clus_mixture)
   
-  data_generated = do.call(what = generate_data, args = data_param)
-  
+  if (N_component_true == 1) {
+    data_generated = do.call(what = generate_data_Ncomp_1, args = data_param)
+  } else if (N_component_true == 2) {
+    data_generated = do.call(what = generate_data, args = data_param)
+  }
   
   spks_time_mlist = data_generated$spks_time_mlist
   stim_onset_vec = data_generated$stim_onset_vec
@@ -111,8 +115,8 @@ main_kcfc = function(### Parameters for generative model
     FPCAobj = fpcaList_permn[[idx_clus]]    
     N_node_tmp = nrow(FPCAobj$xiEst)
     mean_density_vec = FPCAobj$mu
-    eigenfuncs_mat = FPCAobj$phi[,1:N_component] # len(t_fpca_vec) x N_component
-    fpc_scores_mat = FPCAobj$xiEst[,1:N_component] # N_node_tmp x N_component
+    eigenfuncs_mat = FPCAobj$phi[ , 1:N_component, drop=FALSE] # len(t_fpca_vec) x N_component
+    fpc_scores_mat = FPCAobj$xiEst[ , 1:N_component, drop=FALSE] # N_node_tmp x N_component
     t_fpca_vec = FPCAobj$workGrid
     
     for (id_component in 1:N_component){
@@ -132,8 +136,8 @@ main_kcfc = function(### Parameters for generative model
   for (id_clus in 1:N_clus){
     FPCAobj = fpcaList_permn[[id_clus]]    
     mean_density_vec = FPCAobj$mu
-    eigenfuncs_mat = FPCAobj$phi[,1:N_component] # len(t_vec) x N_component
-    fpc_scores_mat = FPCAobj$xiEst[,1:N_component] # clus_size x N_component
+    eigenfuncs_mat = FPCAobj$phi[ , 1:N_component, drop=FALSE] # len(t_vec) x N_component
+    fpc_scores_mat = FPCAobj$xiEst[ , 1:N_component, drop=FALSE] # clus_size x N_component
     t_fpca_vec = FPCAobj$workGrid
     current_cluster = which(memb_est_vec_permn==id_clus)
     ### Calculate time shifts
