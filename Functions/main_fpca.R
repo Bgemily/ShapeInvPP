@@ -2,30 +2,31 @@
 # library(fdapace)
 
 main_fpca = function(### Parameters for generative model
-  SEED, 
-  N_node = 100,
-  N_replicate = 1,
-  N_clus=2, 
-  u_1 = 1, u_0 = 1,
-  t_vec = seq(-u_0,u_1,by=0.01),
-  t_vec_extend = t_vec,
-  N_spks_total = 1000,
-  timeshift_max_vec = c(1/8, 1/32),
-  ### params when N_clus==4:
-  clus_sep = 2,
-  ### params when N_clus==1:
-  N_spks_ratio = 3/2,
-  sd_shrinkage = 1,
-  c_1 = 0, delta_1 = 0,
-  c_2 = 0, delta_2 = 0,
-  c_3 = 0, delta_3 = 0,
-  identical_components = FALSE,
-  ### params when N_clus==2:
-  clus_mixture = 0,
-  ### Parameters for algorithms
-  bw = 0,
-  N_component = 2,
-  save_center_pdf_array = FALSE)
+                      SEED, 
+                      N_node = 100,
+                      N_replicate = 1,
+                      N_clus=2, 
+                      N_component_true = 2,
+                      u_1 = 1, u_0 = 1,
+                      t_vec = seq(-u_0,u_1,by=0.01),
+                      t_vec_extend = t_vec,
+                      N_spks_total = 1000,
+                      timeshift_max_vec = c(1/8, 1/32),
+                      ### params when N_clus==4:
+                      clus_sep = 2,
+                      ### params when N_clus==1:
+                      N_spks_ratio = 3/2,
+                      sd_shrinkage = 1,
+                      c_1 = 0, delta_1 = 0,
+                      c_2 = 0, delta_2 = 0,
+                      c_3 = 0, delta_3 = 0,
+                      identical_components = FALSE,
+                      ### params when N_clus==2:
+                      clus_mixture = 0,
+                      ### Parameters for algorithms
+                      bw = 0,
+                      N_component = 2,
+                      save_center_pdf_array = FALSE)
 {
   t_unit = t_vec[2]-t_vec[1]
   # Generate data -------------------------------------------------------
@@ -47,8 +48,11 @@ main_fpca = function(### Parameters for generative model
                     c_3 = c_3, delta_3 = delta_3,
                     identical_components = identical_components,
                     clus_mixture = clus_mixture)
-  
-  data_generated = do.call(what = generate_data, args = data_param)
+  if (N_component_true == 1) {
+    data_generated = do.call(what = generate_data_Ncomp_1, args = data_param)
+  } else if (N_component_true == 2) {
+    data_generated = do.call(what = generate_data, args = data_param)
+  }
   
   
   spks_time_mlist = data_generated$spks_time_mlist
@@ -73,8 +77,8 @@ main_fpca = function(### Parameters for generative model
   # Fit FPCA ------------------------------------
   FPCAobj = FPCA(Ly=yList, Lt=tList, optns=list(dataType='Dense', maxK=N_component))
   mean_density_vec = FPCAobj$mu
-  eigenfuncs_mat = FPCAobj$phi[,1:N_component] # len(t_vec) x N_component
-  fpc_scores_mat = FPCAobj$xiEst[,1:N_component] # N_node x N_component
+  eigenfuncs_mat = FPCAobj$phi[ , 1:N_component, drop=FALSE] # len(t_vec) x N_component
+  fpc_scores_mat = FPCAobj$xiEst[ , 1:N_component, drop=FALSE] # N_node x N_component
   t_fpca_vec = FPCAobj$workGrid
   
   
