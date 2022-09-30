@@ -44,8 +44,9 @@ align_multi_components = function(f_target,
                                       fft_f_origin_mat = fft_f_origin_mat,
                                       n0_vec = n0_vec)
     n0_vec = n0_vec - step_size * gd_vec
-    # print((step_size)*gd_vec)
-    n0_vec = round(n0_vec) 
+    if (FALSE) {
+      print((step_size)*gd_vec)
+    }
     
     n0_vec[which(n0_vec<n0_min_vec)] = n0_min_vec[which(n0_vec<n0_min_vec)]
     n0_vec[which(n0_vec>n0_max_vec)] = n0_max_vec[which(n0_vec>n0_max_vec)]
@@ -75,7 +76,7 @@ align_multi_components = function(f_target,
     converge = dist_redu < stopping_redu
   
   }
-  
+   n0_vec = round(n0_vec)
   
   if (iter_count == MaxIter) {
     warning("Reached max iteration number when estimating a time shift. Consider adjusting the step size.")
