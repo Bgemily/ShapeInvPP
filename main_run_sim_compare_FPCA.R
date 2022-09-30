@@ -35,13 +35,12 @@ registerDoParallel(cores=N_cores)
 
 ### Compare with FPCA. ###########
 ### Parameters' possible values:
-timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
-                              c(1/4, 1/16)*0.5, c(1/4, 1/16)*0.25, c(1/4, 1/16)*0.75, 
-                              c(1/4, 1/16)*1.25, c(1/4, 1/16)*1.75)
+timeshift_max_vec_list = list(c(1/4, 1/16)*0.5, c(1/4, 1/16)*0.25, c(1/4, 1/16)*0.125,
+                              c(1/4, 1/16)*1, c(1/4, 1/16)*1.5, c(1/4, 1/16)*2)
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v1.7'
-default_setting = 'N_spks_total=1000,N_node=100,N_clus=1,N_comp=2'
+setup = 'Compare_methods_v1.7.1'
+default_setting = 'N_spks_total=1000,N_node=100,N_clus=1,N_comp=1'
 
 ### Save estimated densities
 for (. in 1:1) {
@@ -53,15 +52,15 @@ for (. in 1:1) {
       tryCatch(main_v5_pdf(SEED = SEED, 
                            N_node = 100,
                            N_clus=1, 
-                           N_component_true = 2,
+                           N_component_true = 1,
                            N_spks_total = 1000,
                            timeshift_max_vec = timeshift_max_vec,
-                           t_vec = seq(-1,1,0.005),
+                           t_vec = seq(-1,1,0.001),
                            ### Parameters for algorithms
                            freq_trun = 10,
                            step_size = 5e-5,
-                           N_component = 2,
-                           key_times_vec = c(-1,0,1),
+                           N_component = 1,
+                           key_times_vec = c(-1,1),
                            fix_timeshift = FALSE,
                            fix_membership = FALSE,
                            save_center_pdf_array = TRUE),
@@ -89,10 +88,10 @@ for (. in 1:1) {
       tryCatch(main_fpca(SEED = SEED,
                          N_node = 100,
                          N_clus = 1,
-                         N_component_true = 2,
+                         N_component_true = 1,
                          N_spks_total = 1000,
                          timeshift_max_vec = timeshift_max_vec,
-                         t_vec = seq(-1,1,0.005),
+                         t_vec = seq(-1,1,0.001),
                          ### Parameters for algorithms
                          bw = 'SJ',
                          N_component = 2,
@@ -126,15 +125,15 @@ for (. in 1:split) {
       tryCatch(main_v5_pdf(SEED = SEED, 
                            N_node = 100,
                            N_clus = 1, 
-                           N_component_true = 2,
+                           N_component_true = 1,
                            N_spks_total = 1000,
                            timeshift_max_vec = timeshift_max_vec,
-                           t_vec = seq(-1,1,0.005),
+                           t_vec = seq(-1,1,0.001),
                            ### Parameters for algorithms
                            freq_trun = 10,
                            step_size = 5e-5,
-                           N_component = 2,
-                           key_times_vec = c(-1,0,1),
+                           N_component = 1,
+                           key_times_vec = c(-1,1),
                            fix_timeshift = FALSE,
                            fix_membership = FALSE,
                            save_center_pdf_array = FALSE),
@@ -164,13 +163,13 @@ for (. in 1:split) {
       tryCatch(main_fpca(SEED = SEED,
                          N_node = 100,
                          N_clus = 1,
-                         N_component_true = 2,
+                         N_component_true = 1,
                          N_spks_total = 1000,
                          timeshift_max_vec = timeshift_max_vec,
-                         t_vec = seq(-1,1,0.005),
+                         t_vec = seq(-1,1,0.001),
                          ### Parameters for algorithms
                          bw = 'SJ',
-                         N_component = 2,
+                         N_component = 1,
                          save_center_pdf_array = FALSE),
                error = function(x) print(SEED))
     }
