@@ -82,7 +82,7 @@ main_fpca = function(### Parameters for generative model
   t_fpca_vec = FPCAobj$workGrid
   
   
-  # Reconstruct estimates in our model #####
+  # Reconstruct estimates in our model -----
   calculate_deriv = function(x_vec,f_vec){
     n = length(f_vec)
     grad = rep(0, n)
@@ -103,7 +103,6 @@ main_fpca = function(### Parameters for generative model
     f_vec = cumsum(gradient_vec*dx_vec)
     return(f_vec)
   }
-  
   center_density_array_est = array(dim = c(N_clus, N_component, length(t_vec)))
   v_mat_list_est = list() 
   for (id_component in 1:N_component){
@@ -120,6 +119,29 @@ main_fpca = function(### Parameters for generative model
     v_mat_list_est[[id_component]] = matrix(data = v_fpca_vec, nrow = N_node, ncol = N_replicate)
   }
   center_density_array_est = round(center_density_array_est, digits = 4)
+  
+  
+  # Find the best permutation of density components -----
+  permn_list = combinat::permn(1:N_component)  
+  mise_f_max = Inf
+  the_permn = c()
+  id_clus = 1
+  for (permn in permn_list) {
+    mise_f_tmp_vec = c()
+    for (id_component in 1:N_component) {
+      t_unit = data_generated$t_vec[2] - data_generated$t_vec[1]
+      mise_f_tmp_vec[id_component] = sum( t_unit * (center_density_array_est[id_clus, permn[id_component], ] - 
+                                                      data_generated$center_density_array_true[id_clus, id_component, ])^2 )
+    }
+    mise_f_tmp = mean(mise_f_tmp_vec)
+    if (mise_f_tmp < mise_f_max){
+      the_permn = permn
+      mise_f_max = mise_f_tmp
+    }
+  }
+  center_density_array_est[id_clus, , ] = center_density_array_est[id_clus, the_permn, ]
+  v_mat_list_est = v_mat_list_est[the_permn]
+  
   
   # Other estimates
   N_clus_est = 1
