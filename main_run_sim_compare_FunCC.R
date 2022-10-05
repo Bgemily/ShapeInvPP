@@ -83,6 +83,7 @@ for (clus_sep in clus_sep_list) {
                        '/', setup,
                        '/', method)
   dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
+  now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
   save(res, file = paste0(folder_path, '/', 'tuning_parameter_selection', 
                           '_', 'clus_sep', clus_sep, '_', now_trial, '.Rdata'))
   
@@ -95,6 +96,7 @@ folder_path = paste0(top_level_folder,
                      '/', setup,
                      '/', method)
 dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
+now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
 save(res_delta_selection_list, file = paste0(folder_path, '/', 'tuning_parameter_selection', '_', now_trial, '.Rdata'))
 
 
