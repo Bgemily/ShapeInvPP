@@ -81,7 +81,16 @@ main_v5_pdf = function(### Parameters for generative model
   clus_true_list = data_generated$clus_true_list
   v_true_mat_list = data_generated$v_mat_list
   
-
+  # Calculate non-identifiability level --------
+  if (N_component >= 2) {
+    non_identifiability = get_non_identifiability(spks_time_mlist = spks_time_mlist, 
+                                                    v_mat_list = v_true_mat_list, 
+                                                    N_component = N_component, 
+                                                    t_vec = t_vec)
+  } else {
+    non_identifiability = NA
+  }
+  
   # Fit model for various cluster number ------------------------------------
   
   res_list = list()
@@ -356,6 +365,7 @@ main_v5_pdf = function(### Parameters for generative model
               data_generated=switch(save_center_pdf_array, 
                                   "TRUE"=data_generated,
                                   "FALSE"=NULL),
+              non_identifiability = non_identifiability,
               # estimation error
               ARI=ARI, 
               F_mean_sq_err=F_mean_sq_err, 
