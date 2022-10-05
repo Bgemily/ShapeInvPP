@@ -70,7 +70,7 @@ for (clus_sep in clus_sep_list) {
   
   # Get results for various delta
   res = FunCC_find_best_delta(fun_mat = density_array, 
-                              delta_min = 0.01, delta_max = 0.2, num_delta = 2,
+                              delta_min = 0.01, delta_max = 0.2, num_delta = 10,
                               alpha = 0, beta = 0, theta = 1.25, shift.alignement = TRUE,
                               max.iter.align = 10, number = 10)
   res_delta_selection_list[[clus_sep]] = res
