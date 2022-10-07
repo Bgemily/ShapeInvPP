@@ -70,15 +70,16 @@ for (clus_sep in clus_sep_list) {
   
   # Get results for various delta
   res = FunCC_find_best_delta(fun_mat = density_array, 
-                              delta_min = 0.01, delta_max = 0.2, num_delta = 10,
-                              alpha = 0, beta = 0, theta = 1.25, shift.alignement = TRUE,
+                              delta_min = 0.001, delta_max = 0.1, num_delta = 20,
+                              alpha = 0, beta = 0, theta = 1, 
+                              shift.alignement = TRUE, shift.max = 0.25,
                               max.iter.align = 10, number = 10)
-  res_delta_selection_list[[clus_sep]] = res
+  res_delta_selection_list[[as.character(clus_sep)]] = res
   
   # Save result
   top_level_folder = "../Results/Rdata"
   setup = 'Compare_methods_v1.8'
-  method = 'FunCC'
+  method = 'FunCC_v3'
   folder_path = paste0(top_level_folder,
                        '/', setup,
                        '/', method)
@@ -88,14 +89,6 @@ for (clus_sep in clus_sep_list) {
                           '_', 'clus_sep', clus_sep, '_', now_trial, '.Rdata'))
   
 }
-
-top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v1.8'
-method = 'FunCC'
-folder_path = paste0(top_level_folder,
-                     '/', setup,
-                     '/', method)
-dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
 now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
 save(res_delta_selection_list, file = paste0(folder_path, '/', 'tuning_parameter_selection', '_', now_trial, '.Rdata'))
 
