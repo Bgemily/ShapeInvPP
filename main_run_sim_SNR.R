@@ -25,7 +25,7 @@ N_trial = N_trial_total/split
 
 # Parallel computing setup ------------------------------------------------
 
-N_cores = 10
+N_cores = 5
 registerDoParallel(cores=N_cores)
 
 
@@ -39,7 +39,7 @@ N_node_list = list(100, 200, 300, 400, 500)
 clus_sep_list = list(1.5, 1.6, 1.7, 1.8, 1.9, 2.0)
 
 top_level_folder = "../Results/Rdata"
-setup = 'Nclus4_v2'
+setup = 'Nclus4_v2.1'
 default_setting = 'N_spks_total=50,N_node=100,clus_sep=1.5'
 
 ### Save estimated densities
