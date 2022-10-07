@@ -83,7 +83,7 @@ main_funcc = function(### Parameters for generative model
   ### Apply kCFC --------------------------------
   res = FunCC::funcc_biclust(fun_mat = density_array, 
                              delta = delta, theta = theta,
-                             alpha = 1, beta = 1, shift.alignement=TRUE, 
+                             alpha = 0, beta = 0, shift.alignement=TRUE, 
                              max.iter.align = 10)
   # Get estimated clusters
   N_biclus = res[[1]]@Number
