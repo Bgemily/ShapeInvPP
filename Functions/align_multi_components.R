@@ -8,7 +8,7 @@ align_multi_components = function(f_target,
                                   pad = NULL,
                                   periodic = FALSE,
                                   MaxIter=1000, 
-                                  stopping_redu=0.0001, 
+                                  stopping_redu=0.01, 
                                   weights=NULL)
 {
   
