@@ -17,8 +17,8 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_trial_total = 50
-split = 5
+N_trial_total = 20
+split = 2
 
 N_trial = N_trial_total/split
 
@@ -39,7 +39,7 @@ N_node_list = list(100, 200, 300, 400, 500)
 clus_sep_list = list(1.7, 1.8, 1.9, 2.0)
 
 top_level_folder = "../Results/Rdata"
-setup = 'ICL_Nclus4_v2.1'
+setup = 'ICL_Nclus4_v2.2'
 default_setting = 'N_spks_total=50,N_node=100,clus_sep=1.7'
 ### Save estimated densities
 for (. in 1:1) {
@@ -65,7 +65,6 @@ for (. in 1:1) {
                                freq_trun = freq_trun,
                                N_clus_min = 1,
                                N_clus_max = 6,
-                               step_size = 5e-5,
                                N_component = 2,
                                key_times_vec = c(-1,0,1),
                                fix_timeshift = FALSE,
@@ -111,7 +110,6 @@ for (. in 1:1) {
                                freq_trun = freq_trun,
                                N_clus_min = 1,
                                N_clus_max = 6,
-                               step_size = 5e-5,
                                N_component = 2,
                                key_times_vec = c(-1,0,1),
                                fix_timeshift = FALSE,
@@ -156,7 +154,6 @@ for (. in 1:1) {
                                freq_trun = freq_trun,
                                N_clus_min = 1,
                                N_clus_max = 6,
-                               step_size = 5e-5,
                                N_component = 2,
                                key_times_vec = c(-1,0,1),
                                fix_timeshift = FALSE,
@@ -208,7 +205,6 @@ for (. in 1:split) {
                                freq_trun = freq_trun,
                                N_clus_min = 1,
                                N_clus_max = 6,
-                               step_size = 5e-5,
                                N_component = 2,
                                key_times_vec = c(-1,0,1),
                                fix_timeshift = FALSE,
@@ -254,7 +250,6 @@ for (. in 1:split) {
                                freq_trun = freq_trun,
                                N_clus_min = 1,
                                N_clus_max = 6,
-                               step_size = 5e-5,
                                N_component = 2,
                                key_times_vec = c(-1,0,1),
                                fix_timeshift = FALSE,
@@ -299,7 +294,6 @@ for (. in 1:split) {
                                freq_trun = freq_trun,
                                N_clus_min = 1,
                                N_clus_max = 6,
-                               step_size = 5e-5,
                                N_component = 2,
                                key_times_vec = c(-1,0,1),
                                fix_timeshift = FALSE,
