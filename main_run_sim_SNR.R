@@ -7,6 +7,7 @@ file_path = "./Functions"
 file.sources = list.files(path = file_path, pattern = "*.R$", full.names = TRUE)
 sapply(file.sources, source)
 library(Matrix)
+library(matrixcalc)
 library(fdapace)
 
 # Load libraries ----------------------------------------------------------
@@ -17,8 +18,8 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_trial_total = 50
-split = 5
+N_trial_total = 20
+split = 2
 
 N_trial = N_trial_total/split
 
