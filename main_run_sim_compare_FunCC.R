@@ -35,10 +35,12 @@ registerDoParallel(cores=N_cores)
 # Select tuning parameter -------------------------------------------------
 N_component_true = 2
 clus_sep_list = list(2, 1.9, 1.8, 1.7, 1.6, 1.5)
-res_delta_selection_list = list()
-for (clus_sep in clus_sep_list) {
+N_trial = 10
+
+# Define one replicate
+find_best_delta_tmp = function(SEED, clus_sep){
   # Generate synthetic data
-  data_param = list(SEED = 1,
+  data_param = list(SEED = SEED,
                     N_node = 100,
                     N_replicate = 1,
                     N_clus = 4, 
@@ -48,13 +50,10 @@ for (clus_sep in clus_sep_list) {
                     N_spks_total = 100,
                     timeshift_max_vec = c(1/4, 1/16),
                     clus_sep = clus_sep)
-  if (N_component_true == 1) {
-    data_generated = do.call(what = generate_data_Ncomp_1, args = data_param)
-  } else if (N_component_true == 2) {
-    data_generated = do.call(what = generate_data, args = data_param)
-  }
+  data_generated = do.call(what = generate_data, args = data_param)
   
   ### Prepare data for FunCC 
+  N_component_true = 2
   key_times_vec = c(-1, 0, 1)
   spks_time_mlist = data_generated$spks_time_mlist
   density_array = array(dim = c(data_param$N_node, N_component_true, length(data_param$t_vec)))
@@ -74,23 +73,30 @@ for (clus_sep in clus_sep_list) {
                               alpha = 0, beta = 0, theta = 1, 
                               shift.alignement = TRUE, shift.max = 0.25,
                               max.iter.align = 10, number = 10)
-  res_delta_selection_list[[as.character(clus_sep)]] = res
+  return(list(SEED = SEED, res = res))
+}
+
+for (clus_sep in clus_sep_list) {
+  # Get results of multiple replicates
+  results <- foreach(j = 1:N_trial) %dopar% {
+    SEED = sample(1:1e7,1)
+    tryCatch(find_best_delta_tmp(SEED = SEED, clus_sep = clus_sep),
+             error = function(x) print(SEED))
+  }
   
-  # Save result
+  # Save results
   top_level_folder = "../Results/Rdata"
   setup = 'Compare_methods_v1.8'
-  method = 'FunCC_v3'
+  method = 'FunCC_v4'
   folder_path = paste0(top_level_folder,
                        '/', setup,
                        '/', method)
   dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
   now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-  save(res, file = paste0(folder_path, '/', 'tuning_parameter_selection', 
+  save(results, file = paste0(folder_path, '/', 'tuning_parameter_selection', 
                           '_', 'clus_sep', clus_sep, '_', now_trial, '.Rdata'))
-  
+  rm(results)
 }
-now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-save(res_delta_selection_list, file = paste0(folder_path, '/', 'tuning_parameter_selection', '_', now_trial, '.Rdata'))
 
 
 # Run simulations ---------------------------------------------------------
