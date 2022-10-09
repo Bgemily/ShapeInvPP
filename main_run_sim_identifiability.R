@@ -42,8 +42,8 @@ timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*0.75,
                               c(1/4, 1/16)*1.75, c(1/4, 1/16)*2)
 
 top_level_folder = "../Results/Rdata"
-setup = 'Non_identifiability_v2'
-default_setting = 'N_spks_total=1000,N_node=100,N_clus=1,N_comp=2'
+setup = 'Non_identifiability_v2.1'
+default_setting = 'N_spks_total=100,N_node=100,N_clus=1,N_comp=2'
 
 ### Save estimated densities
 for (. in 1:1) {
@@ -56,12 +56,11 @@ for (. in 1:1) {
                            N_node = 100,
                            N_clus = 1, 
                            N_component_true = 2,
-                           N_spks_total = 1000,
+                           N_spks_total = 100,
                            timeshift_max_vec = timeshift_max_vec,
-                           t_vec = seq(-1,1,0.005),
+                           t_vec = seq(-1,1,0.01),
                            ### Parameters for algorithms
                            freq_trun = 10,
-                           step_size = 5e-5,
                            N_component = 2,
                            key_times_vec = c(-1,0,1),
                            fix_timeshift = TRUE, use_true_timeshift = TRUE,
@@ -97,12 +96,11 @@ for (. in 1:split) {
                            N_node = 100,
                            N_clus = 1, 
                            N_component_true = 2,
-                           N_spks_total = 1000,
+                           N_spks_total = 100,
                            timeshift_max_vec = timeshift_max_vec,
-                           t_vec = seq(-1,1,0.005),
+                           t_vec = seq(-1,1,0.01),
                            ### Parameters for algorithms
                            freq_trun = 10,
-                           step_size = 5e-5,
                            N_component = 2,
                            key_times_vec = c(-1,0,1),
                            fix_timeshift = TRUE, use_true_timeshift = TRUE,
