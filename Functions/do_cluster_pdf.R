@@ -70,6 +70,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
   center_density_array_update = center_density_array_current = center_density_array
   center_Nspks_mat_update = center_Nspks_mat_current = center_Nspks_mat
   v_mat_list_update = v_mat_list_current = v_mat_list
+  l2_loss_update = l2_loss_current = Inf
   
   n_iter = 1
   stopping = FALSE
@@ -101,27 +102,9 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
     loss_history = c(loss_history, l2_loss)
     
     ### Evaluate stopping criterion
-    clusters_update = clusters_list_update
-    clusters_current = clusters_list_current
-    delta_clusters = 1 - get_one_ARI(memb_est_vec = clus2mem(clusters_update), 
-                                     memb_true_vec = clus2mem(clusters_current))
-    
-    delta_center_density_vec = sapply(1:N_component, function(id_component){
-      sqrt( sum((abs(center_density_array_update[,id_component,]-center_density_array_current[,id_component,]))^2) / 
-              (sum(abs(center_density_array_current[,id_component,])^2) + .Machine$double.eps) )
-    } )
-    
-    delta_center_Nspks_vec = sapply(1:N_component, function(id_component){
-      sqrt( sum((abs(center_Nspks_mat_update[,id_component]-center_Nspks_mat_current[,id_component]))^2) / 
-              (sum(abs(center_Nspks_mat_current[,id_component])^2) + .Machine$double.eps) )
-    } )
-    
-    delta_v_vec = sapply(1:N_component, function(id_component){
-      sqrt( sum((v_mat_list_update[[id_component]]-v_mat_list_current[[id_component]])^2) / 
-              (sum((v_mat_list_current[[id_component]])^2) + .Machine$double.eps) )
-    })
-    
-    stopping = mean(c(delta_clusters,delta_center_density_vec,delta_center_Nspks_vec,delta_v_vec)) < conv_thres
+    l2_loss_update = l2_loss
+    delta_loss = (l2_loss_current - l2_loss_update) / (l2_loss_update + .Machine$double.eps)
+    stopping = delta_loss < conv_thres
     
     
     ### *update -> *current
@@ -130,6 +113,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
     center_density_array_update -> center_density_array_current 
     center_Nspks_mat_update -> center_Nspks_mat_current
     v_mat_list_update -> v_mat_list_current
+    l2_loss_update -> l2_loss_current
     
     clusters_history = c(clusters_history, list(clusters_list_current))
   }

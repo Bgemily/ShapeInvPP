@@ -7,6 +7,7 @@ file_path = "./Functions"
 file.sources = list.files(path = file_path, pattern = "*.R$", full.names = TRUE)
 sapply(file.sources, source)
 library(Matrix)
+library(matrixcalc)
 library(fdapace)
 
 # Load libraries ----------------------------------------------------------
@@ -25,7 +26,7 @@ N_trial = N_trial_total/split
 
 # Parallel computing setup ------------------------------------------------
 
-N_cores = 10
+N_cores = 5
 registerDoParallel(cores=N_cores)
 
 
@@ -39,7 +40,7 @@ N_node_list = list(100, 200, 300, 400, 500)
 clus_sep_list = list(1.7, 1.8, 1.9, 2.0)
 
 top_level_folder = "../Results/Rdata"
-setup = 'ICL_Nclus4_v1.2'
+setup = 'ICL_Nclus4_v2.3'
 default_setting = 'N_spks_total=50,N_node=100,clus_sep=1.7'
 ### Save estimated densities
 for (. in 1:1) {
@@ -55,9 +56,9 @@ for (. in 1:1) {
           tryCatch(main_v5_pdf(SEED = SEED,
                                N_node = 100,
                                N_clus = 4,
-                               u_1 = 1, u_0 = 1,
+                               N_component_true = 2,
                                t_vec = seq(-1, 1, by=0.01),
-                               t_vec_extend = seq(-3/2, 1, by=0.01),
+                               timeshift_max_vec = c(1/4, 1/16),
                                ### params when N_clus==4:
                                N_spks_total = N_spks_total,
                                clus_sep = clus_sep,
@@ -65,8 +66,11 @@ for (. in 1:1) {
                                freq_trun = freq_trun,
                                N_clus_min = 1,
                                N_clus_max = 6,
-                               fix_timeshift=FALSE,
-                               save_center_pdf_array=TRUE ),
+                               N_component = 2,
+                               key_times_vec = c(-1,0,1),
+                               fix_timeshift = FALSE,
+                               fix_membership = FALSE,
+                               save_center_pdf_array = TRUE ),
                    error = function(x) print(SEED))
         }
         param_name_0 = "clus_sep"
@@ -97,9 +101,9 @@ for (. in 1:1) {
                                N_node = 100,
                                N_replicate = N_replicate,
                                N_clus = 4,
-                               u_1 = 1, u_0 = 1,
+                               N_component_true = 2,
                                t_vec = seq(-1, 1, by=0.01),
-                               t_vec_extend = seq(-3/2, 1, by=0.01),
+                               timeshift_max_vec = c(1/4, 1/16),
                                ### params when N_clus==4:
                                N_spks_total = 50,
                                clus_sep = clus_sep,
@@ -107,8 +111,11 @@ for (. in 1:1) {
                                freq_trun = freq_trun,
                                N_clus_min = 1,
                                N_clus_max = 6,
-                               fix_timeshift=FALSE,
-                               save_center_pdf_array=TRUE ),
+                               N_component = 2,
+                               key_times_vec = c(-1,0,1),
+                               fix_timeshift = FALSE,
+                               fix_membership = FALSE,
+                               save_center_pdf_array = TRUE ),
                    error = function(x) print(SEED))
         }
         param_name_0 = "clus_sep"
@@ -128,7 +135,7 @@ for (. in 1:1) {
         rm(results)
       }
     }
-    ### interaction(clus_sep, N_replicate)
+    ### interaction(clus_sep, N_node)
     for (id_clus_sep in 1:length(clus_sep_list)){
       clus_sep = clus_sep_list[[id_clus_sep]]
       for (id_N_node in 1:length(N_node_list)) {
@@ -138,9 +145,9 @@ for (. in 1:1) {
           tryCatch(main_v5_pdf(SEED = SEED,
                                N_node = N_node,
                                N_clus = 4,
-                               u_1 = 1, u_0 = 1,
+                               N_component_true = 2,
                                t_vec = seq(-1, 1, by=0.01),
-                               t_vec_extend = seq(-3/2, 1, by=0.01),
+                               timeshift_max_vec = c(1/4, 1/16),
                                ### params when N_clus==4:
                                N_spks_total = 50,
                                clus_sep = clus_sep,
@@ -148,8 +155,11 @@ for (. in 1:1) {
                                freq_trun = freq_trun,
                                N_clus_min = 1,
                                N_clus_max = 6,
-                               fix_timeshift=FALSE,
-                               save_center_pdf_array=TRUE ),
+                               N_component = 2,
+                               key_times_vec = c(-1,0,1),
+                               fix_timeshift = FALSE,
+                               fix_membership = FALSE,
+                               save_center_pdf_array = TRUE ),
                    error = function(x) print(SEED))
         }
         param_name_0 = "clus_sep"
@@ -186,9 +196,9 @@ for (. in 1:split) {
           tryCatch(main_v5_pdf(SEED = SEED,
                                N_node = 100,
                                N_clus = 4,
-                               u_1 = 1, u_0 = 1,
+                               N_component_true = 2,
                                t_vec = seq(-1, 1, by=0.01),
-                               t_vec_extend = seq(-3/2, 1, by=0.01),
+                               timeshift_max_vec = c(1/4, 1/16),
                                ### params when N_clus==4:
                                N_spks_total = N_spks_total,
                                clus_sep = clus_sep,
@@ -196,8 +206,11 @@ for (. in 1:split) {
                                freq_trun = freq_trun,
                                N_clus_min = 1,
                                N_clus_max = 6,
-                               fix_timeshift=FALSE,
-                               save_center_pdf_array=FALSE ),
+                               N_component = 2,
+                               key_times_vec = c(-1,0,1),
+                               fix_timeshift = FALSE,
+                               fix_membership = FALSE,
+                               save_center_pdf_array = FALSE ),
                    error = function(x) print(SEED))
         }
         param_name_0 = "clus_sep"
@@ -211,7 +224,7 @@ for (. in 1:split) {
                              '/', param_name_0, '/', param_value_0,
                              '/', param_name, '/', param_value)
         dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
-
+        
         now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
         save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
         rm(results)
@@ -228,9 +241,9 @@ for (. in 1:split) {
                                N_node = 100,
                                N_replicate = N_replicate,
                                N_clus = 4,
-                               u_1 = 1, u_0 = 1,
+                               N_component_true = 2,
                                t_vec = seq(-1, 1, by=0.01),
-                               t_vec_extend = seq(-3/2, 1, by=0.01),
+                               timeshift_max_vec = c(1/4, 1/16),
                                ### params when N_clus==4:
                                N_spks_total = 50,
                                clus_sep = clus_sep,
@@ -238,8 +251,11 @@ for (. in 1:split) {
                                freq_trun = freq_trun,
                                N_clus_min = 1,
                                N_clus_max = 6,
-                               fix_timeshift=FALSE,
-                               save_center_pdf_array=FALSE ),
+                               N_component = 2,
+                               key_times_vec = c(-1,0,1),
+                               fix_timeshift = FALSE,
+                               fix_membership = FALSE,
+                               save_center_pdf_array = FALSE ),
                    error = function(x) print(SEED))
         }
         param_name_0 = "clus_sep"
@@ -253,13 +269,13 @@ for (. in 1:split) {
                              '/', param_name_0, '/', param_value_0,
                              '/', param_name, '/', param_value)
         dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
-
+        
         now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
         save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
         rm(results)
       }
     }
-    ### interaction(clus_sep, N_replicate)
+    ### interaction(clus_sep, N_node)
     for (id_clus_sep in 1:length(clus_sep_list)){
       clus_sep = clus_sep_list[[id_clus_sep]]
       for (id_N_node in 1:length(N_node_list)) {
@@ -269,9 +285,9 @@ for (. in 1:split) {
           tryCatch(main_v5_pdf(SEED = SEED,
                                N_node = N_node,
                                N_clus = 4,
-                               u_1 = 1, u_0 = 1,
+                               N_component_true = 2,
                                t_vec = seq(-1, 1, by=0.01),
-                               t_vec_extend = seq(-3/2, 1, by=0.01),
+                               timeshift_max_vec = c(1/4, 1/16),
                                ### params when N_clus==4:
                                N_spks_total = 50,
                                clus_sep = clus_sep,
@@ -279,8 +295,11 @@ for (. in 1:split) {
                                freq_trun = freq_trun,
                                N_clus_min = 1,
                                N_clus_max = 6,
-                               fix_timeshift=FALSE,
-                               save_center_pdf_array=FALSE ),
+                               N_component = 2,
+                               key_times_vec = c(-1,0,1),
+                               fix_timeshift = FALSE,
+                               fix_membership = FALSE,
+                               save_center_pdf_array = FALSE ),
                    error = function(x) print(SEED))
         }
         param_name_0 = "clus_sep"
@@ -294,7 +313,7 @@ for (. in 1:split) {
                              '/', param_name_0, '/', param_value_0,
                              '/', param_name, '/', param_value)
         dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
-
+        
         now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
         save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
         rm(results)
