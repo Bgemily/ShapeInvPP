@@ -34,8 +34,8 @@ registerDoParallel(cores=N_cores)
 
 # Experiment type ---------------------------------------------------------
 
-select_tuning_parameter = FALSE
-test_algorithm_performance = TRUE
+select_tuning_parameter = TRUE
+test_algorithm_performance = FALSE
 
 # Select tuning parameter -------------------------------------------------
 if (select_tuning_parameter) {
@@ -92,15 +92,17 @@ if (select_tuning_parameter) {
     
     # Save results
     top_level_folder = "../Results/Rdata"
-    setup = 'Compare_methods_v1.8'
+    setup = 'FunCC_tuning_param'
     method = 'FunCC_v4'
     folder_path = paste0(top_level_folder,
                          '/', setup,
-                         '/', method)
+                         '/', method,
+                         '/', 'clus_sep',
+                         '/', as.character(clus_sep))
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
     save(results, file = paste0(folder_path, '/', 'tuning_parameter_selection', 
-                                '_', 'clus_sep', clus_sep, '_', now_trial, '.Rdata'))
+                                '_', now_trial, '.Rdata'))
     rm(results)
   }
 }
