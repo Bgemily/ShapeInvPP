@@ -18,15 +18,15 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_trial_total = 20
-split = 2
+N_trial_total = 50
+split = 5
 
 N_trial = N_trial_total/split
 
 
 # Parallel computing setup ------------------------------------------------
 
-N_cores = 10
+N_cores = 5
 registerDoParallel(cores=N_cores)
 
 
@@ -37,7 +37,7 @@ registerDoParallel(cores=N_cores)
 freq_trun_vec = c(1,5,10,15,20,25,30)
 
 top_level_folder = "../Results/Rdata"
-setup = 'sensitivity_anal_v2'
+setup = 'sensitivity_anal_v2.3'
 default_setting = 'N_spks_total=30,N_node=100,clus_sep=2'
 ### Save estimated densities
 for (. in 1:1) {

@@ -40,7 +40,7 @@ N_node_list = list(100, 200, 300, 400, 500)
 clus_sep_list = list(1.7, 1.8, 1.9, 2.0)
 
 top_level_folder = "../Results/Rdata"
-setup = 'ICL_Nclus4_v2.2'
+setup = 'ICL_Nclus4_v2.3'
 default_setting = 'N_spks_total=50,N_node=100,clus_sep=1.7'
 ### Save estimated densities
 for (. in 1:1) {

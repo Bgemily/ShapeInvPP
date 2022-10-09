@@ -40,7 +40,7 @@ N_node_list = list(100, 200, 300, 400, 500)
 clus_sep_list = list(1.5, 1.6, 1.7, 1.8, 1.9, 2.0)
 
 top_level_folder = "../Results/Rdata"
-setup = 'Nclus4_v2.2'
+setup = 'Nclus4_v2.3'
 default_setting = 'N_spks_total=50,N_node=100,clus_sep=1.5'
 
 ### Save estimated densities
@@ -158,43 +158,7 @@ for (. in 1:1) {
       rm(results)
     }
 
-    ### clus_sep
-    for (id_clus_sep in 1:length(clus_sep_list)) {
-      clus_sep = clus_sep_list[[id_clus_sep]]
-      results <- foreach(j = 1:N_trial) %dopar% {
-        SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED,
-                             N_node = 100,
-                             N_clus = 4,
-                             N_component_true = 2,
-                             t_vec = seq(-1, 1, by=0.01),
-                             timeshift_max_vec = c(1/4, 1/16),
-                             ### params when N_clus==4:
-                             N_spks_total = 50,
-                             clus_sep = clus_sep,
-                             ### Parameters for algorithms
-                             freq_trun = freq_trun,
-                             N_component = 2,
-                             key_times_vec = c(-1,0,1),
-                             fix_timeshift = FALSE,
-                             fix_membership = FALSE,
-                             save_center_pdf_array = TRUE ),
-                 error = function(x) print(SEED))
-      }
-      param_name = "clus_sep"
-      param_value = clus_sep
-      folder_path = paste0(top_level_folder,
-                           '/', setup,
-                           '/', method, '_freqtrun', freq_trun,
-                           '/', default_setting,
-                           '/', param_name, '/', param_value)
-      dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
-
-      now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
-      rm(results)
-    }
-
+    
   }
 
 }
@@ -303,43 +267,6 @@ for (. in 1:split) {
       }
       param_name = "N_node"
       param_value = N_node
-      folder_path = paste0(top_level_folder,
-                           '/', setup,
-                           '/', method, '_freqtrun', freq_trun,
-                           '/', default_setting,
-                           '/', param_name, '/', param_value)
-      dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
-      
-      now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
-      rm(results)
-    }
-    
-    ### clus_sep
-    for (id_clus_sep in 1:length(clus_sep_list)) {
-      clus_sep = clus_sep_list[[id_clus_sep]]
-      results <- foreach(j = 1:N_trial) %dopar% {
-        SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED,
-                             N_node = 100,
-                             N_clus = 4,
-                             N_component_true = 2,
-                             t_vec = seq(-1, 1, by=0.01),
-                             timeshift_max_vec = c(1/4, 1/16),
-                             ### params when N_clus==4:
-                             N_spks_total = 50,
-                             clus_sep = clus_sep,
-                             ### Parameters for algorithms
-                             freq_trun = freq_trun,
-                             N_component = 2,
-                             key_times_vec = c(-1,0,1),
-                             fix_timeshift = FALSE,
-                             fix_membership = FALSE,
-                             save_center_pdf_array = FALSE ),
-                 error = function(x) print(SEED))
-      }
-      param_name = "clus_sep"
-      param_value = clus_sep
       folder_path = paste0(top_level_folder,
                            '/', setup,
                            '/', method, '_freqtrun', freq_trun,
