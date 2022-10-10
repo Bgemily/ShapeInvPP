@@ -34,8 +34,8 @@ registerDoParallel(cores=N_cores)
 
 # Experiment type ---------------------------------------------------------
 
-select_tuning_parameter = TRUE
-test_algorithm_performance = FALSE
+select_tuning_parameter = FALSE
+test_algorithm_performance = TRUE
 
 # Select tuning parameter -------------------------------------------------
 if (select_tuning_parameter) {
@@ -116,7 +116,7 @@ if (test_algorithm_performance) {
   clus_sep_list = list(2, 1.9, 1.8, 1.7, 1.6, 1.5)
   
   top_level_folder = "../Results/Rdata"
-  setup = 'Compare_methods_v1.8.1'
+  setup = 'Compare_methods_v2.2'
   default_setting = 'N_spks_total=100,N_node=100,N_clus=4,N_comp=2'
   
   ### Save estimated densities
@@ -163,6 +163,11 @@ if (test_algorithm_performance) {
     method = 'funcc'
     for (id_clus_sep in 1:length(clus_sep_list)) {
       clus_sep = clus_sep_list[[id_clus_sep]]
+      if (clus_sep %in% c(2.0, 1.9, 1.8, 1.7)) {
+        delta = 0.01
+      } else if (clus_sep %in% c(1.6, 1.5)) {
+        delta = 0.03
+      }
       results <- foreach(j = 1:N_trial) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_funcc(SEED = SEED, 
@@ -175,7 +180,7 @@ if (test_algorithm_performance) {
                             ### params when N_clus==4:
                             clus_sep = clus_sep,
                             ### Parameters for algorithms
-                            delta = 0.025, 
+                            delta = delta, 
                             theta = 1.25,
                             bw = 'SJ',
                             N_component = 2,
@@ -243,6 +248,11 @@ if (test_algorithm_performance) {
     method = 'funcc'
     for (id_clus_sep in 1:length(clus_sep_list)) {
       clus_sep = clus_sep_list[[id_clus_sep]]
+      if (clus_sep %in% c(2.0, 1.9, 1.8, 1.7)) {
+        delta = 0.01
+      } else if (clus_sep %in% c(1.6, 1.5)) {
+        delta = 0.03
+      }
       results <- foreach(j = 1:N_trial) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_funcc(SEED = SEED, 
@@ -255,7 +265,7 @@ if (test_algorithm_performance) {
                             ### params when N_clus==4:
                             clus_sep = clus_sep,
                             ### Parameters for algorithms
-                            delta = 0.025, 
+                            delta = delta, 
                             theta = 1.25,
                             bw = 'SJ',
                             N_component = 2,
