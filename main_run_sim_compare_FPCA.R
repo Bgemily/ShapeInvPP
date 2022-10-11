@@ -43,7 +43,7 @@ timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
 
 if (test_N_component_2){
   top_level_folder = "../Results/Rdata"
-  setup = 'Compare_methods_v2'
+  setup = 'Compare_methods_v2.3'
   default_setting = 'N_spks_total=100,N_node=100,N_clus=1,N_comp=2'
   
   ### Save estimated densities
@@ -195,7 +195,7 @@ if (test_N_component_2){
 
 if (test_N_component_1) {
   top_level_folder = "../Results/Rdata"
-  setup = 'Compare_methods_v2.0.1'
+  setup = 'Compare_methods_v2.3.1'
   default_setting = 'N_spks_total=100,N_node=100,N_clus=1,N_comp=1'
   
   ### Save estimated densities
