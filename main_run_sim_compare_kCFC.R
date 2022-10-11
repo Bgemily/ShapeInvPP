@@ -40,7 +40,7 @@ clus_sep_list = list(2, 1.9, 1.8, 1.7, 1.6, 1.5)
 
 if (test_N_component_2) {
   top_level_folder = "../Results/Rdata"
-  setup = 'Compare_methods_v2.1'
+  setup = 'Compare_methods_v2.4'
   default_setting = 'N_spks_total=100,N_node=100,N_clus=4,N_comp=2'
   
   ### Save estimated densities
@@ -192,7 +192,7 @@ if (test_N_component_2) {
 
 if (test_N_component_1) {
   top_level_folder = "../Results/Rdata"
-  setup = 'Compare_methods_v2.1.1'
+  setup = 'Compare_methods_v2.4.1'
   default_setting = 'N_spks_total=100,N_node=100,N_clus=4,N_comp=1'
   
   ### Save estimated densities

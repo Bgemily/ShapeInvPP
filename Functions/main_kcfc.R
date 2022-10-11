@@ -88,7 +88,7 @@ main_kcfc = function(### Parameters for generative model
   memb_est_vec_permn = clus2mem(clusters_list_est[the_permn])
   fpcaList_permn = kcfcObj$fpcaList[the_permn]    
   
-  # Reconstruct density components 
+  # Reconstruct density components and time shifts 
   calculate_deriv = function(x_vec,f_vec){
     n = length(f_vec)
     grad = rep(0, n)
@@ -110,47 +110,48 @@ main_kcfc = function(### Parameters for generative model
     return(f_vec)
   }
   
-  center_density_fpca_array_permn = array(dim = c(N_clus, N_component, length(t_vec_extend)))
-  for (idx_clus in 1:N_clus){
-    FPCAobj = fpcaList_permn[[idx_clus]]    
+  center_density_fpca_array_permn = array(dim = c(N_clus, N_component, length(t_vec)))
+  v_fpca_mat = matrix(nrow = N_node, ncol = N_component)
+  for (id_clus in 1:N_clus){
+    ### Extract FPCA estimates
+    FPCAobj = fpcaList_permn[[id_clus]]    
     N_node_tmp = nrow(FPCAobj$xiEst)
     mean_density_vec = FPCAobj$mu
     eigenfuncs_mat = FPCAobj$phi[ , 1:N_component, drop=FALSE] # len(t_fpca_vec) x N_component
     fpc_scores_mat = FPCAobj$xiEst[ , 1:N_component, drop=FALSE] # N_node_tmp x N_component
     t_fpca_vec = FPCAobj$workGrid
-    
+    current_cluster = which(memb_est_vec_permn==id_clus)
+    ### Calculate densities and time shifts
     for (id_component in 1:N_component){
       derivative_mean_density_vec = calculate_deriv(x_vec = t_fpca_vec, f_vec = mean_density_vec)
       eigen_func_vec = eigenfuncs_mat[,id_component]
       inner_prod = sum( derivative_mean_density_vec * eigen_func_vec ) * (t_fpca_vec[2]-t_fpca_vec[1])
-      derivative_density_vec = eigen_func_vec * inner_prod
-      density_vec = calculate_antideriv(x_vec = t_fpca_vec, gradient_vec = derivative_density_vec)
-      density_vec = approx(x = t_fpca_vec, xout = data_generated$t_vec_extend,
-                           y = density_vec)$y
-      center_density_fpca_array_permn[idx_clus, id_component, ] = density_vec
+      derivative_density_shifted_vec = eigen_func_vec * inner_prod
+      v_fpca_vec = -fpc_scores_mat[, id_component] * (inner_prod^(-1))
+      v_mean_fpca_vec = -min(v_fpca_vec)
+      if (v_mean_fpca_vec > (max(t_vec)-min(t_vec)) ) {
+        v_mean_fpca_vec = 1/2 * data_param$timeshift_max_vec[id_component]
+      }
+      
+      density_shifted_vec = calculate_antideriv(x_vec = t_fpca_vec, gradient_vec = derivative_density_shifted_vec)
+      density_shifted_vec = approx(x = t_fpca_vec, xout = t_vec, y = density_shifted_vec)$y
+      timeshift_density = -v_mean_fpca_vec
+      if (timeshift_density < 0) {
+        N_timegrid = round(abs(timeshift_density)/t_unit)
+        density_vec = c(tail(density_shifted_vec, length(density_shifted_vec) - N_timegrid),
+                        rep(0, N_timegrid))
+      } else if (timeshift_density > 0) {
+        N_timegrid = round(abs(timeshift_density)/t_unit)
+        density_vec = c(rep(0, N_timegrid),
+                        head(density_shifted_vec, length(density_shifted_vec) - N_timegrid))
+      }
+      center_density_fpca_array_permn[id_clus, id_component, ] = density_vec
+      
+      v_fpca_vec = v_fpca_vec + v_mean_fpca_vec
+      v_fpca_mat[current_cluster, id_component] = v_fpca_vec
     }
   }
   
-  # Reconstruct time shifts 
-  v_fpca_mat = matrix(nrow = N_node, ncol = N_component)
-  for (id_clus in 1:N_clus){
-    FPCAobj = fpcaList_permn[[id_clus]]    
-    mean_density_vec = FPCAobj$mu
-    eigenfuncs_mat = FPCAobj$phi[ , 1:N_component, drop=FALSE] # len(t_vec) x N_component
-    fpc_scores_mat = FPCAobj$xiEst[ , 1:N_component, drop=FALSE] # clus_size x N_component
-    t_fpca_vec = FPCAobj$workGrid
-    current_cluster = which(memb_est_vec_permn==id_clus)
-    ### Calculate time shifts
-    for (id_component in 1:N_component){
-      derivative_mean_density_vec = calculate_deriv(x_vec = t_fpca_vec, f_vec = mean_density_vec)
-      eigen_func_vec = eigenfuncs_mat[,id_component]
-      inner_prod = sum( derivative_mean_density_vec * eigen_func_vec ) * (t_fpca_vec[2]-t_fpca_vec[1])        
-      v_fpca_vec = -fpc_scores_mat[, id_component] * (inner_prod^(-1))
-      v_fpca_mat[current_cluster, id_component] = v_fpca_vec
-      ### Force minimum time shift to be 0
-      v_fpca_mat[current_cluster, id_component] = v_fpca_mat[current_cluster, id_component] - min(v_fpca_mat[current_cluster, id_component])
-    }
-  }
   
   # Find the best permutation of density components
   v_fpca_mat_permn = 0 * v_fpca_mat

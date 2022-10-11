@@ -116,7 +116,7 @@ if (test_algorithm_performance) {
   clus_sep_list = list(2, 1.9, 1.8, 1.7, 1.6, 1.5)
   
   top_level_folder = "../Results/Rdata"
-  setup = 'Compare_methods_v2.5'
+  setup = 'Compare_methods_v2.6'
   default_setting = 'N_spks_total=100,N_node=100,N_clus=4,N_comp=2'
   
   ### Save estimated densities
@@ -164,7 +164,7 @@ if (test_algorithm_performance) {
     for (id_clus_sep in 1:length(clus_sep_list)) {
       clus_sep = clus_sep_list[[id_clus_sep]]
       if (clus_sep %in% c(2.0, 1.9, 1.8, 1.7)) {
-        delta = 0.01
+        delta = 0.03
       } else if (clus_sep %in% c(1.6, 1.5)) {
         delta = 0.03
       }
@@ -249,7 +249,7 @@ if (test_algorithm_performance) {
     for (id_clus_sep in 1:length(clus_sep_list)) {
       clus_sep = clus_sep_list[[id_clus_sep]]
       if (clus_sep %in% c(2.0, 1.9, 1.8, 1.7)) {
-        delta = 0.01
+        delta = 0.03
       } else if (clus_sep %in% c(1.6, 1.5)) {
         delta = 0.03
       }
