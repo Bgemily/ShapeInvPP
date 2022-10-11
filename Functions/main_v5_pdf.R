@@ -86,7 +86,8 @@ main_v5_pdf = function(### Parameters for generative model
     non_identifiability = get_non_identifiability(spks_time_mlist = spks_time_mlist, 
                                                     v_mat_list = v_true_mat_list, 
                                                     N_component = N_component, 
-                                                    t_vec = t_vec)
+                                                    t_vec = t_vec, 
+                                                  freq_trun = freq_trun)
   } else {
     non_identifiability = NA
   }
