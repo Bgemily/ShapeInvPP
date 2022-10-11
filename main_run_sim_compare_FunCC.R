@@ -28,7 +28,7 @@ N_trial = N_trial_total/split
 
 # Parallel computing setup ------------------------------------------------
 
-N_cores = 10
+N_cores = 5
 registerDoParallel(cores=N_cores)
 
 
@@ -116,7 +116,7 @@ if (test_algorithm_performance) {
   clus_sep_list = list(2, 1.9, 1.8, 1.7, 1.6, 1.5)
   
   top_level_folder = "../Results/Rdata"
-  setup = 'Compare_methods_v2.2'
+  setup = 'Compare_methods_v2.5'
   default_setting = 'N_spks_total=100,N_node=100,N_clus=4,N_comp=2'
   
   ### Save estimated densities
@@ -181,7 +181,7 @@ if (test_algorithm_performance) {
                             clus_sep = clus_sep,
                             ### Parameters for algorithms
                             delta = delta, 
-                            theta = 1.25,
+                            theta = 1,
                             bw = 'SJ',
                             N_component = 2,
                             key_times_vec = c(-1, 0, 1),
@@ -266,7 +266,7 @@ if (test_algorithm_performance) {
                             clus_sep = clus_sep,
                             ### Parameters for algorithms
                             delta = delta, 
-                            theta = 1.25,
+                            theta = 1,
                             bw = 'SJ',
                             N_component = 2,
                             key_times_vec = c(-1, 0, 1),
