@@ -76,12 +76,16 @@ main_kmeans_align = function(### Parameters for generative model
   
   ### Apply kmeans_align() --------------------------------
   set.seed(SEED)
+  time_start = Sys.time()
   fdakma_obj = fdasrvf::kmeans_align(f = f_mat,
                                      time = time_vec,
                                      K = N_clus,
                                      alignment = TRUE, 
                                     nonempty = 2, 
                                      showplot = FALSE)
+  time_end = Sys.time()
+  time_estimation = time_end - time_start
+  time_estimation = as.numeric(time_estimation, units='secs')
   
   # Find the best permutation of cluster labels
   clusters_list_true = data_generated$clus_true_list
@@ -90,9 +94,9 @@ main_kmeans_align = function(### Parameters for generative model
                                     clusters_list_est = clusters_list_est)
   clusters_list_est_permn = clusters_list_est[the_permn]
 
-  # Extract center densities
+  # Extract center densities 
   center_density_mat_est = t(fdakma_obj$templates)
-  center_density_mat_est_permn = center_density_mat_est[the_permn]
+  center_density_mat_est_permn = center_density_mat_est[the_permn, , drop = FALSE]
   center_density_array_est_permn = array(dim = c(N_clus, 1, length(t_vec)))
   center_density_array_est_permn[ , 1, ] = center_density_mat_est_permn
   
@@ -195,7 +199,7 @@ main_kmeans_align = function(### Parameters for generative model
               cand_N_clus_vec=NA,
               N_restart = NA,
               t_vec=t_vec, t_vec_extend=t_vec_extend,
-              time_estimation=NA,
+              time_estimation = time_estimation,
               N_iteration=NA,
               loss_history=NA
   ))
