@@ -69,7 +69,7 @@ if (FALSE) {
                              fix_timeshift = TRUE, use_true_timeshift = TRUE,
                              fix_membership = FALSE,
                              save_center_pdf_array = TRUE),
-                 error = function(x) print(SEED))
+                 error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
       param_name = "timeshift_max_vec"
       param_value = paste0(timeshift_max_vec, collapse = '_')
@@ -111,7 +111,7 @@ for (. in 1:split) {
                            fix_timeshift = TRUE, use_true_timeshift = TRUE,
                            fix_membership = FALSE,
                            save_center_pdf_array = FALSE),
-               error = function(x) print(SEED))
+               error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
     param_name = "timeshift_max_vec"
     param_value = paste0(timeshift_max_vec, collapse = '_')

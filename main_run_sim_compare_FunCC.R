@@ -87,7 +87,7 @@ if (select_tuning_parameter) {
     results <- foreach(j = 1:N_trial) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(find_best_delta_tmp(SEED = SEED, clus_sep = clus_sep),
-               error = function(x) print(SEED))
+               error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
     
     # Save results
@@ -154,7 +154,7 @@ if (test_algorithm_performance) {
                                N_component = 2,
                                key_times_vec = c(-1, 0, 1),
                                save_center_pdf_array = save_center_pdf_array),
-                   error = function(x) print(SEED))
+                   error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
         }
         param_name = "timeshift_max_vec"
         param_value = paste0(timeshift_max_vec, collapse = '_')
@@ -194,7 +194,7 @@ if (test_algorithm_performance) {
                               N_component = 2,
                               key_times_vec = c(-1, 0, 1),
                               save_center_pdf_array = save_center_pdf_array),
-                   error = function(x) print(SEED))
+                   error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
         }
         param_name = "clus_sep"
         param_value = clus_sep
@@ -240,7 +240,7 @@ if (test_algorithm_performance) {
                               N_component = 1,
                               key_times_vec = c(-1, 1),
                               save_center_pdf_array = save_center_pdf_array),
-                   error = function(x) print(SEED))
+                   error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
         }
         param_name = "timeshift_max_vec"
         param_value = paste0(timeshift_max_vec, collapse = '_')
@@ -280,7 +280,7 @@ if (test_algorithm_performance) {
                               N_component = 1,
                               key_times_vec = c(-1, 1),
                               save_center_pdf_array = save_center_pdf_array),
-                   error = function(x) print(SEED))
+                   error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
         }
         param_name = "clus_sep"
         param_value = clus_sep
@@ -324,7 +324,7 @@ if (test_algorithm_performance) {
                               N_component = 2,
                               key_times_vec = c(-1, 0, 1),
                               save_center_pdf_array = save_center_pdf_array),
-                   error = function(x) print(SEED))
+                   error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
         }
         param_name = "timeshift_max_vec"
         param_value = paste0(timeshift_max_vec, collapse = '_')

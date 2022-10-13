@@ -63,7 +63,7 @@ for (. in 1:1) {
                            fix_timeshift = FALSE,
                            fix_membership = FALSE,
                            save_center_pdf_array = TRUE ),
-               error = function(x) print(SEED))
+               error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
     param_name = "freq_trun"
     param_value = freq_trun
@@ -104,7 +104,7 @@ for (. in 1:split) {
                            fix_timeshift = FALSE,
                            fix_membership = FALSE,
                            save_center_pdf_array = FALSE ),
-               error = function(x) print(SEED))
+               error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
     param_name = "freq_trun"
     param_value = freq_trun
@@ -148,7 +148,7 @@ for (. in 1:1) {
                            fix_timeshift = FALSE,
                            fix_membership = FALSE,
                            save_center_pdf_array = TRUE ),
-               error = function(x) print(SEED))
+               error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
     param_name = "freq_trun"
     param_value = freq_trun
@@ -189,7 +189,7 @@ for (. in 1:split) {
                            fix_timeshift = FALSE,
                            fix_membership = FALSE,
                            save_center_pdf_array = FALSE ),
-               error = function(x) print(SEED))
+               error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
     param_name = "freq_trun"
     param_value = freq_trun
@@ -233,7 +233,7 @@ for (. in 1:1) {
                            fix_timeshift = FALSE,
                            fix_membership = FALSE,
                            save_center_pdf_array = TRUE ),
-               error = function(x) print(SEED))
+               error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
     param_name = "freq_trun"
     param_value = freq_trun
@@ -274,7 +274,7 @@ for (. in 1:split) {
                            fix_timeshift = FALSE,
                            fix_membership = FALSE,
                            save_center_pdf_array = FALSE ),
-               error = function(x) print(SEED))
+               error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
     param_name = "freq_trun"
     param_value = freq_trun

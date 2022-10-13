@@ -68,7 +68,7 @@ for (. in 1:1) {
                              fix_timeshift = FALSE,
                              fix_membership = FALSE,
                              save_center_pdf_array = TRUE ),
-                 error = function(x) print(SEED))
+                 error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
       param_name = "N_spks_total"
       param_value = N_spks_total
@@ -106,7 +106,7 @@ for (. in 1:1) {
                              fix_timeshift = FALSE,
                              fix_membership = FALSE,
                              save_center_pdf_array = TRUE ),
-                 error = function(x) print(SEED))
+                 error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
       param_name = "N_replicate"
       param_value = N_replicate
@@ -142,7 +142,7 @@ for (. in 1:1) {
                              fix_timeshift = FALSE,
                              fix_membership = FALSE,
                              save_center_pdf_array = TRUE ),
-                 error = function(x) print(SEED))
+                 error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
       param_name = "N_node"
       param_value = N_node
@@ -189,7 +189,7 @@ for (. in 1:split) {
                              fix_timeshift = FALSE,
                              fix_membership = FALSE,
                              save_center_pdf_array = FALSE ),
-                 error = function(x) print(SEED))
+                 error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
       param_name = "N_spks_total"
       param_value = N_spks_total
@@ -227,7 +227,7 @@ for (. in 1:split) {
                              fix_timeshift = FALSE,
                              fix_membership = FALSE,
                              save_center_pdf_array = FALSE ),
-                 error = function(x) print(SEED))
+                 error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
       param_name = "N_replicate"
       param_value = N_replicate
@@ -263,7 +263,7 @@ for (. in 1:split) {
                              fix_timeshift = FALSE,
                              fix_membership = FALSE,
                              save_center_pdf_array = FALSE ),
-                 error = function(x) print(SEED))
+                 error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
       param_name = "N_node"
       param_value = N_node
