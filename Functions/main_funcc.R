@@ -93,9 +93,14 @@ main_funcc = function(### Parameters for generative model
   
   # Get estimated clusters
   N_biclus = res[[1]]@Number
-  mem = res[[1]]@RowxNumber %*% c(2^(0:(N_biclus-1)))
-  mem = as.numeric(as.factor(mem))
-  clusters_list_est = mem2clus(mem, N_clus_min = length(unique(mem)))
+  if (N_biclus > 0) {
+    mem = res[[1]]@RowxNumber %*% c(2^(0:(N_biclus-1)))
+    mem = as.numeric(as.factor(mem))
+    clusters_list_est = mem2clus(mem, N_clus_min = length(unique(mem)))
+  } else {
+    mem = rep(1, N_node)
+    clusters_list_est = list(1:N_node)
+  }
   
   # Get densities
   N_clus_est = length(clusters_list_est)
