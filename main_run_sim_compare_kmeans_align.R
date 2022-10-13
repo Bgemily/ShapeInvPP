@@ -71,6 +71,7 @@ if (test_N_component_2) {
                              ### Parameters for algorithms
                              bw = 'SJ',
                              N_component = 1,
+                             key_times_vec = c(-1,0,1),
                              save_center_pdf_array = save_center_pdf_array),
                  error = function(x) print(SEED))
       }
@@ -102,6 +103,7 @@ if (test_N_component_2) {
                                    ### Parameters for algorithms
                                    bw = 'SJ',
                                    N_component = 1,
+                                   key_times_vec = c(-1,0,1),
                                    save_center_pdf_array = save_center_pdf_array),
                  error = function(x) print(SEED))
       }
@@ -146,6 +148,7 @@ if (test_N_component_1) {
                              ### Parameters for algorithms
                              bw = 'SJ',
                              N_component = 1,
+                             key_times_vec = c(-1,1),
                              save_center_pdf_array = save_center_pdf_array),
                  error = function(x) print(SEED))
       }
@@ -177,6 +180,7 @@ if (test_N_component_1) {
                            ### Parameters for algorithms
                            bw = 'SJ',
                            N_component = 1,
+                           key_times_vec = c(-1,1),
                            save_center_pdf_array = save_center_pdf_array),
                  error = function(x) print(SEED))
       }
@@ -216,6 +220,7 @@ if (test_N_clus_1) {
                                  ### Parameters for algorithms
                                  bw = 'SJ',
                                  N_component = 1,
+                                 key_times_vec = c(-1,0,1),
                                  save_center_pdf_array = save_center_pdf_array),
                error = function(x) print(SEED))
     }

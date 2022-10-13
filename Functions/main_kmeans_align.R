@@ -26,6 +26,7 @@ main_kmeans_align = function(### Parameters for generative model
   ### Parameters for algorithms
   bw = 0,
   N_component = 2,
+  key_times_vec = c(min(t_vec),0,max(t_vec)),
   save_center_pdf_array = FALSE)
 {
   t_unit = t_vec[2]-t_vec[1]
@@ -100,6 +101,17 @@ main_kmeans_align = function(### Parameters for generative model
   center_density_array_est_permn = array(dim = c(N_clus, 1, length(t_vec)))
   center_density_array_est_permn[ , 1, ] = center_density_mat_est_permn
   
+  # Segment densities if needed
+  if (N_component_true > N_component) {
+    center_density_array_est_permn_new = array(dim = c(N_clus, N_component_true, length(t_vec)))
+    for (id_component in 1:N_component_true) {
+      indicator_curr_comp_vec = (t_vec >= key_times_vec[id_component]) & (t_vec <= key_times_vec[id_component+1])
+      indicator_curr_comp_mat = matrix(indicator_curr_comp_vec, byrow = TRUE, nrow = N_clus, ncol = length(t_vec))
+      center_density_array_est_permn_new[ , id_component, ] = indicator_curr_comp_mat * center_density_array_est_permn[ , 1, ] 
+    }
+    center_density_array_est_permn = center_density_array_est_permn_new
+  }
+  
   # Rename estimates
   clusters_list_est = clusters_list_est
   clusters_list_est_permn = clusters_list_est_permn
@@ -119,33 +131,27 @@ main_kmeans_align = function(### Parameters for generative model
   # Compute estimation error ------------------------------------------------
   if (TRUE) {
     # Compute errors of conn patts, i.e. F ---------
-    if (N_component_true == N_component) {
-      ### Calculate distance 
-      dist_mse_mat = matrix(nrow=N_clus, ncol=N_component)
-      for (id_clus in 1:N_clus) {
-        for (id_component in 1:N_component) {
-          dist_mse_mat[id_clus,id_component] = sum( (center_density_array_est_permn[id_clus,id_component,] - 
-                                                       center_density_array_true[id_clus,id_component,])^2 * 
-                                                      t_unit )
-        }
+    
+    ### Calculate distance 
+    dist_mse_mat = matrix(nrow=N_clus, ncol=N_component_true)
+    for (id_clus in 1:N_clus) {
+      for (id_component in 1:N_component_true) {
+        dist_mse_mat[id_clus,id_component] = sum( (center_density_array_est_permn[id_clus,id_component,] - 
+                                                     center_density_array_true[id_clus,id_component,])^2 * 
+                                                    t_unit )
       }
-      F_mean_sq_err = mean(dist_mse_mat)
-      F_mean_sq_err_vec = colMeans(dist_mse_mat)
-      
-      F_l2_squared_norm_mat = apply(center_density_array_true, 1:2, function(density){
-        sum(density^2 * t_unit)
-      })
-      F_mse_squarel2_ratio_mat =  dist_mse_mat / F_l2_squared_norm_mat 
-      
-      weight_vec = sapply(clusters_list_est_permn, length) / length(unlist(clusters_list_est_permn))
-      F_mse_squarel2_ratio = sum( rowMeans(F_mse_squarel2_ratio_mat) * weight_vec )
-    } else {
-      dist_mse_mat = NA
-      F_mean_sq_err = NA
-      F_mean_sq_err_vec = NA
-      F_mse_squarel2_ratio_mat = NA
-      F_mse_squarel2_ratio = NA
     }
+    F_mean_sq_err = mean(dist_mse_mat)
+    F_mean_sq_err_vec = colMeans(dist_mse_mat)
+    
+    F_l2_squared_norm_mat = apply(center_density_array_true, 1:2, function(density){
+      sum(density^2 * t_unit)
+    })
+    F_mse_squarel2_ratio_mat =  dist_mse_mat / F_l2_squared_norm_mat 
+    
+    weight_vec = sapply(clusters_list_est_permn, length) / length(unlist(clusters_list_est_permn))
+    F_mse_squarel2_ratio = sum( rowMeans(F_mse_squarel2_ratio_mat) * weight_vec )
+    
     
     
     # Compute errors of clusters, i.e. Z ------------------------------------
