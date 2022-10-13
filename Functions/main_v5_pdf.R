@@ -131,7 +131,8 @@ main_v5_pdf = function(### Parameters for generative model
                      use_true_timeshift = use_true_timeshift, 
                      jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
                      fix_membership = fix_membership,
-                     v_true_mat_list = v_true_mat_list)
+                     v_true_mat_list = v_true_mat_list, 
+                     rmv_conn_prob = TRUE)
     }
     
     clusters_list_init = res$clusters_list
