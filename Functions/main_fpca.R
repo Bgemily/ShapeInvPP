@@ -75,7 +75,12 @@ main_fpca = function(### Parameters for generative model
   
   
   # Fit FPCA ------------------------------------
+  time_start = Sys.time()
   FPCAobj = FPCA(Ly=yList, Lt=tList, optns=list(dataType='Dense', maxK=N_component))
+  time_end = Sys.time()
+  time_estimation = time_end - time_start
+  time_estimation = as.numeric(time_estimation, units='secs')
+  
   mean_density_vec = FPCAobj$mu
   eigenfuncs_mat = FPCAobj$phi[ , 1:N_component, drop=FALSE] # len(t_vec) x N_component
   fpc_scores_mat = FPCAobj$xiEst[ , 1:N_component, drop=FALSE] # N_node x N_component
@@ -256,7 +261,7 @@ main_fpca = function(### Parameters for generative model
               cand_N_clus_vec=NA,
               N_restart = NA,
               t_vec=t_vec, t_vec_extend=t_vec_extend,
-              time_estimation=NA,
+              time_estimation=time_estimation,
               N_iteration=NA,
               loss_history=NA
   ))

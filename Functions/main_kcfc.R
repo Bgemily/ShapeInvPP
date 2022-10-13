@@ -75,10 +75,14 @@ main_kcfc = function(### Parameters for generative model
   
   
   ### Apply kCFC --------------------------------
+  time_start = Sys.time()
   kcfcObj = kCFC(y = yList, t = tList, k = N_clus, 
                  kSeed = 123, maxIter = 20,
                  optnsSW = list(dataType='Dense', maxK=N_component, FVEthreshold = 1), 
                  optnsCS = list(dataType='Dense', maxK=N_component, FVEthreshold = 1))
+  time_end = Sys.time()
+  time_estimation = time_end - time_start
+  time_estimation = as.numeric(time_estimation, units='secs')
   
   # Find the best permutation of cluster labels
   clusters_list_true = data_generated$clus_true_list
@@ -277,7 +281,7 @@ main_kcfc = function(### Parameters for generative model
               cand_N_clus_vec=NA,
               N_restart = NA,
               t_vec=t_vec, t_vec_extend=t_vec_extend,
-              time_estimation=NA,
+              time_estimation=time_estimation,
               N_iteration=NA,
               loss_history=NA
   ))
