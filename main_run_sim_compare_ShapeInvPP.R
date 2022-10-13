@@ -40,6 +40,7 @@ save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Compare_methods_v2.7.1'
+method = 'shape_inv_pp'
 
 ### Parameters' possible values:
 timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
@@ -51,7 +52,6 @@ clus_sep_list = list(2, 1.9, 1.8, 1.7, 1.6, 1.5, 1.4, 1.3)
 if (test_N_component_2){
   default_setting = 'N_spks_total=100,N_node=100,N_clus=4,clus_sep=1.3,N_comp=2'
   for (id_split in 1:split) {
-    method = 'shape_inv_pp'
     if (save_res_details & (id_split == 1)) {
       save_center_pdf_array = TRUE
     } else {
@@ -132,7 +132,6 @@ if (test_N_component_2){
 if (test_N_component_1) {
   default_setting = 'N_spks_total=100,N_node=100,N_clus=4,clus_sep=1.3,N_comp=1'
   for (id_split in 1:split) {
-    method = 'shape_inv_pp'
     if (save_res_details & (id_split == 1)) {
       save_center_pdf_array = TRUE
     } else {
@@ -213,7 +212,6 @@ if (test_N_component_1) {
 if (test_N_clus_1) {
   default_setting = 'N_spks_total=100,N_node=100,N_clus=1,N_comp=2'
   for (id_split in 1:split) {
-    method = 'shape_inv_pp'
     if (save_res_details & (id_split == 1)) {
       save_center_pdf_array = TRUE
     } else {
