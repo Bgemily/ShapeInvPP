@@ -46,10 +46,11 @@ align_multi_components = function(f_target,
     hessian_mat = hessian_multi_component(fft_f_target = fft_f_target, 
                                           fft_f_origin_mat = fft_f_origin_mat,
                                           n0_vec = n0_vec)
-    if (matrixcalc::is.non.singular.matrix(hessian_mat)) {
-      n0_vec = n0_vec - solve(hessian_mat) %*% gd_vec
+    inv_hessian_mat = try(solve(hessian_mat), silent = TRUE)
+    if (class(inv_hessian_mat) == "try-error") {
+      n0_vec = n0_vec - (diag(hessian_mat) + .Machine$double.eps)^(-1) * gd_vec
     } else {
-      diag(hessian_mat+.Machine$double.eps)^(-1) * gd_vec
+      n0_vec = n0_vec - inv_hessian_mat %*% gd_vec
     }
     
     if (FALSE) {
