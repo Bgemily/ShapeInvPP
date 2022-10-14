@@ -53,7 +53,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
           spks_time_curr_comp_vec = spks_time_tmp[which(spks_time_tmp >= time_start_curr_comp &
                                                           spks_time_tmp <= time_end_curr_comp)]
           if (length(spks_time_curr_comp_vec) > 0) {
-            v_mat_list[[id_component]][id_node, id_replicate] = median(spks_time_curr_comp_vec) 
+            v_mat_list[[id_component]][id_node, id_replicate] = quantile(spks_time_curr_comp_vec, 0.05) 
           }
         }
       }
