@@ -103,13 +103,13 @@ est_timeshift = function(spks_time_mlist,
         
         # Calculate distance between (id_node, id_replicate) and id_clus ----
         ### TODO: Move calculation of fft_center_density_mat out of this for loop
-        fft_node_density = fft(node_density_smooth) / length(node_density_smooth)
+        fft_node_density = fft(node_density_unsmooth) / length(node_density_unsmooth)
         fft_center_density_mat = matrix(nrow = N_component, ncol = dim(center_density_unsmooth_array)[3])
         for (id_component in 1:N_component) {
           center_density_vec_tmp = center_density_unsmooth_array[id_clus, id_component, ]   
           fft_center_density_mat[id_component, ] = fft(center_density_vec_tmp) / length(center_density_vec_tmp)
         }
-        N = length(node_density_smooth)
+        N = length(node_density_unsmooth)
         l_vec = 0:(N-1)
         l_vec = c( head(l_vec, N-(N-1)%/%2),
                    tail(l_vec, (N-1)%/%2) - N )
