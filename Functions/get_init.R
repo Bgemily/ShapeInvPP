@@ -135,9 +135,23 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     }
     
     if (rmv_conn_prob){
-      membership = kmeans(x=node_density_array[,1,], centers = N_clus, nstart = 5)$cluster
+      yList = list()
+      tList = list()
+      for (id_node in 1:N_node) {
+        yList[[id_node]] = node_density_array[id_node, 1, ]
+        tList[[id_node]] = t_vec
+      }
+      fpcaObjY <- fdapace::FPCA(Ly = yList, Lt = tList, optns = list(dataType='Dense', maxK=N_component, FVEthreshold = 1))
+      membership = kmeans(x=fpcaObjY$xiEst, centers = N_clus, nstart = 5)$cluster
     } else{
-      membership = kmeans(x=node_intensity_array[,1,], centers = N_clus, nstart = 5)$cluster
+      yList = list()
+      tList = list()
+      for (id_node in 1:N_node) {
+        yList[[id_node]] = node_intensity_array[id_node, 1, ]
+        tList[[id_node]] = t_vec
+      }
+      fpcaObjY <- fdapace::FPCA(Ly = yList, Lt = tList, optns = list(dataType='Dense', maxK=N_component, FVEthreshold = 1))
+      membership = kmeans(x=fpcaObjY$xiEst, centers = N_clus, nstart = 5)$cluster
     }
     
     clusters = mem2clus(membership = membership, N_clus_min = N_clus)
