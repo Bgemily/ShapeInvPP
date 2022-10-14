@@ -108,10 +108,10 @@ get_center_intensity_array = function(spks_time_mlist,
       ### Force second density to be zero when t<=0
       if (N_component >= 2) {
         for (id_component in 2:N_component) {
-          density_q_before0 = mean(density_q_mat[id_component, which(t_vec <= key_times_vec[id_component])])
-          density_q_mat[id_component, ] = density_q_mat[id_component, ] - density_q_before0
-          density_q_mat[1, ] = density_q_mat[1, ] + density_q_before0
-          density_q_mat[id_component, which(t_vec <= key_times_vec[id_component])] = 0
+          index_before0 = which(t_vec <= key_times_vec[id_component])
+          density_q_before0 = density_q_mat[id_component, index_before0]
+          density_q_mat[1, index_before0] = density_q_mat[1, index_before0] + density_q_before0
+          density_q_mat[id_component, index_before0] = 0
         }
       }
       
