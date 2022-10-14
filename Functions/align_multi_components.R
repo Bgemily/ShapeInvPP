@@ -47,7 +47,7 @@ align_multi_components = function(f_target,
                                           fft_f_origin_mat = fft_f_origin_mat,
                                           n0_vec = n0_vec)
     inv_hessian_mat = try(solve(hessian_mat), silent = TRUE)
-    if (class(inv_hessian_mat) == "try-error") {
+    if (identical(class(inv_hessian_mat), "try-error")) {
       n0_vec = n0_vec - (diag(hessian_mat) + .Machine$double.eps)^(-1) * gd_vec
     } else {
       n0_vec = n0_vec - inv_hessian_mat %*% gd_vec
