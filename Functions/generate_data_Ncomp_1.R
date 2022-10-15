@@ -57,19 +57,19 @@ generate_data_Ncomp_1 = function(SEED=NULL,
     center_density_array_true[1,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec & t_vec<=mu_tmp+s_tmp) 
   } else if (N_clus==4) {
     ## Clus 1
-    s_tmp = u_0*(1/2)*(1/(clus_sep^3)); mu_tmp = -u_0*(1/2); 
+    s_tmp = u_0*(1/8)*(1); mu_tmp = -u_0*(1/2); 
     center_density_array_true[1,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     ## Clus 2
-    s_tmp = u_0*(1/2)*(1/clus_sep^2); mu_tmp = -u_0*(1/2); 
+    s_tmp = u_0*(1/8)*(sqrt(clus_sep)); mu_tmp = -u_0*(1/2); 
     center_density_array_true[2,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     ## Clus 3
-    s_tmp = u_0*(1/2)*(1/clus_sep^1); mu_tmp = -u_0*(1/2) 
+    s_tmp = u_0*(1/8)*(clus_sep^1); mu_tmp = -u_0*(1/2) 
     center_density_array_true[3,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     ## Clus 4
-    s_tmp = u_0*(1/2)*1; mu_tmp = -u_0*(1/2); 
+    s_tmp = u_0*(1/8)*(clus_sep^2); mu_tmp = -u_0*(1/2); 
     center_density_array_true[4,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
   } 
   

@@ -96,7 +96,7 @@ est_timeshift = function(spks_time_mlist,
         tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
                               freq_trun = Inf, 
                               t_vec = t_vec, 
-                              bw=0)
+                              bw = 0)
         node_intensity_unsmooth = tmp$intens_vec
         node_density_unsmooth = node_intensity_unsmooth / length(spks_time_vec)
         center_density_unsmooth_array = center_density_array

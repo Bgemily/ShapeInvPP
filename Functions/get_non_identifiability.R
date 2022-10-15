@@ -5,6 +5,9 @@ get_non_identifiability = function(spks_time_mlist,
                                    freq_trun) 
 {
   non_identifiability = 0
+  if (freq_trun == Inf) {
+    freq_trun = (length(t_vec)-1) %/% 2
+  }
   for (freq in 1:freq_trun) {
     # Get X matrix
     N_node = nrow(spks_time_mlist)

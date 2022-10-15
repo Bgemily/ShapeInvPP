@@ -62,7 +62,7 @@ for (. in 1:1) {
                     fix_timeshift=FALSE,
                     save_center_pdf_array=TRUE )
       }),
-      error = function(x) print(SEED))
+      error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
     param_name = "N_restart_various"
     folder_path = paste0(top_level_folder,
@@ -103,7 +103,7 @@ for (. in 1:split) {
                     fix_timeshift=FALSE,
                     save_center_pdf_array=FALSE )
       }),
-      error = function(x) print(SEED))
+      error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
     param_name = "N_restart_various"
     folder_path = paste0(top_level_folder,

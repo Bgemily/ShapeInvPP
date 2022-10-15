@@ -81,16 +81,26 @@ main_funcc = function(### Parameters for generative model
   
   
   ### Apply kCFC --------------------------------
+  time_start = Sys.time()
   res = FunCC::funcc_biclust(fun_mat = density_array, 
                              delta = delta, theta = theta,
                              alpha = 0, beta = 0, 
-                             shift.alignement=TRUE, shift.max = 0.25,
+                             shift.alignement = TRUE, shift.max = 0.25,
                              max.iter.align = 10)
+  time_end = Sys.time()
+  time_estimation = time_end - time_start
+  time_estimation = as.numeric(time_estimation, units='secs')
+  
   # Get estimated clusters
   N_biclus = res[[1]]@Number
-  mem = res[[1]]@RowxNumber %*% c(2^(0:(N_biclus-1)))
-  mem = as.numeric(as.factor(mem))
-  clusters_list_est = mem2clus(mem, N_clus_min = length(unique(mem)))
+  if (N_biclus > 0) {
+    mem = res[[1]]@RowxNumber %*% c(2^(0:(N_biclus-1)))
+    mem = as.numeric(as.factor(mem))
+    clusters_list_est = mem2clus(mem, N_clus_min = length(unique(mem)))
+  } else {
+    mem = rep(1, N_node)
+    clusters_list_est = list(1:N_node)
+  }
   
   # Get densities
   N_clus_est = length(clusters_list_est)
@@ -250,7 +260,7 @@ main_funcc = function(### Parameters for generative model
               cand_N_clus_vec=NA,
               N_restart = NA,
               t_vec=t_vec, t_vec_extend=t_vec_extend,
-              time_estimation=NA,
+              time_estimation=time_estimation,
               N_iteration=NA,
               loss_history=NA
   ))
