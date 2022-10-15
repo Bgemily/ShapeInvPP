@@ -35,7 +35,7 @@ registerDoParallel(cores=N_cores)
 test_N_component_1 = TRUE
 test_N_component_2 = TRUE
 test_N_clus_1 = TRUE
-save_res_details = TRUE
+save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Compare_methods_v2.7.1'

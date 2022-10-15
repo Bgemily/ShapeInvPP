@@ -38,17 +38,18 @@ test_N_component_2 = TRUE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v2.3'
+setup = 'Compare_methods_v2.7.1'
+method = 'fpca'
 
 ### Parameters' possible values:
 timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
-                              c(1/4, 1/16)*0.5, c(1/4, 1/16)*0.25, c(1/4, 1/16)*0.75, 
+                              c(1/4, 1/16)*0.5, c(1/4, 1/16)*0.75, 
+                              c(1/4, 1/16)*0.25, c(1/4, 1/16)*0.125,
                               c(1/4, 1/16)*1.25, c(1/4, 1/16)*1.75)
 
 if (test_N_component_2){
   default_setting = 'N_spks_total=100,N_node=100,N_clus=1,N_comp=2'
   for (id_split in 1:split) {
-    method = 'fpca'
     if (save_res_details & (id_split == 1)) {
       save_center_pdf_array = TRUE
     } else {
@@ -90,12 +91,9 @@ if (test_N_component_2){
   
 }
 
-top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v2.3.1'
 if (test_N_component_1) {
   default_setting = 'N_spks_total=100,N_node=100,N_clus=1,N_comp=1'
   for (id_split in 1:split) {
-    method = 'fpca'
     if (save_res_details & (id_split == 1)) {
       save_center_pdf_array = TRUE
     } else {

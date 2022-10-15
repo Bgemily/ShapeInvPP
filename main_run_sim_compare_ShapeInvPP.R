@@ -20,8 +20,8 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_trial_total = 50
-split = 5
+N_trial_total = 20
+split = 2
 
 N_trial = N_trial_total/split
 
@@ -40,7 +40,7 @@ save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Compare_methods_v2.7.1'
-method = 'shape_inv_pp'
+method = 'shape_inv_pp_v6'
 
 ### Parameters' possible values:
 timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
