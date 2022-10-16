@@ -9,6 +9,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
                     v0 = 0.15, v1 = 0.1,
                     t_vec=seq(0, v0, by=0.01),
                     key_times_vec = c(min(t_vec),0,max(t_vec)),
+                    N_start_kmean = 5,
                     fix_timeshift=FALSE,
                     fix_comp1_timeshift_only=FALSE,
                     use_true_timeshift=FALSE, 
@@ -135,9 +136,9 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     }
     
     if (rmv_conn_prob){
-      membership = kmeans(x=node_density_array[,1,], centers = N_clus, nstart = 5)$cluster
+      membership = kmeans(x=node_density_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
     } else{
-      membership = kmeans(x=node_intensity_array[,1,], centers = N_clus, nstart = 5)$cluster
+      membership = kmeans(x=node_intensity_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
     }
     
     clusters = mem2clus(membership = membership, N_clus_min = N_clus)
