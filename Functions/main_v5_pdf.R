@@ -39,6 +39,7 @@ main_v5_pdf = function(### Parameters for generative model
                         save_center_pdf_array = FALSE,
                         rand_init = FALSE,
                         N_restart = 1,
+                        N_start_kmean = 5,
                         ### Unused
                         jitter_time_rad = 10, max_iter = 50,
                         conv_thres = 5e-3, 
@@ -108,6 +109,7 @@ main_v5_pdf = function(### Parameters for generative model
                    v0 = u_1, v1 = u_0,
                    t_vec = t_vec, 
                    key_times_vec = key_times_vec,
+                   N_start_kmean = N_start_kmean,
                    freq_trun = freq_trun,
                    bw = bw,
                    fix_timeshift = fix_timeshift, 
@@ -174,6 +176,7 @@ main_v5_pdf = function(### Parameters for generative model
                        v0 = u_1, v1 = u_0,
                        t_vec = t_vec, 
                        key_times_vec = key_times_vec,
+                       N_start_kmean = N_start_kmean,
                        freq_trun = freq_trun,
                        bw = bw,
                        fix_timeshift = fix_timeshift, 
