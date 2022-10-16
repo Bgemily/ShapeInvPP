@@ -136,7 +136,19 @@ main_kmeans_align = function(### Parameters for generative model
     dist_mse_mat = matrix(nrow=N_clus, ncol=N_component_true)
     for (id_clus in 1:N_clus) {
       for (id_component in 1:N_component_true) {
-        dist_mse_mat[id_clus,id_component] = sum( (center_density_array_est_permn[id_clus,id_component,] - 
+        density_est = center_density_array_est_permn[id_clus,id_component,]
+        n0 = align_multi_components(f_target = center_density_array_true[id_clus,id_component,], 
+                                    f_origin_mat = matrix(density_est, nrow = 1),
+                                    t_unit = t_vec[2] - t_vec[1], 
+                                    n0_vec = c(0),
+                                    n0_min_vec = -length(f_target) %/% 2,
+                                    n0_max_vec = length(f_target) %/% 2 )
+        if (n0 > 0) {
+          density_est = c(rep(0, n0), head(density_est, length(density_est) - n0) )
+        } else if (n0 < 0) {
+          density_est = c(tail(density_est, length(density_est) - abs(n0)), rep(0, abs(n0)) )
+        }
+        dist_mse_mat[id_clus,id_component] = sum( (density_est - 
                                                      center_density_array_true[id_clus,id_component,])^2 * 
                                                     t_unit )
       }
