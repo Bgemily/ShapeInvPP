@@ -101,40 +101,22 @@ main_v5_pdf = function(### Parameters for generative model
     N_clus_tmp = c(N_clus_min:N_clus_max)[ind_N_clus]
     
     ### Get initialization -----------
-    if(rand_init) {
-      res = get_init_random(spks_time_mlist = spks_time_mlist, 
-                            stim_onset_vec = stim_onset_vec,
-                            N_clus = N_clus_tmp,
-                            N_component = N_component,
-                            v0 = u_1, v1 = u_0,
-                            t_vec = t_vec, 
-                            N_restart = 1,
-                            freq_trun = freq_trun,
-                            bw = bw,
-                            fix_timeshift = fix_timeshift, 
-                            fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                            use_true_timeshift = use_true_timeshift, 
-                            jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
-                            fix_membership = fix_membership,
-                            v_true_mat_list = v_true_mat_list)
-    } else {
-      res = get_init(spks_time_mlist = spks_time_mlist, 
-                     stim_onset_vec = stim_onset_vec,
-                     N_clus = N_clus_tmp,
-                     N_component = N_component,
-                     v0 = u_1, v1 = u_0,
-                     t_vec = t_vec, 
-                     key_times_vec = key_times_vec,
-                     freq_trun = freq_trun,
-                     bw = bw,
-                     fix_timeshift = fix_timeshift, 
-                     fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                     use_true_timeshift = use_true_timeshift, 
-                     jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
-                     fix_membership = fix_membership,
-                     v_true_mat_list = v_true_mat_list, 
-                     rmv_conn_prob = TRUE)
-    }
+    res = get_init(spks_time_mlist = spks_time_mlist, 
+                   stim_onset_vec = stim_onset_vec,
+                   N_clus = N_clus_tmp,
+                   N_component = N_component,
+                   v0 = u_1, v1 = u_0,
+                   t_vec = t_vec, 
+                   key_times_vec = key_times_vec,
+                   freq_trun = freq_trun,
+                   bw = bw,
+                   fix_timeshift = fix_timeshift, 
+                   fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                   use_true_timeshift = use_true_timeshift, 
+                   jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
+                   fix_membership = fix_membership,
+                   v_true_mat_list = v_true_mat_list, 
+                   rmv_conn_prob = TRUE)
     
     clusters_list_init = res$clusters_list
     v_mat_list_init = res$v_mat_list
@@ -148,7 +130,6 @@ main_v5_pdf = function(### Parameters for generative model
     
     
     # Apply algorithm ---------
-    
     time_start = Sys.time()
     ### Estimation z,v,f based on pdf
     res = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
@@ -173,7 +154,7 @@ main_v5_pdf = function(### Parameters for generative model
     time_estimation = time_end - time_start
     time_estimation = as.numeric(time_estimation, units='secs')
     
-    if(rand_init==TRUE & N_restart>1){
+    if(N_restart>1){
       ### Initialize best estimator as current estimator
       res_best = res
       ### Initialize best loss as loss for current estimator
@@ -186,21 +167,22 @@ main_v5_pdf = function(### Parameters for generative model
       
       for (ind_restart in 1:(N_restart-1)) {
         ### Get init
-        res = get_init_random(spks_time_mlist = spks_time_mlist, 
-                              stim_onset_vec = stim_onset_vec,
-                              N_clus = N_clus_tmp,
-                              N_component = N_component,
-                              v0 = u_1, v1 = u_0,
-                              t_vec = t_vec, 
-                              N_restart = 1,
-                              freq_trun = freq_trun,
-                              bw = bw,
-                              fix_timeshift = fix_timeshift, 
-                              fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                              use_true_timeshift = use_true_timeshift, 
-                              jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
-                              fix_membership = fix_membership,
-                              v_true_mat_list = v_true_mat_list)
+        res = get_init(spks_time_mlist = spks_time_mlist, 
+                       stim_onset_vec = stim_onset_vec,
+                       N_clus = N_clus_tmp,
+                       N_component = N_component,
+                       v0 = u_1, v1 = u_0,
+                       t_vec = t_vec, 
+                       key_times_vec = key_times_vec,
+                       freq_trun = freq_trun,
+                       bw = bw,
+                       fix_timeshift = fix_timeshift, 
+                       fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                       use_true_timeshift = use_true_timeshift, 
+                       jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
+                       fix_membership = fix_membership,
+                       v_true_mat_list = v_true_mat_list, 
+                       rmv_conn_prob = TRUE)
         clusters_list_init = res$clusters_list
         v_mat_list_init = res$v_mat_list
         
