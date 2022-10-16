@@ -34,6 +34,7 @@ main_v5_pdf = function(### Parameters for generative model
                         fix_comp1_timeshift_only = FALSE,
                         use_true_timeshift = FALSE,
                         jitter_prop_true_timeshift = 0,
+                        jitter_level = 0,
                         fix_membership = FALSE,
                         save_center_pdf_array = FALSE,
                         rand_init = FALSE,
@@ -137,6 +138,13 @@ main_v5_pdf = function(### Parameters for generative model
     
     clusters_list_init = res$clusters_list
     v_mat_list_init = res$v_mat_list
+    
+    ### Inject noise to initial values
+    v_mat_list_init = jitter_init_timeshift(v_mat_list_init = v_mat_list_init, 
+                                            jitter_level = jitter_level, 
+                                            timeshift_min = 0, timeshift_max = 1/2)
+    clusters_list_init = jitter_init_membership(clusters_list_init = clusters_list_init, 
+                                                jitter_level = jitter_level)
     
     
     # Apply algorithm ---------
