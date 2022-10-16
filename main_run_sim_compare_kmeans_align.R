@@ -33,13 +33,13 @@ registerDoParallel(cores=N_cores)
 
 # Run simulations ---------------------------------------------------------
 test_N_component_1 = TRUE
-test_N_component_2 = FALSE
-test_N_clus_1 = FALSE
+test_N_component_2 = TRUE
+test_N_clus_1 = TRUE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Compare_methods_v2.7.1'
-method = 'kmeans_align'
+method = 'kmeans_align_v2'
 
 ### Parameters' possible values:
 timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
