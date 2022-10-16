@@ -83,6 +83,7 @@ main_kmeans_align = function(### Parameters for generative model
                                      K = N_clus,
                                      alignment = TRUE, 
                                     nonempty = 2, 
+                                    MaxItr = 30,
                                      showplot = FALSE)
   time_end = Sys.time()
   time_estimation = time_end - time_start
@@ -138,12 +139,12 @@ main_kmeans_align = function(### Parameters for generative model
       for (id_component in 1:N_component_true) {
         f_target = center_density_array_true[id_clus,id_component,]
         density_est = center_density_array_est_permn[id_clus,id_component,]
-        res_ccf = ccf(x = density_est, y = f_target, plot = FALSE)
-        n0_init = res_ccf$lag[which.min(abs(res_ccf$acf))]
+        res_ccf = ccf(y = density_est, x = f_target, plot = FALSE)
+        n0_init = res_ccf$lag[which.max(res_ccf$acf)]
         f_origin_mat = matrix(density_est, nrow = 1)
         n0 = align_multi_components(f_target = f_target,
                                     f_origin_mat = f_origin_mat,
-                                    t_unit = t_vec[2] - t_vec[1], 
+                                    t_unit = t_unit, 
                                     n0_vec = c(n0_init),
                                     n0_min_vec = -length(f_target) %/% 2,
                                     n0_max_vec = length(f_target) %/% 2 )$n0_vec

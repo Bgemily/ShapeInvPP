@@ -39,7 +39,7 @@ save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Compare_methods_v2.7.1'
-method = 'kmeans_align_v2'
+method = 'kmeans_align_v3'
 
 ### Parameters' possible values:
 timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
@@ -127,7 +127,6 @@ if (test_N_component_2) {
 if (test_N_component_1) {
   default_setting = 'N_spks_total=100,N_node=100,N_clus=4,clus_sep=1.3,N_comp=1'
   for (id_split in 1:split) {
-    method = 'kmeans_align'
     if (save_res_details & (id_split == 1)) {
       save_center_pdf_array = TRUE
     } else {
