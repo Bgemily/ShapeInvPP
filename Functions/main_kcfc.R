@@ -208,7 +208,25 @@ main_kcfc = function(### Parameters for generative model
     dist_mse_mat = matrix(nrow=N_clus, ncol=N_component)
     for (id_clus in 1:N_clus) {
       for (id_component in 1:N_component) {
-        dist_mse_mat[id_clus,id_component] = sum( (center_density_array_est_permn[id_clus,id_component,] - 
+        f_target = center_density_array_true[id_clus,id_component,]
+        density_est = center_density_array_est_permn[id_clus,id_component,]
+        res_ccf = ccf(y = density_est, x = f_target, plot = FALSE)
+        n0_init = res_ccf$lag[which.max(res_ccf$acf)]
+        f_origin_mat = matrix(density_est, nrow = 1)
+        n0 = align_multi_components(f_target = f_target,
+                                    f_origin_mat = f_origin_mat,
+                                    t_unit = t_unit, 
+                                    n0_vec = c(n0_init),
+                                    n0_min_vec = -length(f_target) %/% 2,
+                                    n0_max_vec = length(f_target) %/% 2 )$n0_vec
+        if (n0 > 0) {
+          density_est_shift = c(rep(0, n0), head(density_est, length(density_est) - n0) )
+        } else if (n0 < 0) {
+          density_est_shift = c(tail(density_est, length(density_est) - abs(n0)), rep(0, abs(n0)) )
+        } else if (n0 == 0) {
+          density_est_shift = density_est
+        }
+        dist_mse_mat[id_clus,id_component] = sum( (density_est_shift - 
                                                      center_density_array_true[id_clus,id_component,])^2 * 
                                                     t_unit )
       }
