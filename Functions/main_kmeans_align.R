@@ -132,14 +132,12 @@ main_kmeans_align = function(### Parameters for generative model
   # Compute estimation error ------------------------------------------------
   if (TRUE) {
     # Compute errors of conn patts, i.e. F ---------
-    
-    ### Calculate distance 
     dist_mse_mat = matrix(nrow=N_clus, ncol=N_component_true)
     for (id_clus in 1:N_clus) {
       for (id_component in 1:N_component_true) {
         f_target = center_density_array_true[id_clus,id_component,]
         density_est = center_density_array_est_permn[id_clus,id_component,]
-        res_ccf = ccf(y = density_est, x = f_target, plot = FALSE)
+        res_ccf = ccf(y = density_est, x = f_target, plot = FALSE, lag.max = length(t_vec)%/%2)
         n0_init = res_ccf$lag[which.max(res_ccf$acf)]
         f_origin_mat = matrix(density_est, nrow = 1)
         n0 = align_multi_components(f_target = f_target,
@@ -152,6 +150,8 @@ main_kmeans_align = function(### Parameters for generative model
           density_est_shift = c(rep(0, n0), head(density_est, length(density_est) - n0) )
         } else if (n0 < 0) {
           density_est_shift = c(tail(density_est, length(density_est) - abs(n0)), rep(0, abs(n0)) )
+        } else if (n0 == 0) {
+          density_est_shift = density_est
         }
         dist_mse_mat[id_clus,id_component] = sum( (density_est_shift - 
                                                      center_density_array_true[id_clus,id_component,])^2 * 

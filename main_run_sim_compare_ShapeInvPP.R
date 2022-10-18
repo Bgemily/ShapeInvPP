@@ -36,11 +36,11 @@ registerDoParallel(cores=N_cores)
 test_N_component_1 = TRUE
 test_N_component_2 = TRUE
 test_N_clus_1 = TRUE
-save_res_details = FALSE
+save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v2.7.1'
-method = 'shape_inv_pp_v6'
+setup = 'Compare_methods_v2.8'
+method = 'shape_inv_pp'
 
 ### Parameters' possible values:
 timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,

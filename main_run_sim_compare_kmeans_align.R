@@ -38,7 +38,7 @@ test_N_clus_1 = TRUE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v2.7.1'
+setup = 'Compare_methods_v2.8'
 method = 'kmeans_align_v3'
 
 ### Parameters' possible values:

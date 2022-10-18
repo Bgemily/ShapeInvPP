@@ -28,7 +28,7 @@ N_trial = N_trial_total/split
 
 # Parallel computing setup ------------------------------------------------
 
-N_cores = 5
+N_cores = 10
 registerDoParallel(cores=N_cores)
 
 
@@ -115,7 +115,7 @@ test_N_clus_1 = TRUE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v2.7.1'
+setup = 'Compare_methods_v2.8'
 method = 'funcc'
 
 ### Parameters' possible values:
