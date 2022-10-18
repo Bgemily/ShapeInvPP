@@ -306,15 +306,13 @@ main_v5_pdf = function(### Parameters for generative model
                                                       t_unit )
         }
       }
-      F_mean_sq_err = mean(dist_mse_mat)
+      weight_vec = sapply(clusters_list_est_permn, length) / length(unlist(clusters_list_est_permn))
+      F_mean_sq_err = sum( rowMeans(dist_mse_mat) * weight_vec )
       F_mean_sq_err_vec = colMeans(dist_mse_mat)
-      
       F_l2_squared_norm_mat = apply(center_density_array_true, 1:2, function(density){
         sum(density^2 * t_unit)
       })
       F_mse_squarel2_ratio_mat =  dist_mse_mat / F_l2_squared_norm_mat 
-      
-      weight_vec = sapply(clusters_list_est_permn, length) / length(unlist(clusters_list_est_permn))
       F_mse_squarel2_ratio = sum( rowMeans(F_mse_squarel2_ratio_mat) * weight_vec )
     } else {
       F_mean_sq_err = F_mean_sq_err_vec = F_mse_squarel2_ratio = NA
