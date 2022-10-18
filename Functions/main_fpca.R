@@ -143,7 +143,7 @@ main_fpca = function(### Parameters for generative model
   
   # Find the best permutation of density components -----
   permn_list = combinat::permn(1:N_component)  
-  mise_f_max = Inf
+  mise_f_min = Inf
   the_permn = c()
   id_clus = 1
   for (permn in permn_list) {
@@ -154,9 +154,9 @@ main_fpca = function(### Parameters for generative model
                                                       data_generated$center_density_array_true[id_clus, id_component, ])^2 )
     }
     mise_f_tmp = mean(mise_f_tmp_vec)
-    if (mise_f_tmp < mise_f_max){
+    if (mise_f_tmp < mise_f_min){
       the_permn = permn
-      mise_f_max = mise_f_tmp
+      mise_f_min = mise_f_tmp
     }
   }
   center_density_array_est[id_clus, , ] = center_density_array_est[id_clus, the_permn, ]
