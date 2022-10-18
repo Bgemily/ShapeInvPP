@@ -146,7 +146,7 @@ main_funcc = function(### Parameters for generative model
           t_unit = data_generated$t_vec[2] - data_generated$t_vec[1]
           f_target = data_generated$center_density_array_true[id_clus, id_component, ]
           density_est = center_density_array_est_permn[id_clus, permn[id_component], ]
-          res_ccf = ccf(y = density_est, x = f_target, plot = FALSE)
+          res_ccf = ccf(y = density_est, x = f_target, plot = FALSE, lag.max = length(t_vec)%/%2)
           n0_init = res_ccf$lag[which.max(res_ccf$acf)]
           f_origin_mat = matrix(density_est, nrow = 1)
           n0 = align_multi_components(f_target = f_target,
@@ -197,7 +197,7 @@ main_funcc = function(### Parameters for generative model
         for (id_component in 1:N_component) {
           f_target = center_density_array_true[id_clus,id_component,]
           density_est = center_density_array_est_permn[id_clus,id_component,]
-          res_ccf = ccf(y = density_est, x = f_target, plot = FALSE)
+          res_ccf = ccf(y = density_est, x = f_target, plot = FALSE, lag.max = length(t_vec)%/%2)
           n0_init = res_ccf$lag[which.max(res_ccf$acf)]
           f_origin_mat = matrix(density_est, nrow = 1)
           n0 = align_multi_components(f_target = f_target,
