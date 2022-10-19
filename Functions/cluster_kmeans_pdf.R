@@ -126,8 +126,17 @@ cluster_kmeans_pdf = function(spks_time_mlist,
   ### For each cluster, force the minimum time shifts to be zero
   if ( (!fix_timeshift) & (!fix_comp1_timeshift_only) ) {
     for (id_clus in 1:N_clus) {
-      v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate] = v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate] - 
-        quantile(v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate], probs = 0.00)
+      if (diff(range(v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate])) >= 0.25) {
+        min_timeshift = quantile(v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate], probs = 0) 
+      } else {
+        y = sort(v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate])
+        x = seq(length(y)) - 1
+        index_vec = seq(from = round(0.1*length(x)), to = round(0.9*length(x)))
+        intercept = as.numeric(lm(y[index_vec]~x[index_vec])$coef[1])
+        min_timeshift = intercept
+      }
+      
+      v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate] = v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate] - min_timeshift
       v_mat_list[[1]] = round(v_mat_list[[1]]/t_unit)*t_unit
       v_mat_list[[1]][v_mat_list[[1]]<0] = 0
     }
