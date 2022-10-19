@@ -287,6 +287,9 @@ main_v5_pdf = function(### Parameters for generative model
           density_est = center_density_array_est_permn[id_clus,id_component,]
           res_ccf = ccf(y = density_est, x = f_target, plot = FALSE, lag.max = length(t_vec)%/%2)
           n0_init = res_ccf$lag[which.max(res_ccf$acf)]
+          if (length(n0_init) == 0) {
+            n0_init = 0
+          }
           f_origin_mat = matrix(density_est, nrow = 1)
           n0 = align_multi_components(f_target = f_target,
                                       f_origin_mat = f_origin_mat,
@@ -294,6 +297,7 @@ main_v5_pdf = function(### Parameters for generative model
                                       n0_vec = c(n0_init),
                                       n0_min_vec = -length(f_target) %/% 2,
                                       n0_max_vec = length(f_target) %/% 2 )$n0_vec
+          n0 = round(n0)
           if (n0 > 0) {
             density_est_shift = c(rep(0, n0), head(density_est, length(density_est) - n0) )
           } else if (n0 < 0) {
@@ -331,6 +335,21 @@ main_v5_pdf = function(### Parameters for generative model
           (ifelse(id_component == 1, yes = u_0/4, no = (u_1 - u_0/2)/2 ) )^2
       })
       v_mean_sq_err = mean(v_mean_sq_err_vec)
+      
+      v_align_mean_sq_err_vec = c()
+      v_align_mat_list_est = v_mat_list_est
+      for (id_component in 1:N_component) {
+        for (id_clus in 1:N_clus) {
+          v_align_mat_list_est[[id_component]][clusters_list_est_permn[[id_clus]], ] = v_mat_list_est[[id_component]][clusters_list_est_permn[[id_clus]], ] - 
+            mean(v_mat_list_est[[id_component]][clusters_list_est_permn[[id_clus]], ]) + 
+            mean(v_true_mat_list[[id_component]][clusters_list_est_permn[[id_clus]], ])
+        }
+        mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_align_mat_list_est[[id_component]]) )^2) /
+          (ifelse(id_component == 1, yes = u_0/4, no = (u_1 - u_0/2)/2 ) )^2
+        v_align_mean_sq_err_vec[id_component] = mse_tmp
+      }
+      v_align_mean_sq_err = mean(v_align_mean_sq_err_vec)
+      
     } else {
       v_mean_sq_err = v_mean_sq_err_vec = NA
     }
@@ -386,6 +405,7 @@ main_v5_pdf = function(### Parameters for generative model
               dist_mse_mat = dist_mse_mat,
               v_mean_sq_err=v_mean_sq_err,
               v_mean_sq_err_vec=v_mean_sq_err_vec,
+              v_align_mean_sq_err = v_align_mean_sq_err,
               # other
               cand_N_clus_vec=cand_N_clus_vec,
               N_restart = N_restart,

@@ -85,8 +85,7 @@ align_multi_components = function(f_target,
     converge = dist_redu < stopping_redu
   
   }
-  n0_vec = round(n0_vec)
-  
+
   if (iter_count == MaxIter) {
     warning("Reached max iteration number when estimating a time shift. Consider adjusting the step size.")
   }
