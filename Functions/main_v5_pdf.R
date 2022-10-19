@@ -332,6 +332,16 @@ main_v5_pdf = function(### Parameters for generative model
           (ifelse(id_component == 1, yes = u_0/4, no = (u_1 - u_0/2)/2 ) )^2
       })
       v_mean_sq_err = mean(v_mean_sq_err_vec)
+      
+      v_align_mean_sq_err_vec = c()
+      for (id_component in 1:N_component) {
+        mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]) - 
+                           mean(unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]])) )^2) /
+          (ifelse(id_component == 1, yes = u_0/4, no = (u_1 - u_0/2)/2 ) )^2
+        v_align_mean_sq_err_vec[id_component] = mse_tmp
+      }
+      v_align_mean_sq_err = mean(v_align_mean_sq_err_vec)
+      
     } else {
       v_mean_sq_err = v_mean_sq_err_vec = NA
     }
@@ -387,6 +397,7 @@ main_v5_pdf = function(### Parameters for generative model
               dist_mse_mat = dist_mse_mat,
               v_mean_sq_err=v_mean_sq_err,
               v_mean_sq_err_vec=v_mean_sq_err_vec,
+              v_align_mean_sq_err = v_align_mean_sq_err,
               # other
               cand_N_clus_vec=cand_N_clus_vec,
               N_restart = N_restart,
