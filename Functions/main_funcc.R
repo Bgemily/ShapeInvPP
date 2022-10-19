@@ -155,6 +155,7 @@ main_funcc = function(### Parameters for generative model
                                       n0_vec = c(n0_init),
                                       n0_min_vec = -length(f_target) %/% 2,
                                       n0_max_vec = length(f_target) %/% 2 )$n0_vec
+          n0 = round(n0)
           if (n0 > 0) {
             density_est_shift = c(rep(0, n0), head(density_est, length(density_est) - n0) )
           } else if (n0 < 0) {
@@ -206,6 +207,7 @@ main_funcc = function(### Parameters for generative model
                                       n0_vec = c(n0_init),
                                       n0_min_vec = -length(f_target) %/% 2,
                                       n0_max_vec = length(f_target) %/% 2 )$n0_vec
+          n0 = round(n0)
           if (n0 > 0) {
             density_est_shift = c(rep(0, n0), head(density_est, length(density_est) - n0) )
           } else if (n0 < 0) {
