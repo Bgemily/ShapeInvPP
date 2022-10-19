@@ -337,9 +337,14 @@ main_v5_pdf = function(### Parameters for generative model
       v_mean_sq_err = mean(v_mean_sq_err_vec)
       
       v_align_mean_sq_err_vec = c()
+      v_align_mat_list_est = v_mat_list_est
       for (id_component in 1:N_component) {
-        mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]) - 
-                           mean(unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]])) )^2) /
+        for (id_clus in 1:N_clus) {
+          v_align_mat_list_est[[id_component]][clusters_list_est_permn[[id_clus]], ] = v_mat_list_est[[id_component]][clusters_list_est_permn[[id_clus]], ] - 
+            mean(v_mat_list_est[[id_component]][clusters_list_est_permn[[id_clus]], ]) + 
+            mean(v_true_mat_list[[id_component]][clusters_list_est_permn[[id_clus]], ])
+        }
+        mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_align_mat_list_est[[id_component]]) )^2) /
           (ifelse(id_component == 1, yes = u_0/4, no = (u_1 - u_0/2)/2 ) )^2
         v_align_mean_sq_err_vec[id_component] = mse_tmp
       }
