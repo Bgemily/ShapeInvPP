@@ -72,7 +72,7 @@ est_timeshift = function(spks_time_mlist,
           if (N_component == 2) {
             n0_max_vec = c(round((v1/2)/t_unit), round((v0-v1/2)/t_unit) )
           } else {
-            n0_max_vec = rep(round((v1/2)/t_unit), N_component)
+            n0_max_vec = rep(round((v1/1)/t_unit), N_component)
           }
           n0_min_vec = rep(0, N_component)
           n0_vec_update = align_multi_components(f_target = f_target,
