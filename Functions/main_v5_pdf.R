@@ -150,14 +150,6 @@ main_v5_pdf = function(### Parameters for generative model
       }
       
       
-      ### Inject noise to initial values
-      v_mat_list_init = jitter_init_timeshift(v_mat_list_init = v_mat_list_init, 
-                                              jitter_level = jitter_level, 
-                                              timeshift_min = 0, timeshift_max = 1/2)
-      clusters_list_init = jitter_init_membership(clusters_list_init = clusters_list_init, 
-                                                  jitter_level = jitter_level)
-      
-      
       # Apply algorithm ---------
       time_start = Sys.time()
       ### Estimation z,v,f based on pdf
