@@ -120,6 +120,8 @@ main_v5_pdf = function(### Parameters for generative model
                    v_true_mat_list = v_true_mat_list, 
                    rmv_conn_prob = TRUE)
     
+    center_density_array_init = res$center_density_array
+    center_Nspks_mat_init = res$center_Nspks_mat
     clusters_list_init = res$clusters_list
     v_mat_list_init = res$v_mat_list
     
@@ -136,6 +138,8 @@ main_v5_pdf = function(### Parameters for generative model
     ### Estimation z,v,f based on pdf
     res = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
                          stim_onset_vec = stim_onset_vec,
+                         center_density_array_init = center_density_array_init,
+                         center_Nspks_mat_init = center_Nspks_mat_init,
                          clusters_list_init = clusters_list_init,
                          v_mat_list_init = v_mat_list_init,
                          N_component = N_component, 
@@ -186,12 +190,16 @@ main_v5_pdf = function(### Parameters for generative model
                        fix_membership = fix_membership,
                        v_true_mat_list = v_true_mat_list, 
                        rmv_conn_prob = TRUE)
+        center_density_array_init = res$center_density_array
+        center_Nspks_mat_init = res$center_Nspks_mat
         clusters_list_init = res$clusters_list
         v_mat_list_init = res$v_mat_list
         
         ### Apply algorithm
         res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
                                  stim_onset_vec = stim_onset_vec,
+                                 center_density_array_init = center_density_array_init,
+                                 center_Nspks_mat_init = center_Nspks_mat_init,
                                  clusters_list_init = clusters_list_init,
                                  v_mat_list_init = v_mat_list_init,
                                  N_component = N_component, 

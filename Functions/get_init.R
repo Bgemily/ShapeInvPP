@@ -147,9 +147,6 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     
   }
   
-  
-  
-  
   ### Force minimum time shifts in each (cluster, component) to be zero
   if (!fix_timeshift) {
     for (id_clus in 1:N_clus) {
@@ -165,10 +162,30 @@ get_init = function(spks_time_mlist, stim_onset_vec,
   }
   
   
+  # Initialize densities -------------
+  res = get_center_intensity_array(spks_time_mlist = spks_time_mlist, 
+                                   stim_onset_vec = stim_onset_vec, 
+                                   clusters_list = clusters_list, 
+                                   v_mat_list = v_mat_list,
+                                   N_component = N_component,
+                                   key_times_vec = key_times_vec,
+                                   fix_timeshift = fix_timeshift,
+                                   freq_trun = Inf,
+                                   bw = bw,
+                                   v0 = v0, v1 = v1,
+                                   t_vec = t_vec,
+                                   rmv_conn_prob = TRUE)
+  center_density_array = res$center_density_array
+  center_Nspks_mat = res$center_Nspks_mat
+  center_intensity_array = res$center_intensity_array
+  v_mat_list = res$v_mat_list
   
   return(list(v_vec=v_vec,
               v_mat_list=v_mat_list,
               membership_vec=membership_vec, 
-              clusters_list=clusters_list))
+              clusters_list=clusters_list,
+              center_density_array = center_density_array,
+              center_Nspks_mat = center_Nspks_mat,
+              center_intensity_array = center_intensity_array))
 }
 
