@@ -29,7 +29,6 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
     stim_onset_vec = stim_onset_vec[,1]
   }
   
-  
   t_unit = t_vec[2] - t_vec[1]
   N_node = nrow(spks_time_mlist)
   N_replicate = ncol(spks_time_mlist)
@@ -75,30 +74,44 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
   n_iter = 1
   stopping = FALSE
   while (!stopping & n_iter<=MaxIter){
-    ### Update cluster-specific intensities and clusters once
-    res = cluster_kmeans_pdf(spks_time_mlist = spks_time_mlist,
-                             stim_onset_vec = stim_onset_vec, 
-                             clusters_list = clusters_list_current, 
-                             v_mat_list = v_mat_list_current,
-                             N_component = N_component, 
-                             freq_trun = freq_trun, 
-                             bw = bw,
-                             v0 = v0, v1 = v1,
-                             t_vec = t_vec,
-                             key_times_vec = key_times_vec,
-                             fix_timeshift=fix_timeshift,
-                             fix_comp1_timeshift_only=fix_comp1_timeshift_only,
-                             fix_membership=fix_membership,
-                             gamma=gamma,
-                             ...
-    )
-    clusters_list_update = res$clusters_list
-    center_density_array_update = res$center_density_array
-    center_Nspks_mat_update = res$center_Nspks_mat
-    center_intensity_array = res$center_intensity_array
-    v_mat_list_update = res$v_mat_list
+    ### Update intensities 
+    tmp = get_center_intensity_array(spks_time_mlist = spks_time_mlist, 
+                                     stim_onset_vec = stim_onset_vec, 
+                                     reaction_time_vec = reaction_time_vec, 
+                                     clusters_list = clusters_list_current, 
+                                     v_mat_list = v_mat_list_current,
+                                     N_component = N_component,
+                                     freq_trun = Inf, 
+                                     bw = bw,
+                                     v0 = v0, v1 = v1,
+                                     t_vec = t_vec,
+                                     key_times_vec = key_times_vec,
+                                     fix_timeshift = fix_timeshift,
+                                     align_density = FALSE)
+    center_density_array_update = tmp$center_density_array
+    center_Nspks_mat_update = tmp$center_Nspks_mat
+    center_intensity_array = tmp$center_intensity_array
+    v_mat_list_tmp = tmp$v_mat_list
     
-    l2_loss = res$l2_loss
+    
+    ### Update time shifts and clusters 
+    tmp = get_timeshift_and_clusters(spks_time_mlist = spks_time_mlist,
+                                     stim_onset_vec = stim_onset_vec,
+                                     center_density_array = center_density_array_update,
+                                     center_Nspks_mat = center_Nspks_mat_update,
+                                     clusters_list = clusters_list_current,
+                                     v_mat_list = v_mat_list_tmp,
+                                     freq_trun = freq_trun,
+                                     bw = bw,
+                                     v0 = v0, v1 = v1,
+                                     t_vec = t_vec,
+                                     fix_timeshift = fix_timeshift,
+                                     fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                                     fix_membership = fix_membership,
+                                     gamma = gamma)
+    clusters_list_update = tmp$clusters_list
+    v_mat_list_update = tmp$v_mat_list
+    l2_loss = tmp$l2_loss
     loss_history = c(loss_history, l2_loss)
     
     ### Evaluate stopping criterion
