@@ -35,7 +35,6 @@ main_v5_pdf = function(### Parameters for generative model
                         use_true_timeshift = FALSE,
                         jitter_prop_true_timeshift = 0,
                         jitter_level = 0,
-                        fix_membership = FALSE,
                         save_center_pdf_array = FALSE,
                         rand_init = FALSE,
                         N_restart = 1,
@@ -116,7 +115,6 @@ main_v5_pdf = function(### Parameters for generative model
                    fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                    use_true_timeshift = use_true_timeshift, 
                    jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
-                   fix_membership = fix_membership,
                    v_true_mat_list = v_true_mat_list, 
                    rmv_conn_prob = TRUE)
     
@@ -140,7 +138,6 @@ main_v5_pdf = function(### Parameters for generative model
                          stim_onset_vec = stim_onset_vec,
                          center_density_array_init = center_density_array_init,
                          center_Nspks_mat_init = center_Nspks_mat_init,
-                         clusters_list_init = clusters_list_init,
                          v_mat_list_init = v_mat_list_init,
                          N_component = N_component, 
                          freq_trun = freq_trun,
@@ -153,7 +150,6 @@ main_v5_pdf = function(### Parameters for generative model
                          key_times_vec = key_times_vec,
                          fix_timeshift = fix_timeshift, 
                          fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                         fix_membership = fix_membership,
                          conv_thres = conv_thres,
                          ...)
     time_end = Sys.time()
@@ -187,7 +183,6 @@ main_v5_pdf = function(### Parameters for generative model
                        fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                        use_true_timeshift = use_true_timeshift, 
                        jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
-                       fix_membership = fix_membership,
                        v_true_mat_list = v_true_mat_list, 
                        rmv_conn_prob = TRUE)
         center_density_array_init = res$center_density_array
@@ -213,7 +208,6 @@ main_v5_pdf = function(### Parameters for generative model
                                  key_times_vec = key_times_vec,
                                  fix_timeshift = fix_timeshift, 
                                  fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                                 fix_membership = fix_membership,
                                  conv_thres = conv_thres,
                                  ...)
         ### Calculate log likelihood

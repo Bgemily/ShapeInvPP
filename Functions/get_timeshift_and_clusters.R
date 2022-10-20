@@ -4,7 +4,6 @@ get_timeshift_and_clusters = function(spks_time_mlist,
                                       stim_onset_vec,
                                       center_density_array,
                                       center_Nspks_mat,
-                                      clusters_list,
                                       v_mat_list,
                                       freq_trun,
                                       bw,
@@ -12,16 +11,18 @@ get_timeshift_and_clusters = function(spks_time_mlist,
                                       t_vec,
                                       fix_timeshift,
                                       fix_comp1_timeshift_only,
-                                      fix_membership,
                                       gamma)
 {
   t_unit = t_vec[2]-t_vec[1]
   N_node = nrow(spks_time_mlist)
   N_replicate = ncol(spks_time_mlist)
-  N_clus = length(clusters_list)
+  N_clus = dim(center_density_array)[1]
   N_component = dim(center_density_array)[2]
   
   ### Get time shift between each node and each cluster -----
+  if (is.null(v_mat_list)) {
+    v_mat_list = rep(list(matrix(0, nrow = N_node, ncol = N_replicate)), N_component)
+  }
   tmp = est_timeshift(spks_time_mlist = spks_time_mlist, 
                       stim_onset_vec = stim_onset_vec, 
                       center_density_array = center_density_array,
@@ -60,28 +61,20 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   
   
   ### Select memberships to minimize total distance -----
-  if(fix_membership==TRUE){
-    dist_to_centr_vec = numeric(N_node)
-    for(id_clus in 1:N_clus){
-      dist_to_centr_vec[clusters_list[[id_clus]]] = dist_mat[clusters_list[[id_clus]], id_clus]
+  membership = numeric(N_node)
+  dist_to_centr_vec = numeric(N_node)
+  for (i in 1:N_node) {
+    dist_vec_tmp = dist_mat[i, ]
+    mem_tmp = which.min(dist_vec_tmp)
+    if(length(mem_tmp)>1){
+      mem_tmp = sample(mem_tmp, 1)
     }
-    clusters_list = clusters_list
-    l2_loss = sum(dist_to_centr_vec)
-  } else {
-    membership = numeric(N_node)
-    dist_to_centr_vec = numeric(N_node)
-    for (i in 1:N_node) {
-      dist_vec_tmp = dist_mat[i, ]
-      mem_tmp = which.min(dist_vec_tmp)
-      if(length(mem_tmp)>1){
-        mem_tmp = sample(mem_tmp, 1)
-      }
-      membership[i] = mem_tmp
-      dist_to_centr_vec[i] = min(dist_vec_tmp)
-    }
-    clusters_list = mem2clus(membership = membership, N_clus_min = N_clus)
-    l2_loss = sum(dist_to_centr_vec)
+    membership[i] = mem_tmp
+    dist_to_centr_vec[i] = min(dist_vec_tmp)
   }
+  clusters_list = mem2clus(membership = membership, N_clus_min = N_clus)
+  l2_loss = sum(dist_to_centr_vec)
+  
   
   ### Extract time shifts based on selected memberships -----
   for (id_clus in 1:N_clus) {
