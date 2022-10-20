@@ -10,6 +10,7 @@ get_timeshift_and_clusters = function(spks_time_mlist,
                                       v0, v1,
                                       t_vec,
                                       fix_timeshift,
+                                      rand_init,
                                       fix_comp1_timeshift_only,
                                       gamma)
 {
@@ -33,6 +34,7 @@ get_timeshift_and_clusters = function(spks_time_mlist,
                       v0 = v0, v1 = v1,
                       t_vec = t_vec,
                       fix_timeshift = fix_timeshift,
+                      rand_init = rand_init,
                       fix_comp1_timeshift_only = fix_comp1_timeshift_only )
   v_array_list_tmp = tmp$v_array_list
   dist_mat_tmp = tmp$dist_mat

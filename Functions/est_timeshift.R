@@ -11,6 +11,7 @@ est_timeshift = function(spks_time_mlist,
                          t_vec=seq(0, v0, by=0.01),
                          step_size = 1e-4,
                          fix_timeshift=FALSE,
+                         rand_init = FALSE,
                          fix_comp1_timeshift_only=FALSE,
                          bw=0)
 {
@@ -75,6 +76,9 @@ est_timeshift = function(spks_time_mlist,
             n0_max_vec = rep(round((v1/1)/t_unit), N_component)
           }
           n0_min_vec = rep(0, N_component)
+          if (rand_init) {
+            n0_min_vec = -1 * n0_max_vec
+          }
           n0_vec_update = align_multi_components(f_target = f_target,
                                                  f_origin_mat = f_origin_mat,
                                                  step_size = step_size,

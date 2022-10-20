@@ -17,6 +17,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
                           key_times_vec = c(min(t_vec), 0, max(t_vec)),
                           MaxIter=10, conv_thres=5e-3, 
                           fix_timeshift=FALSE,
+                          rand_init = FALSE,
                           fix_comp1_timeshift_only=FALSE,
                           gamma=0.06,
                           # Unused arguments
@@ -55,6 +56,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
                                      v0 = v0, v1 = v1,
                                      t_vec = t_vec,
                                      fix_timeshift = fix_timeshift,
+                                     rand_init = rand_init,
                                      fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                                      gamma = gamma)
     clusters_list_update = tmp$clusters_list
