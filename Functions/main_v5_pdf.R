@@ -101,27 +101,50 @@ main_v5_pdf = function(### Parameters for generative model
     N_clus_tmp = c(N_clus_min:N_clus_max)[ind_N_clus]
     
     ### Get initialization -----------
-    res = get_init(spks_time_mlist = spks_time_mlist, 
-                   stim_onset_vec = stim_onset_vec,
-                   N_clus = N_clus_tmp,
-                   N_component = N_component,
-                   v0 = u_1, v1 = u_0,
-                   t_vec = t_vec, 
-                   key_times_vec = key_times_vec,
-                   N_start_kmean = N_start_kmean,
-                   freq_trun = freq_trun,
-                   bw = bw,
-                   fix_timeshift = fix_timeshift, 
-                   fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                   use_true_timeshift = use_true_timeshift, 
-                   jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
-                   v_true_mat_list = v_true_mat_list, 
-                   rmv_conn_prob = TRUE)
+    if (rand_init) {
+      res = get_init_random(spks_time_mlist = spks_time_mlist, 
+                            stim_onset_vec = stim_onset_vec,
+                            N_clus = N_clus_tmp,
+                            N_component = N_component,
+                            v0 = u_1, v1 = u_0,
+                            t_vec = t_vec, 
+                            key_times_vec = key_times_vec,
+                            N_start_kmean = N_start_kmean,
+                            freq_trun = freq_trun,
+                            bw = bw,
+                            fix_timeshift = fix_timeshift, 
+                            fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                            use_true_timeshift = use_true_timeshift, 
+                            jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
+                            v_true_mat_list = v_true_mat_list, 
+                            rmv_conn_prob = TRUE)
+      center_density_array_init = res$center_density_array
+      center_Nspks_mat_init = res$center_Nspks_mat
+      clusters_list_init = res$clusters_list
+      v_mat_list_init = res$v_mat_list
+    } else {
+      res = get_init(spks_time_mlist = spks_time_mlist, 
+                     stim_onset_vec = stim_onset_vec,
+                     N_clus = N_clus_tmp,
+                     N_component = N_component,
+                     v0 = u_1, v1 = u_0,
+                     t_vec = t_vec, 
+                     key_times_vec = key_times_vec,
+                     N_start_kmean = N_start_kmean,
+                     freq_trun = freq_trun,
+                     bw = bw,
+                     fix_timeshift = fix_timeshift, 
+                     fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                     use_true_timeshift = use_true_timeshift, 
+                     jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
+                     v_true_mat_list = v_true_mat_list, 
+                     rmv_conn_prob = TRUE)
+      center_density_array_init = res$center_density_array
+      center_Nspks_mat_init = res$center_Nspks_mat
+      clusters_list_init = res$clusters_list
+      v_mat_list_init = res$v_mat_list
+    }
     
-    center_density_array_init = res$center_density_array
-    center_Nspks_mat_init = res$center_Nspks_mat
-    clusters_list_init = res$clusters_list
-    v_mat_list_init = res$v_mat_list
     
     ### Inject noise to initial values
     v_mat_list_init = jitter_init_timeshift(v_mat_list_init = v_mat_list_init, 
@@ -149,6 +172,7 @@ main_v5_pdf = function(### Parameters for generative model
                          t_vec_extend=t_vec_extend,
                          key_times_vec = key_times_vec,
                          fix_timeshift = fix_timeshift, 
+                         rand_init = rand_init,
                          fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                          conv_thres = conv_thres,
                          ...)
