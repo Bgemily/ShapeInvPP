@@ -100,99 +100,33 @@ main_v5_pdf = function(### Parameters for generative model
     res_list[[ind_N_clus]] = list()
     N_clus_tmp = c(N_clus_min:N_clus_max)[ind_N_clus]
     
-    ### Get initialization -----------
-    if (rand_init) {
-      res = get_init_random(spks_time_mlist = spks_time_mlist, 
-                            stim_onset_vec = stim_onset_vec,
-                            N_clus = N_clus_tmp,
-                            N_component = N_component,
-                            v0 = u_1, v1 = u_0,
-                            t_vec = t_vec, 
-                            key_times_vec = key_times_vec,
-                            N_start_kmean = N_start_kmean,
-                            freq_trun = freq_trun,
-                            bw = bw,
-                            fix_timeshift = fix_timeshift, 
-                            fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                            use_true_timeshift = use_true_timeshift, 
-                            jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
-                            v_true_mat_list = v_true_mat_list, 
-                            rmv_conn_prob = TRUE)
-      center_density_array_init = res$center_density_array
-      center_Nspks_mat_init = res$center_Nspks_mat
-      clusters_list_init = res$clusters_list
-      v_mat_list_init = res$v_mat_list
-    } else {
-      res = get_init(spks_time_mlist = spks_time_mlist, 
-                     stim_onset_vec = stim_onset_vec,
-                     N_clus = N_clus_tmp,
-                     N_component = N_component,
-                     v0 = u_1, v1 = u_0,
-                     t_vec = t_vec, 
-                     key_times_vec = key_times_vec,
-                     N_start_kmean = N_start_kmean,
-                     freq_trun = freq_trun,
-                     bw = bw,
-                     fix_timeshift = fix_timeshift, 
-                     fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                     use_true_timeshift = use_true_timeshift, 
-                     jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
-                     v_true_mat_list = v_true_mat_list, 
-                     rmv_conn_prob = TRUE)
-      center_density_array_init = res$center_density_array
-      center_Nspks_mat_init = res$center_Nspks_mat
-      clusters_list_init = res$clusters_list
-      v_mat_list_init = res$v_mat_list
-    }
-    
-    
-    ### Inject noise to initial values
-    v_mat_list_init = jitter_init_timeshift(v_mat_list_init = v_mat_list_init, 
-                                            jitter_level = jitter_level, 
-                                            timeshift_min = 0, timeshift_max = 1/2)
-    clusters_list_init = jitter_init_membership(clusters_list_init = clusters_list_init, 
-                                                jitter_level = jitter_level)
-    
-    
-    # Apply algorithm ---------
-    time_start = Sys.time()
-    ### Estimation z,v,f based on pdf
-    res = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
-                         stim_onset_vec = stim_onset_vec,
-                         center_density_array_init = center_density_array_init,
-                         center_Nspks_mat_init = center_Nspks_mat_init,
-                         v_mat_list_init = v_mat_list_init,
-                         N_component = N_component, 
-                         freq_trun = freq_trun,
-                         bw = bw,
-                         MaxIter = MaxIter, 
-                         gamma=gamma,
-                         v0 = u_1, v1= u_0,
-                         t_vec=t_vec, 
-                         t_vec_extend=t_vec_extend,
-                         key_times_vec = key_times_vec,
-                         fix_timeshift = fix_timeshift, 
-                         rand_init = rand_init,
-                         fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                         conv_thres = conv_thres,
-                         ...)
-    time_end = Sys.time()
-    time_estimation = time_end - time_start
-    time_estimation = as.numeric(time_estimation, units='secs')
-    
-    if(N_restart>1){
-      ### Initialize best estimator as current estimator
-      res_best = res
-      ### Initialize best loss as loss for current estimator
-      res = select_model(spks_time_mlist, 
-                         stim_onset_vec, 
-                         N_component = N_component,
-                         key_times_vec = key_times_vec,
-                         result_list = list(res_best))
-      compl_log_lik_best = res$compl_log_lik_vec[1]
-      
-      for (ind_restart in 1:(N_restart-1)) {
-        ### Get init
+    # Restart -----------------------------------------------------------------
+    res_best = NA
+    compl_log_lik_best = -Inf
+    for (id_restart in 1:N_restart) {
+      ### Get initialization -----------
+      if (rand_init) {
+        res = get_init_random(spks_time_mlist = spks_time_mlist, 
+                              stim_onset_vec = stim_onset_vec,
+                              N_clus = N_clus_tmp,
+                              N_component = N_component,
+                              v0 = u_1, v1 = u_0,
+                              t_vec = t_vec, 
+                              key_times_vec = key_times_vec,
+                              N_start_kmean = N_start_kmean,
+                              freq_trun = freq_trun,
+                              bw = bw,
+                              fix_timeshift = fix_timeshift, 
+                              fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                              use_true_timeshift = use_true_timeshift, 
+                              jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
+                              v_true_mat_list = v_true_mat_list, 
+                              rmv_conn_prob = TRUE)
+        center_density_array_init = res$center_density_array
+        center_Nspks_mat_init = res$center_Nspks_mat
+        clusters_list_init = res$clusters_list
+        v_mat_list_init = res$v_mat_list
+      } else {
         res = get_init(spks_time_mlist = spks_time_mlist, 
                        stim_onset_vec = stim_onset_vec,
                        N_clus = N_clus_tmp,
@@ -213,46 +147,60 @@ main_v5_pdf = function(### Parameters for generative model
         center_Nspks_mat_init = res$center_Nspks_mat
         clusters_list_init = res$clusters_list
         v_mat_list_init = res$v_mat_list
-        
-        ### Apply algorithm
-        res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
-                                 stim_onset_vec = stim_onset_vec,
-                                 center_density_array_init = center_density_array_init,
-                                 center_Nspks_mat_init = center_Nspks_mat_init,
-                                 clusters_list_init = clusters_list_init,
-                                 v_mat_list_init = v_mat_list_init,
-                                 N_component = N_component, 
-                                 freq_trun = freq_trun,
-                                 bw = bw,
-                                 MaxIter = MaxIter, 
-                                 gamma=gamma,
-                                 v0 = u_1, v1= u_0,
-                                 t_vec=t_vec, 
-                                 t_vec_extend=t_vec_extend,
-                                 key_times_vec = key_times_vec,
-                                 fix_timeshift = fix_timeshift, 
-                                 fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                                 conv_thres = conv_thres,
-                                 ...)
-        ### Calculate log likelihood
-        res = select_model(spks_time_mlist, 
-                           stim_onset_vec, 
-                           N_component = N_component,
-                           key_times_vec = key_times_vec,
-                           result_list = list(res_new))
-        compl_log_lik_new = res$compl_log_lik_vec[1]
-        
-        ### Update best estimation
-        if(compl_log_lik_new > compl_log_lik_best){
-          compl_log_lik_best = compl_log_lik_new
-          res_best = res_new
-        }
       }
-      res = res_best
+      
+      
+      ### Inject noise to initial values
+      v_mat_list_init = jitter_init_timeshift(v_mat_list_init = v_mat_list_init, 
+                                              jitter_level = jitter_level, 
+                                              timeshift_min = 0, timeshift_max = 1/2)
+      clusters_list_init = jitter_init_membership(clusters_list_init = clusters_list_init, 
+                                                  jitter_level = jitter_level)
+      
+      
+      # Apply algorithm ---------
+      time_start = Sys.time()
+      ### Estimation z,v,f based on pdf
+      res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
+                               stim_onset_vec = stim_onset_vec,
+                               center_density_array_init = center_density_array_init,
+                               center_Nspks_mat_init = center_Nspks_mat_init,
+                               v_mat_list_init = v_mat_list_init,
+                               N_component = N_component, 
+                               freq_trun = freq_trun,
+                               bw = bw,
+                               MaxIter = MaxIter, 
+                               gamma=gamma,
+                               v0 = u_1, v1= u_0,
+                               t_vec=t_vec, 
+                               t_vec_extend=t_vec_extend,
+                               key_times_vec = key_times_vec,
+                               fix_timeshift = fix_timeshift, 
+                               rand_init = rand_init,
+                               fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                               conv_thres = conv_thres,
+                               ...)
+      time_end = Sys.time()
+      time_estimation = time_end - time_start
+      time_estimation = as.numeric(time_estimation, units='secs')
+      
+      ### Calculate log likelihood
+      res = select_model(spks_time_mlist, 
+                         stim_onset_vec, 
+                         N_component = N_component,
+                         key_times_vec = key_times_vec,
+                         result_list = list(res_new))
+      compl_log_lik_new = res$compl_log_lik_vec[1]
+      
+      ### Update best estimation
+      if(compl_log_lik_new > compl_log_lik_best){
+        compl_log_lik_best = compl_log_lik_new
+        res_best = res_new
+      }
     }
     
     # Save results of N_clus_tmp ----------------------------------------------
-    res_list[[ind_N_clus]] = res
+    res_list[[ind_N_clus]] = res_best
     
   }
   
