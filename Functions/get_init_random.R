@@ -53,10 +53,11 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
   # Initialize densities -------------
   center_density_array = array(dim = c(N_clus, N_component, length(t_vec)) )
   center_Nspks_mat = matrix(nrow = N_clus, ncol = N_component)
-  ind_random = sample(1:(N_node*N_replicate), size = N_clus, replace = FALSE)
+  ind_random = sample(1:(N_node), size = N_clus, replace = FALSE)
   for (id_clus in 1:N_clus) {
     ind = ind_random[id_clus]
-    spks_time_vec = spks_time_mlist[ind][[1]]
+    ind_2 = sample(1:N_replicate, size = 1)
+    spks_time_vec = spks_time_mlist[ind,ind_2][[1]]
     tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
                           freq_trun = freq_trun, 
                           t_vec = t_vec, 
