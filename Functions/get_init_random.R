@@ -15,7 +15,6 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
                     use_true_timeshift=FALSE, 
                     v_true_mat_list = NULL,
                     jitter_prop_true_timeshift=0,
-                    fix_membership=FALSE,
                     rmv_conn_prob=FALSE,
                     default_timeshift=0
 )
@@ -26,21 +25,50 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
   N_replicate = ncol(spks_time_mlist)
   
   # Initialize time shifts -------------
-  v_mat_list = rep(list(matrix(0, nrow = N_node, ncol = N_replicate)), N_component)
-  for (id_node in 1:N_node) {
-    for (id_replicate in 1:N_replicate) {
-      spks_time_tmp = spks_time_mlist[id_node, id_replicate][[1]]-stim_onset_vec[id_replicate]
-      for (id_component in 1:N_component){
-        time_start_curr_comp = key_times_vec[id_component]
-        time_end_curr_comp = key_times_vec[id_component + 1]
-        spks_time_curr_comp_vec = spks_time_tmp[which(spks_time_tmp >= time_start_curr_comp &
-                                                        spks_time_tmp <= time_end_curr_comp)]
-        if (length(spks_time_curr_comp_vec) > 0) {
-          v_mat_list[[id_component]][id_node, id_replicate] = quantile(spks_time_curr_comp_vec, 0.05) 
+  if (fix_timeshift) {
+    if (use_true_timeshift) {
+      v_mat_list = v_true_mat_list
+      ### Jitter true time shift
+      if(jitter_prop_true_timeshift>0){
+        u_0 = v1; u_1 = v0;
+        for (id_component in 1:N_component) {
+          v_mat_list[[id_component]] = jitter(v_mat_list[[id_component]], amount = jitter_prop_true_timeshift*(u_0/2-0))
+        }
+      }
+    } else{
+      v_vec = matrix(default_timeshift, nrow = N_node, ncol = N_replicate)
+      v_mat_list = rep(list(v_vec), N_component)
+    }
+  } else{
+    ### Use median of spike times as time shifts
+    v_mat_list = rep(list(matrix(0, nrow = N_node, ncol = N_replicate)), N_component)
+    for (id_node in 1:N_node) {
+      for (id_replicate in 1:N_replicate) {
+        spks_time_tmp = spks_time_mlist[id_node, id_replicate][[1]]-stim_onset_vec[id_replicate]
+        for (id_component in 1:N_component){
+          time_start_curr_comp = key_times_vec[id_component]
+          time_end_curr_comp = key_times_vec[id_component + 1]
+          spks_time_curr_comp_vec = spks_time_tmp[which(spks_time_tmp >= time_start_curr_comp &
+                                                          spks_time_tmp <= time_end_curr_comp)]
+          if (length(spks_time_curr_comp_vec) > 0) {
+            v_mat_list[[id_component]][id_node, id_replicate] = quantile(spks_time_curr_comp_vec, 0.05) 
+          }
         }
       }
     }
+    
+    ### Force minimum time shifts in each component to be zero
+    for (id_component in 1:N_component){
+      v_mat_list[[id_component]] = v_mat_list[[id_component]] - min(v_mat_list[[id_component]])
+      v_mat_list[[id_component]] = round(v_mat_list[[id_component]]/t_unit)*t_unit
+    }
+    
+    ### Force time shifts of first component to be truth
+    if( (!fix_timeshift) & fix_comp1_timeshift_only ){
+      v_mat_list[[1]] = v_true_mat_list[[1]]
+    }
   }
+  
   
   ### Force minimum time shifts in each component to be zero
   for (id_component in 1:N_component){
