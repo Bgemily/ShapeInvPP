@@ -13,7 +13,7 @@ library(fdapace)
 
 library(foreach)
 library(doParallel)
-
+library(parallel)
 
 # User input setup --------------------------------------------------------
 
@@ -26,7 +26,8 @@ N_trial = N_trial_total/split
 # Parallel computing setup ------------------------------------------------
 
 N_cores = 10
-registerDoParallel(cores=N_cores)
+cl = parallel::makePSOCKcluster(names = N_cores)
+doParallel::registerDoParallel(cl)
 
 
 # Run simulations ---------------------------------------------------------
@@ -40,11 +41,11 @@ setup = 'Multi_restart'
 if (test_random_restart) {
   ### Parameters' possible values:
   N_replicate_list = list(1,2,3,4,5)
-  N_restart_algo_list = list(1, 3, 5, 10, 15)
+  N_restart_algo_list = list(1, 3, 5, 10)
   for (id_method in 1:length(N_restart_algo_list)) {
     N_restart = N_restart_algo_list[[id_method]]
     method = paste0('Rand_init_Nrestart', '_algo', as.character(N_restart) )
-    default_setting = 'N_spks_total=100,N_node=100,N_clus=4,clus_sep=1.3,N_comp=2'
+    default_setting = 'N_spks_total=100,N_node=100,N_clus=4,clus_sep=2,N_comp=2'
     for (id_split in 1:split) {
       if (save_res_details & (id_split == 1)) {
         save_center_pdf_array = TRUE
@@ -64,7 +65,7 @@ if (test_random_restart) {
                                ### params when N_clus==4:
                                N_spks_total = 100,
                                N_replicate = N_replicate,
-                               clus_sep = 1.3,
+                               clus_sep = 2,
                                ### Parameters for algorithms
                                rand_init = TRUE,
                                N_restart = N_restart, 
