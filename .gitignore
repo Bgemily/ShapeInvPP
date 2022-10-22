@@ -34,3 +34,4 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 slurm.sh
+Test.r
