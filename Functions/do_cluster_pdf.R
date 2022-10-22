@@ -3,8 +3,6 @@
 do_cluster_pdf = function(spks_time_mlist, stim_onset_vec, 
                           reaction_time_vec=NULL,
                           # Initial values
-                          center_density_array_init,
-                          center_Nspks_mat_init,
                           clusters_list_init,
                           v_vec_init=NULL,
                           v_mat_list_init=NULL,
@@ -42,11 +40,29 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
   clusters_history = c(clusters_history, list(clusters_list_init))
   
   ### Estimate parameters 
+  res = get_center_intensity_array(spks_time_mlist = spks_time_mlist, 
+                                   stim_onset_vec = stim_onset_vec, 
+                                   clusters_list = clusters_list_init, 
+                                   v_mat_list = v_mat_list_init,
+                                   N_component = N_component,
+                                   key_times_vec = key_times_vec,
+                                   fix_timeshift = fix_timeshift,
+                                   freq_trun = Inf,
+                                   bw = bw,
+                                   v0 = v0, v1 = v1,
+                                   t_vec = t_vec,
+                                   rmv_conn_prob = TRUE)
+  center_density_array = res$center_density_array
+  center_Nspks_mat = res$center_Nspks_mat
+  center_intensity_array = res$center_intensity_array
+  v_mat_list = res$v_mat_list
+  
   clusters_list_update = clusters_list_current = clusters_list_init
-  center_density_array_update = center_density_array_current = center_density_array_init
-  center_Nspks_mat_update = center_Nspks_mat_current = center_Nspks_mat_init
-  v_mat_list_update = v_mat_list_current = v_mat_list_init
+  center_density_array_update = center_density_array_current = center_density_array
+  center_Nspks_mat_update = center_Nspks_mat_current = center_Nspks_mat
+  v_mat_list_update = v_mat_list_current = v_mat_list
   l2_loss_update = l2_loss_current = Inf
+  
   n_iter = 1
   stopping = FALSE
   while (!stopping & n_iter<=MaxIter){
