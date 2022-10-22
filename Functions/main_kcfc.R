@@ -76,7 +76,7 @@ main_kcfc = function(### Parameters for generative model
   
   ### Apply kCFC --------------------------------
   time_start = Sys.time()
-  kcfcObj = kCFC(y = yList, t = tList, k = N_clus, 
+  kcfcObj = fdapace::kCFC(y = yList, t = tList, k = N_clus, 
                  kSeed = 123, maxIter = 20,
                  optnsSW = list(dataType='Dense', maxK=N_component, FVEthreshold = 1), 
                  optnsCS = list(dataType='Dense', maxK=N_component, FVEthreshold = 1))

@@ -9,7 +9,7 @@ sapply(file.sources, source)
 library(Matrix)
 library(mclust)
 library(combinat)
-library(fdapace)
+library(fdasrvf)
 
 # Load libraries ----------------------------------------------------------
 
@@ -28,8 +28,7 @@ N_trial = N_trial_total/split
 # Parallel computing setup ------------------------------------------------
 
 N_cores = 10
-cl = parallel::makePSOCKcluster(names = N_cores)
-doParallel::registerDoParallel(cl)
+doParallel::registerDoParallel(cores = N_cores)
 
 
 # Run simulations ---------------------------------------------------------

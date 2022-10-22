@@ -28,8 +28,7 @@ N_trial = N_trial_total/split
 # Parallel computing setup ------------------------------------------------
 
 N_cores = 10
-cl = parallel::makePSOCKcluster(names = N_cores)
-doParallel::registerDoParallel(cl)
+doParallel::registerDoParallel(cores = N_cores)
 
 
 # Experiment type ---------------------------------------------------------
