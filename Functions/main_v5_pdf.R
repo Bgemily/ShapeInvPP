@@ -81,6 +81,7 @@ main_v5_pdf = function(### Parameters for generative model
   mem_true_vec = data_generated$mem_true_vec
   clus_true_list = data_generated$clus_true_list
   v_true_mat_list = data_generated$v_mat_list
+  v_trialwise_vec_list = data_generated$v_trialwise_vec_list
   
   # Calculate non-identifiability level --------
   if (N_component >= 2) {
@@ -121,6 +122,7 @@ main_v5_pdf = function(### Parameters for generative model
                               use_true_timeshift = use_true_timeshift, 
                               jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
                               v_true_mat_list = v_true_mat_list, 
+                              v_trialwise_vec_list = v_trialwise_vec_list,
                               rmv_conn_prob = TRUE)
         center_density_array_init = res$center_density_array
         center_Nspks_mat_init = res$center_Nspks_mat
@@ -142,6 +144,7 @@ main_v5_pdf = function(### Parameters for generative model
                        use_true_timeshift = use_true_timeshift, 
                        jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
                        v_true_mat_list = v_true_mat_list, 
+                       v_trialwise_vec_list = v_trialwise_vec_list,
                        rmv_conn_prob = TRUE)
         center_density_array_init = res$center_density_array
         center_Nspks_mat_init = res$center_Nspks_mat
@@ -155,6 +158,7 @@ main_v5_pdf = function(### Parameters for generative model
       ### Estimation z,v,f based on pdf
       res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
                                stim_onset_vec = stim_onset_vec,
+                               v_trialwise_vec_list = v_trialwise_vec_list,
                                center_density_array_init = center_density_array_init,
                                center_Nspks_mat_init = center_Nspks_mat_init, 
                                clusters_list_init = clusters_list_init,

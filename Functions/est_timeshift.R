@@ -2,6 +2,7 @@
 
 est_timeshift = function(spks_time_mlist, 
                          stim_onset_vec, 
+                         v_trialwise_vec_list = NULL,
                          center_density_array,
                          v_vec=NULL,
                          v_mat_list=NULL,
@@ -22,12 +23,7 @@ est_timeshift = function(spks_time_mlist,
   
   
   v_mat = matrix(nrow = N_node, ncol = N_clus)
-  v_array_list = list(v_mat)
-  dist_mat = matrix(nrow = N_node, ncol = N_clus)
-  
-  
-  v_array_list = rep(list(array(dim = c(N_node, N_replicate, N_clus))), N_component)
-  
+  v_array_list = rep(list(array(dim = c(N_node, 1, N_clus))), N_component)
   dist_mat = matrix(nrow = N_node, ncol = N_clus)
   center_density_smooth_array = 0 * center_density_array
   for (id_clus in 1:N_clus) {

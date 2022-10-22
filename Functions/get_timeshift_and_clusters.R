@@ -2,6 +2,7 @@
 # Estimate time shifts and cluster memberships, conditioning on densities
 get_timeshift_and_clusters = function(spks_time_mlist,
                                       stim_onset_vec,
+                                      v_trialwise_vec_list = NULL,
                                       center_density_array,
                                       center_Nspks_mat,
                                       v_mat_list,
@@ -23,9 +24,16 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   ### Get time shift between each node and each cluster -----
   if (is.null(v_mat_list)) {
     v_mat_list = rep(list(matrix(0, nrow = N_node, ncol = N_replicate)), N_component)
+    if (!is.null(v_trialwise_vec_list)) {
+      for (id_component in 1:N_component) {
+        v_trialwise_vec = v_trialwise_vec_list[[id_component]]
+        v_mat_list[[id_component]] = v_mat_list[[id_component]]  + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_node, ncol = N_replicate)
+      }
+    }
   }
   tmp = est_timeshift(spks_time_mlist = spks_time_mlist, 
                       stim_onset_vec = stim_onset_vec, 
+                      v_trialwise_vec_list = v_trialwise_vec_list,
                       center_density_array = center_density_array,
                       v_mat_list = v_mat_list,
                       N_component = N_component,
@@ -88,9 +96,12 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   if ( (!fix_timeshift) & (!fix_comp1_timeshift_only) ) {
     for (id_clus in 1:N_clus) {
       min_timeshift = quantile(v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate], probs = 0) 
-      
       v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate] = v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate] - min_timeshift
       v_mat_list[[1]][v_mat_list[[1]]<0] = 0
+      if (!is.null(v_trialwise_vec_list)) {
+        v_trialwise_vec = v_trialwise_vec_list[[1]]
+        v_mat_list[[1]][clusters_list[[id_clus]], ] = v_mat_list[[1]][clusters_list[[id_clus]], ]  + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate)
+      }
     }
   }
   

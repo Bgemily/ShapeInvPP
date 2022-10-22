@@ -14,6 +14,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
                     fix_comp1_timeshift_only=FALSE,
                     use_true_timeshift=FALSE, 
                     v_true_mat_list = NULL,
+                    v_trialwise_vec_list = NULL,
                     jitter_prop_true_timeshift=0,
                     rmv_conn_prob=FALSE,
                     default_timeshift=0
@@ -42,7 +43,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
       v_mat_list = rep(list(v_vec), N_component)
     }
   } else{
-    ### Use median of spike times as time shifts
+    ### Use earliest spike times as time shifts
     v_mat_list = rep(list(matrix(0, nrow = N_node, ncol = N_replicate)), N_component)
     for (id_node in 1:N_node) {
       for (id_replicate in 1:N_replicate) {
@@ -62,6 +63,10 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     ### Force minimum time shifts in each component to be zero
     for (id_component in 1:N_component){
       v_mat_list[[id_component]] = v_mat_list[[id_component]] - min(v_mat_list[[id_component]])
+      if (!is.null(v_trialwise_vec_list)) {
+        v_trialwise_vec = v_trialwise_vec_list[[id_component]]
+        v_mat_list[[id_component]] = v_mat_list[[id_component]] + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_node, ncol = N_replicate)
+      }
       v_mat_list[[id_component]] = round(v_mat_list[[id_component]]/t_unit)*t_unit
     }
     
@@ -148,6 +153,10 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     for (id_clus in 1:N_clus) {
       for (id_component in 1:N_component){
         v_mat_list[[id_component]][clusters_list[[id_clus]], ] = v_mat_list[[id_component]][clusters_list[[id_clus]], ] - (quantile(v_mat_list[[id_component]][clusters_list[[id_clus]], ], 0.0)-0)
+        if (!is.null(v_trialwise_vec_list)) {
+          v_trialwise_vec = v_trialwise_vec_list[[id_component]]
+          v_mat_list[[id_component]][clusters_list[[id_clus]], ] = v_mat_list[[id_component]][clusters_list[[id_clus]], ]  + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate)
+        }
         v_mat_list[[id_component]] = round(v_mat_list[[id_component]]/t_unit)*t_unit
       }
     }
