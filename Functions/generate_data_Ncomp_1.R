@@ -31,7 +31,7 @@ generate_data_Ncomp_1 = function(SEED=NULL,
   # Generate trial-wise time shifts -----------------------------------
   v_trialwise_vec_list = list()
   for (id_component in 1:1) {
-    v_tmp = runif(n = N_replicate, min = 0, max = 1/4)
+    v_tmp = runif(n = N_replicate, min = 0, max = 1/8)
     v_tmp = v_tmp - min(v_tmp)
     v_trialwise_vec_list[[id_component]] = v_tmp
   }
