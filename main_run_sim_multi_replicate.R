@@ -38,15 +38,15 @@ top_level_folder = "../Results/Rdata"
 setup = 'Multi_replicate'
 
 ### Parameters' possible values:
-timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
+timeshift_max_vec_list = list(c(1/4, 1/16), 
                               c(1/4, 1/16)*0.5, c(1/4, 1/16)*0.75, 
                               c(1/4, 1/16)*0.25, c(1/4, 1/16)*0.125,
-                              c(1/4, 1/16)*1.25, c(1/4, 1/16)*1.75)
-N_replicate_list = list(1,2,3,4,5)
+                              c(1/4, 1/16)*1.25 )
+N_replicate_list = list(1,2,4,8)
 
 for (id_N_replicate in 1:length(N_replicate_list)) {
   N_replicate = N_replicate_list[[id_N_replicate]]
-  method = paste0('shape_inv_pp','_N_replicate',N_replicate)
+  method = paste0('shape_inv_pp_v2','_N_replicate',N_replicate)
   default_setting = 'N_spks_total=100,N_node=100,N_clus=4,clus_sep=1.3,N_comp=2'
   for (id_split in 1:split) {
     if (save_res_details & (id_split == 1)) {
