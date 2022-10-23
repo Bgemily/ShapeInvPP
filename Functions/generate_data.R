@@ -28,13 +28,21 @@ generate_data = function(SEED=NULL,
   mem_true_vec = rep(1:N_clus, clus_size_vec)
   clus_true_list = mem2clus(mem_true_vec, N_clus_min = N_clus)
   
+  # Generate trial-wise time shifts -----------------------------------
+  v_trialwise_vec_list = list()
+  for (id_component in 1:2) {
+    v_tmp = runif(n = N_replicate, min = 0, max = 1/8)
+    v_tmp = v_tmp - min(v_tmp)
+    v_trialwise_vec_list[[id_component]] = v_tmp
+  }
+  
   # Generate time shifts ----------------------------------------------------
   v_mat_list = list()
-  v_mat_list[[1]] = runif(n=N_node*N_replicate, 
+  v_mat_list[[1]] = runif(n=N_node, 
                           min = 0,
                           max = timeshift_max_vec[1])  
   v_mat_list[[1]] = matrix(v_mat_list[[1]], nrow = N_node, ncol = N_replicate)
-  v_mat_list[[2]] = runif(n = N_node*N_replicate,
+  v_mat_list[[2]] = runif(n = N_node,
                           min = 0,
                           max = timeshift_max_vec[2] )
   v_mat_list[[2]] = matrix(v_mat_list[[2]], nrow = N_node, ncol = N_replicate)
@@ -42,6 +50,12 @@ generate_data = function(SEED=NULL,
     v_mat_list[[1]][clus_true_list[[id_clus]], ] = v_mat_list[[1]][clus_true_list[[id_clus]], ] - min(v_mat_list[[1]][clus_true_list[[id_clus]], ])
     v_mat_list[[2]][clus_true_list[[id_clus]], ] = v_mat_list[[2]][clus_true_list[[id_clus]], ] - min(v_mat_list[[2]][clus_true_list[[id_clus]], ])
   }
+  
+  v_mat_list[[1]] = v_mat_list[[1]] + matrix(v_trialwise_vec_list[[1]], byrow = TRUE, 
+                                             nrow = N_node, ncol = N_replicate)
+  v_mat_list[[2]] = v_mat_list[[2]] + matrix(v_trialwise_vec_list[[2]], byrow = TRUE, 
+                                             nrow = N_node, ncol = N_replicate)
+  
   
   # Generate expected number of spikes --------------------------------------------
   center_N_spks_mat = matrix(nrow=N_clus,ncol=2)
@@ -211,6 +225,7 @@ generate_data = function(SEED=NULL,
               mem_true_vec=mem_true_vec, 
               clus_true_list=clus_true_list,
               v_mat_list=v_mat_list, 
+              v_trialwise_vec_list = v_trialwise_vec_list,
               center_density_array_true=center_density_array_true,
               center_N_spks_mat=center_N_spks_mat,
               center_intensity_array_true=center_intensity_array_true,
