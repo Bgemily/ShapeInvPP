@@ -59,7 +59,7 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
         }
         
         if (FALSE) {
-          v_subjwise_vec_list[[id_component]][id_node] = runif(n = 1, min = min(0, quantile(spks_time_shifted_vec, 0.05)), 
+          v_subjwise_vec_list[[id_component]][id_node] = runif(n = 1, min = min(t_vec), 
                                                                     max = quantile(spks_time_shifted_vec, 0.05) )
         } else {
           v_subjwise_vec_list[[id_component]][id_node] = quantile(spks_time_shifted_vec, 0.05) 
