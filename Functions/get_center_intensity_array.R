@@ -38,12 +38,12 @@ get_center_intensity_array = function(spks_time_mlist,
       if (!fix_timeshift) {
         for (id_component in 1:N_component){
           if (id_component > 1) {
-            v_mat_tmp = v_mat_list[[id_component]][clusters_list[[q]], ]
-            v_mat_list[[id_component]][clusters_list[[q]], ] = v_mat_tmp - quantile(v_mat_tmp, 0.05)
-            if (!is.null(v_trialwise_vec_list)) {
-              v_trialwise_vec = v_trialwise_vec_list[[id_component]]
-              v_mat_list[[id_component]][clusters_list[[q]], ] = v_mat_list[[id_component]][clusters_list[[q]], ]  + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[q]]), ncol = N_replicate)
-            }
+            id_replicate = 1
+            v_subjwise_vec = v_mat_list[[id_component]][clusters_list[[q]], id_replicate] - v_trialwise_vec_list[[id_component]][id_replicate]
+            v_subjwise_vec = v_subjwise_vec - min(v_subjwise_vec)
+            v_trialwise_vec = v_trialwise_vec_list[[id_component]]
+            v_mat_list[[id_component]][clusters_list[[q]], ] = matrix(v_subjwise_vec, nrow = length(clusters_list[[q]]), ncol = N_replicate) + 
+              matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[q]]), ncol = N_replicate)
           }
         }
       }

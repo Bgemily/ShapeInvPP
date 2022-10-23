@@ -92,15 +92,16 @@ get_timeshift_and_clusters = function(spks_time_mlist,
       v_mat_list[[id_component]][clusters_list[[id_clus]], 1:N_replicate] = v_array_list_tmp[[id_component]][clusters_list[[id_clus]], 1:N_replicate, id_clus]
     }
   }
-  ### For each cluster, force the minimum time shifts to be zero
+  ### For each cluster, force the minimum time shifts to be trial-wise time shift
   if ( (!fix_timeshift) & (!fix_comp1_timeshift_only) ) {
+    id_component = 1
     for (id_clus in 1:N_clus) {
-      min_timeshift = quantile(v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate], probs = 0) 
-      v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate] = v_mat_list[[1]][clusters_list[[id_clus]], 1:N_replicate] - min_timeshift
-      v_mat_list[[1]][v_mat_list[[1]]<0] = 0
-      if (!is.null(v_trialwise_vec_list)) {
-        v_trialwise_vec = v_trialwise_vec_list[[1]]
-        v_mat_list[[1]][clusters_list[[id_clus]], ] = v_mat_list[[1]][clusters_list[[id_clus]], ]  + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate)
+      if (length(clusters_list[[id_clus]])>0) {
+        id_replicate = 1
+        v_subjwise_vec = v_mat_list[[id_component]][clusters_list[[id_clus]], id_replicate] - v_trialwise_vec_list[[id_component]][id_replicate]
+        v_subjwise_vec = v_subjwise_vec - min(v_subjwise_vec)
+        v_trialwise_vec = v_trialwise_vec_list[[id_component]]
+        v_mat_list[[id_component]][clusters_list[[id_clus]], ] = matrix(v_subjwise_vec, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate) + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate)
       }
     }
   }

@@ -261,9 +261,12 @@ main_v5_pdf = function(### Parameters for generative model
           if (length(n0_init) == 0) {
             n0_init = 0
           }
+          f_target_mat = matrix(f_target, nrow = 1)
           f_origin_mat = matrix(density_est, nrow = 1)
-          n0 = align_multi_components(f_target = f_target,
+          n0 = align_multi_components(f_target_mat = f_target_mat,
                                       f_origin_mat = f_origin_mat,
+                                      v_trialwise_vec_list = c(0),
+                                      N_spks_trialwise_vec = c(1),
                                       t_unit = t_unit, 
                                       n0_vec = c(n0_init),
                                       n0_min_vec = -length(f_target) %/% 2,
