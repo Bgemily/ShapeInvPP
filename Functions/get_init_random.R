@@ -41,34 +41,38 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
       v_mat_list = rep(list(v_vec), N_component)
     }
   } else{
-    ### Use earliest spike times as time shifts
-    v_mat_list = rep(list(matrix(0, nrow = N_node, ncol = N_replicate)), N_component)
+    ### Use earliest spike times as subject-wise time shifts
+    v_subjwise_vec_list = rep(list(rep(0, N_node)), N_component)
     for (id_node in 1:N_node) {
-      for (id_replicate in 1:N_replicate) {
-        spks_time_tmp = spks_time_mlist[id_node, id_replicate][[1]]-stim_onset_vec[id_replicate]
-        for (id_component in 1:N_component){
-          time_start_curr_comp = key_times_vec[id_component]
+      for (id_component in 1:N_component){
+        spks_time_shifted_vec = c()
+        for (id_replicate in 1:N_replicate) {
+          spks_time_tmp = spks_time_mlist[id_node, id_replicate][[1]]-stim_onset_vec[id_replicate]
+          time_start_curr_comp = key_times_vec[id_component] 
           time_end_curr_comp = key_times_vec[id_component + 1]
           spks_time_curr_comp_vec = spks_time_tmp[which(spks_time_tmp >= time_start_curr_comp &
                                                           spks_time_tmp <= time_end_curr_comp)]
           if (length(spks_time_curr_comp_vec) > 0) {
-            if (FALSE) {
-              v_mat_list[[id_component]][id_node, id_replicate] = runif(n = 1, min = min(t_vec), max = quantile(spks_time_curr_comp_vec, 0.05) )
-            } else {
-              v_mat_list[[id_component]][id_node, id_replicate] = quantile(spks_time_curr_comp_vec, 0.05) 
-            }
-            
+            spks_time_curr_comp_vec = spks_time_curr_comp_vec - v_trialwise_vec_list[[id_component]][id_replicate]
           }
+          spks_time_shifted_vec = c(spks_time_shifted_vec, spks_time_curr_comp_vec)
+        }
+        
+        if (FALSE) {
+          v_subjwise_vec_list[[id_component]][id_node] = runif(n = 1, min = min(0, quantile(spks_time_shifted_vec, 0.05)), 
+                                                                    max = quantile(spks_time_shifted_vec, 0.05) )
+        } else {
+          v_subjwise_vec_list[[id_component]][id_node] = quantile(spks_time_shifted_vec, 0.05) 
         }
       }
     }
-    ### Force minimum time shifts in each component to be zero
+    
+    ### Force minimum time shifts in each component to be trial-wise time shift
+    v_mat_list = rep(list(matrix(0, nrow = N_node, ncol = N_replicate)), N_component)
     for (id_component in 1:N_component){
-      v_mat_list[[id_component]] = v_mat_list[[id_component]] - min(v_mat_list[[id_component]])
-      if (!is.null(v_trialwise_vec_list)) {
-        v_trialwise_vec = v_trialwise_vec_list[[id_component]]
-        v_mat_list[[id_component]] = v_mat_list[[id_component]] + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_node, ncol = N_replicate)
-      }
+      v_subjwise_vec = v_subjwise_vec_list[[id_component]] - min(v_subjwise_vec_list[[id_component]])
+      v_trialwise_vec = v_trialwise_vec_list[[id_component]]
+      v_mat_list[[id_component]] = matrix(v_subjwise_vec, nrow = N_node, ncol = N_replicate) + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_node, ncol = N_replicate)
       v_mat_list[[id_component]] = round(v_mat_list[[id_component]]/t_unit)*t_unit
     }
     
@@ -120,11 +124,11 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
   if (!fix_timeshift) {
     for (id_clus in 1:N_clus) {
       for (id_component in 1:N_component){
-        v_mat_list[[id_component]][clusters_list[[id_clus]], ] = v_mat_list[[id_component]][clusters_list[[id_clus]], ] - (quantile(v_mat_list[[id_component]][clusters_list[[id_clus]], ], 0.0)-0)
-        if (!is.null(v_trialwise_vec_list)) {
-          v_trialwise_vec = v_trialwise_vec_list[[id_component]]
-          v_mat_list[[id_component]][clusters_list[[id_clus]], ] = v_mat_list[[id_component]][clusters_list[[id_clus]], ]  + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate)
-        }
+        id_replicate = 1
+        v_subjwise_vec = v_mat_list[[id_component]][clusters_list[[id_clus]], id_replicate] - v_trialwise_vec_list[[id_component]][id_replicate]
+        v_subjwise_vec = v_subjwise_vec - min(v_subjwise_vec)
+        v_trialwise_vec = v_trialwise_vec_list[[id_component]]
+        v_mat_list[[id_component]][clusters_list[[id_clus]], ] = matrix(v_subjwise_vec, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate) + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate)
         v_mat_list[[id_component]] = round(v_mat_list[[id_component]]/t_unit)*t_unit
       }
     }
