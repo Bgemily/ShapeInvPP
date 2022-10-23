@@ -17,8 +17,8 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_trial_total = 20
-split = 2
+N_trial_total = 50
+split = 5
 
 N_trial = N_trial_total/split
 
@@ -35,7 +35,7 @@ test_algorithm_restart = FALSE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Multi_restart_v2'
+setup = 'Multi_restart_v2.1'
 
 if (test_random_restart) {
   ### Parameters' possible values:
@@ -54,7 +54,7 @@ if (test_random_restart) {
       for (id_N_replicate in 1:length(N_replicate_list)) {
         N_replicate = N_replicate_list[[id_N_replicate]]
         results <- foreach(id_trial = 1:N_trial) %dopar% {
-          SEED = id_split * 1000 + id_N_replicate * 100 + id_trial
+          SEED = id_split * 1000 + id_N_replicate * 100 + id_trial + 10
           print(paste0("SEED: ", SEED))
           tryCatch(main_v5_pdf(SEED = SEED,
                                N_node = 100,
@@ -103,7 +103,7 @@ if (test_random_restart) {
     for (id_N_replicate in 1:length(N_replicate_list)) {
       N_replicate = N_replicate_list[[id_N_replicate]]
       results <- foreach(id_trial = 1:N_trial) %dopar% {
-        SEED = id_split * 1000 + id_N_replicate * 100 + id_trial
+        SEED = id_split * 1000 + id_N_replicate * 100 + id_trial + 10
         print(paste0("SEED: ", SEED))
         tryCatch(main_v5_pdf(SEED = SEED,
                              N_node = 100,
