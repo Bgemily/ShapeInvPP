@@ -35,13 +35,13 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Multi_replicate'
+setup = 'Multi_replicate_v2'
 
 ### Parameters' possible values:
 timeshift_max_vec_list = list(c(1/4, 1/16), 
                               c(1/4, 1/16)*0.5, c(1/4, 1/16)*0.75, 
                               c(1/4, 1/16)*0.25, c(1/4, 1/16)*0.125,
-                              c(1/4, 1/16)*1.25 )
+                              c(1/4, 1/16)*1.25, c(1/4, 1/16)*1.5 )
 N_replicate_list = list(1,2,4,8)
 
 for (id_N_replicate in 1:length(N_replicate_list)) {
