@@ -46,7 +46,7 @@ N_replicate_list = list(1,2,4,8)
 
 for (id_N_replicate in 1:length(N_replicate_list)) {
   N_replicate = N_replicate_list[[id_N_replicate]]
-  method = paste0('shape_inv_pp','_N_replicate',N_replicate)
+  method = paste0('shape_inv_pp_v2','_N_replicate',N_replicate)
   default_setting = 'N_spks_total=100,N_node=100,N_clus=4,clus_sep=1.3,N_comp=2'
   for (id_split in 1:split) {
     if (save_res_details & (id_split == 1)) {
