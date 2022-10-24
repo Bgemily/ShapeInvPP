@@ -17,8 +17,8 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_trial_total = 20
-split = 2
+N_trial_total = 50
+split = 5
 
 N_trial = N_trial_total/split
 
@@ -26,8 +26,7 @@ N_trial = N_trial_total/split
 # Parallel computing setup ------------------------------------------------
 
 N_cores = 10
-cl = parallel::makePSOCKcluster(names = N_cores)
-doParallel::registerDoParallel(cl)
+doParallel::registerDoParallel(cores = N_cores)
 
 
 # Run simulations ---------------------------------------------------------
@@ -36,7 +35,7 @@ test_algorithm_restart = FALSE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Multi_restart'
+setup = 'Multi_restart_v2.1'
 
 if (test_random_restart) {
   ### Parameters' possible values:
@@ -44,18 +43,19 @@ if (test_random_restart) {
   N_restart_algo_list = list(1, 3, 5, 10)
   for (id_method in 1:length(N_restart_algo_list)) {
     N_restart = N_restart_algo_list[[id_method]]
-    method = paste0('Rand_init_Nrestart', '_algo', as.character(N_restart) )
+    method = paste0('shape_inv_pp_v2_', 'Rand_init_v2_Nrestart_algo', as.character(N_restart) )
     default_setting = 'N_spks_total=100,N_node=100,N_clus=4,clus_sep=2,N_comp=2'
     for (id_split in 1:split) {
       if (save_res_details & (id_split == 1)) {
         save_center_pdf_array = TRUE
       } else {
-        save_center_pdf_array = save_center_pdf_array
+        save_center_pdf_array = FALSE
       }
       for (id_N_replicate in 1:length(N_replicate_list)) {
         N_replicate = N_replicate_list[[id_N_replicate]]
-        results <- foreach(j = 1:N_trial) %dopar% {
-          SEED = sample(1:1e7,1)
+        results <- foreach(id_trial = 1:N_trial) %dopar% {
+          SEED = id_split * 1000 + id_N_replicate * 100 + id_trial + 10
+          print(paste0("SEED: ", SEED))
           tryCatch(main_v5_pdf(SEED = SEED,
                                N_node = 100,
                                N_clus = 4,
@@ -69,6 +69,7 @@ if (test_random_restart) {
                                ### Parameters for algorithms
                                rand_init = TRUE,
                                N_restart = N_restart, 
+                               N_start_kmean = 1,
                                freq_trun = 10, 
                                N_component = 2,
                                key_times_vec = c(-1,0,1),
@@ -91,6 +92,53 @@ if (test_random_restart) {
       }
     }
   }
+  method = paste0('shape_inv_pp_v2_', 'Nrestart_algo1_kmean5' )
+  default_setting = 'N_spks_total=100,N_node=100,N_clus=4,clus_sep=2,N_comp=2'
+  for (id_split in 1:split) {
+    if (save_res_details & (id_split == 1)) {
+      save_center_pdf_array = TRUE
+    } else {
+      save_center_pdf_array = FALSE
+    }
+    for (id_N_replicate in 1:length(N_replicate_list)) {
+      N_replicate = N_replicate_list[[id_N_replicate]]
+      results <- foreach(id_trial = 1:N_trial) %dopar% {
+        SEED = id_split * 1000 + id_N_replicate * 100 + id_trial + 10
+        print(paste0("SEED: ", SEED))
+        tryCatch(main_v5_pdf(SEED = SEED,
+                             N_node = 100,
+                             N_clus = 4,
+                             N_component_true = 2,
+                             t_vec = seq(-1, 1, by=0.01),
+                             timeshift_max_vec = c(1/4, 1/16),
+                             ### params when N_clus==4:
+                             N_spks_total = 100,
+                             N_replicate = N_replicate,
+                             clus_sep = 2,
+                             ### Parameters for algorithms
+                             N_restart = 1, 
+                             N_start_kmean = 5,
+                             freq_trun = 10, 
+                             N_component = 2,
+                             key_times_vec = c(-1,0,1),
+                             fix_timeshift = FALSE,
+                             fix_membership = FALSE,
+                             save_center_pdf_array = save_center_pdf_array ),
+                 error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
+      }
+      param_name = "N_replicate"
+      param_value = N_replicate
+      folder_path = paste0(top_level_folder, '/', setup,
+                           '/', method, 
+                           '/', default_setting,
+                           '/', param_name, '/', param_value)
+      dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
+      
+      now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+      rm(results)
+    }
+  }
 }
 
 
@@ -108,7 +156,7 @@ if (test_algorithm_restart) {
       if (save_res_details & (id_split == 1)) {
         save_center_pdf_array = TRUE
       } else {
-        save_center_pdf_array = save_center_pdf_array
+        save_center_pdf_array = FALSE
       }
       for (id_N_replicate in 1:length(N_replicate_list)) {
         N_replicate = N_replicate_list[[id_N_replicate]]

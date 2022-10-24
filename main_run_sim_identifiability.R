@@ -52,7 +52,7 @@ for (id_split in 1:split) {
   if (save_res_details & (id_split == 1)) {
     save_center_pdf_array = TRUE
   } else {
-    save_center_pdf_array = save_center_pdf_array
+    save_center_pdf_array = FALSE
   }
   for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
     timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]

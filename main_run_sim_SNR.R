@@ -47,7 +47,7 @@ for (id_split in 1:split) {
   if (save_res_details & (id_split == 1)) {
     save_center_pdf_array = TRUE
   } else {
-    save_center_pdf_array = save_center_pdf_array
+    save_center_pdf_array = FALSE
   }
   ### N_spks_total
   for (id_N_spks_total in 1:length(N_spks_total_list)) {
