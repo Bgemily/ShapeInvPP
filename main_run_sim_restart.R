@@ -49,7 +49,7 @@ if (test_random_restart) {
       if (save_res_details & (id_split == 1)) {
         save_center_pdf_array = TRUE
       } else {
-        save_center_pdf_array = save_center_pdf_array
+        save_center_pdf_array = FALSE
       }
       for (id_N_replicate in 1:length(N_replicate_list)) {
         N_replicate = N_replicate_list[[id_N_replicate]]
@@ -98,7 +98,7 @@ if (test_random_restart) {
     if (save_res_details & (id_split == 1)) {
       save_center_pdf_array = TRUE
     } else {
-      save_center_pdf_array = save_center_pdf_array
+      save_center_pdf_array = FALSE
     }
     for (id_N_replicate in 1:length(N_replicate_list)) {
       N_replicate = N_replicate_list[[id_N_replicate]]
@@ -156,7 +156,7 @@ if (test_algorithm_restart) {
       if (save_res_details & (id_split == 1)) {
         save_center_pdf_array = TRUE
       } else {
-        save_center_pdf_array = save_center_pdf_array
+        save_center_pdf_array = FALSE
       }
       for (id_N_replicate in 1:length(N_replicate_list)) {
         N_replicate = N_replicate_list[[id_N_replicate]]
