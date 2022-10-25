@@ -89,7 +89,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     F_hat_tmp = 0
     
     spks_time_vec_tmp = c()
-    N_spks_nodetrial_vec_tmp = c()
+    N_spks_subjtrial_vec_tmp = c()
     for (id_replicate in 1:N_replicate) {
       spks_time_shifted_tmp = c()
       spks_time_tmp = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
@@ -107,7 +107,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
       }
       
       spks_time_vec_tmp = c(spks_time_vec_tmp, spks_time_shifted_tmp)
-      N_spks_nodetrial_vec_tmp = c(N_spks_nodetrial_vec_tmp, length(spks_time_shifted_tmp))
+      N_spks_subjtrial_vec_tmp = c(N_spks_subjtrial_vec_tmp, length(spks_time_shifted_tmp))
     }
     
     ### Smooth the point process 
@@ -125,7 +125,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
       density_tmp = intensity_tmp*0
     }
     
-    F_hat_tmp = sqrt( mean(N_spks_nodetrial_vec_tmp^2) )
+    F_hat_tmp = sqrt( mean(N_spks_subjtrial_vec_tmp^2) )
     
     intensity_tmp = density_tmp*F_hat_tmp
     

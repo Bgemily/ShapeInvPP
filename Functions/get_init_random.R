@@ -101,8 +101,8 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
     } else{
       density_tmp = intensity_tmp*0
     }
-    N_spks_nodetrial_vec_tmp = sapply(spks_time_mlist[id_subj, , drop=FALSE], length)
-    F_hat_tmp = sqrt( mean(N_spks_nodetrial_vec_tmp^2) )
+    N_spks_subjtrial_vec_tmp = sapply(spks_time_mlist[id_subj, , drop=FALSE], length)
+    F_hat_tmp = sqrt( mean(N_spks_subjtrial_vec_tmp^2) )
     intensity_tmp = density_tmp*F_hat_tmp
     
     subj_intensity_array[id_subj,1,] = intensity_tmp

@@ -45,8 +45,8 @@ est_timeshift = function(spks_time_mlist,
       f_target_mat = matrix(nrow = N_replicate, ncol = length(t_vec))
       N_spks_trialwise_vec = rep(0, N_replicate)
       for (id_replicate in 1:N_replicate) {
-        spks_time_nodetrial = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
-        spks_time_vec = spks_time_nodetrial[which(spks_time_nodetrial >= min(t_vec) & spks_time_nodetrial <= max(t_vec))]
+        spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
+        spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial >= min(t_vec) & spks_time_subjtrial <= max(t_vec))]
         tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
                               freq_trun = freq_trun, 
                               t_vec = t_vec, 
@@ -112,8 +112,8 @@ est_timeshift = function(spks_time_mlist,
       dist_tmp_vec = rep(0, N_replicate)
       for (id_replicate in 1:N_replicate) {
         # Get un-smoothed node density ----
-        spks_time_nodetrial = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
-        spks_time_vec = spks_time_nodetrial[which(spks_time_nodetrial >= min(t_vec) & spks_time_nodetrial <= max(t_vec))]
+        spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
+        spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial >= min(t_vec) & spks_time_subjtrial <= max(t_vec))]
         tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
                               freq_trun = Inf, 
                               t_vec = t_vec, 
