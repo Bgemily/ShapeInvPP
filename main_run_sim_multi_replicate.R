@@ -35,7 +35,7 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Multi_replicate_v2'
+setup = 'Multi_trial_v2'
 
 ### Parameters' possible values:
 timeshift_max_vec_list = list(c(1/4, 1/16), 
