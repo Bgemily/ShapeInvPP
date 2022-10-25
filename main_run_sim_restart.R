@@ -35,15 +35,15 @@ test_algorithm_restart = FALSE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Multi_restart_v2.1'
+setup = 'Multi_restart_v3'
 
 if (test_random_restart) {
   ### Parameters' possible values:
   N_trial_list = list(1,2,3,4,5)
-  N_restart_algo_list = list(1, 3, 5, 10)
+  N_restart_algo_list = list(1, 3, 5, 10, 20)
   for (id_method in 1:length(N_restart_algo_list)) {
     N_restart = N_restart_algo_list[[id_method]]
-    method = paste0('shape_inv_pp_v2_', 'Rand_init_v2_Nrestart_algo', as.character(N_restart) )
+    method = paste0('shape_inv_pp_', 'Rand_init_v2_Nrestart_algo', as.character(N_restart) )
     default_setting = 'N_spks_total=100,N_subj=100,N_clus=4,clus_sep=2,N_comp=2'
     for (id_N_split in 1:N_split) {
       if (save_res_details & (id_N_split == 1)) {
@@ -92,7 +92,7 @@ if (test_random_restart) {
       }
     }
   }
-  method = paste0('shape_inv_pp_v2_', 'Nrestart_algo1_kmean5' )
+  method = paste0('shape_inv_pp_', 'Nrestart_algo1_kmean5' )
   default_setting = 'N_spks_total=100,N_subj=100,N_clus=4,clus_sep=2,N_comp=2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
