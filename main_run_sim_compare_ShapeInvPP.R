@@ -86,8 +86,8 @@ if (test_N_component_2){
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_trial, '.Rdata'))
+      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
       rm(results)
     }
     for (id_clus_sep in 1:length(clus_sep_list)) {
@@ -121,8 +121,8 @@ if (test_N_component_2){
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_trial, '.Rdata'))
+      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
       rm(results)
     }
     for (id_N_subj in 1:length(N_subj_list)) {
@@ -156,8 +156,8 @@ if (test_N_component_2){
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_trial, '.Rdata'))
+      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
       rm(results)
     }
   }
@@ -201,8 +201,8 @@ if (test_N_component_1) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_trial, '.Rdata'))
+      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
       rm(results)
     }
     for (id_clus_sep in 1:length(clus_sep_list)) {
@@ -236,8 +236,8 @@ if (test_N_component_1) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_trial, '.Rdata'))
+      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
       rm(results)
     }
     for (id_N_subj in 1:length(N_subj_list)) {
@@ -271,8 +271,8 @@ if (test_N_component_1) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_trial, '.Rdata'))
+      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
       rm(results)
     }
   }
@@ -315,8 +315,8 @@ if (test_N_clus_1) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_trial, '.Rdata'))
+      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
       rm(results)
     }
     for (id_N_subj in 1:length(N_subj_list)) {
@@ -348,8 +348,8 @@ if (test_N_clus_1) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_trial, '.Rdata'))
+      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
       rm(results)
     }
   }
