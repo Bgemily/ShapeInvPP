@@ -46,14 +46,14 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
     for (id_subj in 1:N_subj) {
       for (id_component in 1:N_component){
         spks_time_shifted_vec = c()
-        for (id_replicate in 1:N_trial) {
-          spks_time_tmp = spks_time_mlist[id_subj, id_replicate][[1]]-stim_onset_vec[id_replicate]
+        for (id_trial in 1:N_trial) {
+          spks_time_tmp = spks_time_mlist[id_subj, id_trial][[1]]-stim_onset_vec[id_trial]
           time_start_curr_comp = key_times_vec[id_component] 
           time_end_curr_comp = key_times_vec[id_component + 1]
           spks_time_curr_comp_vec = spks_time_tmp[which(spks_time_tmp >= time_start_curr_comp &
                                                           spks_time_tmp <= time_end_curr_comp)]
           if (length(spks_time_curr_comp_vec) > 0) {
-            spks_time_curr_comp_vec = spks_time_curr_comp_vec - v_trialwise_vec_list[[id_component]][id_replicate]
+            spks_time_curr_comp_vec = spks_time_curr_comp_vec - v_trialwise_vec_list[[id_component]][id_trial]
           }
           spks_time_shifted_vec = c(spks_time_shifted_vec, spks_time_curr_comp_vec)
         }
@@ -124,8 +124,8 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
   if (!fix_timeshift) {
     for (id_clus in 1:N_clus) {
       for (id_component in 1:N_component){
-        id_replicate = 1
-        v_subjwise_vec = v_mat_list[[id_component]][clusters_list[[id_clus]], id_replicate] - v_trialwise_vec_list[[id_component]][id_replicate]
+        id_trial = 1
+        v_subjwise_vec = v_mat_list[[id_component]][clusters_list[[id_clus]], id_trial] - v_trialwise_vec_list[[id_component]][id_trial]
         v_subjwise_vec = v_subjwise_vec - min(v_subjwise_vec)
         v_trialwise_vec = v_trialwise_vec_list[[id_component]]
         v_mat_list[[id_component]][clusters_list[[id_clus]], ] = matrix(v_subjwise_vec, nrow = length(clusters_list[[id_clus]]), ncol = N_trial) + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[id_clus]]), ncol = N_trial)

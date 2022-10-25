@@ -22,8 +22,8 @@ align_multi_components = function(f_target_mat,
   }
   N_trial = nrow(f_target_mat)
   f_target_mat_extend = c()
-  for (id_replicate in 1:N_trial) {
-    f_target_extend_tmp = extend(f_target_mat[id_replicate, ])
+  for (id_trial in 1:N_trial) {
+    f_target_extend_tmp = extend(f_target_mat[id_trial, ])
     f_target_mat_extend = rbind(f_target_mat_extend, f_target_extend_tmp)
   }
   f_target_mat = f_target_mat_extend
@@ -37,8 +37,8 @@ align_multi_components = function(f_target_mat,
   
   ### Compute terms needed in gradients
   fft_f_target_mat = 0 * f_target_mat
-  for (id_replicate in 1:N_trial) {
-    fft_f_target_mat[id_replicate, ] = fft(f_target_mat[id_replicate, ]) #/ length(f_target_mat[id_replicate, ])
+  for (id_trial in 1:N_trial) {
+    fft_f_target_mat[id_trial, ] = fft(f_target_mat[id_trial, ]) #/ length(f_target_mat[id_trial, ])
   }
   fft_f_origin_mat = 0 * f_origin_mat
   for (id_component in 1:N_component) {
@@ -83,24 +83,24 @@ align_multi_components = function(f_target_mat,
     l_vec = c( head(l_vec, N-(N-1)%/%2),
                tail(l_vec, (N-1)%/%2) - N )
     fft_f_origin_shifted_mat = matrix(nrow = N_trial, ncol = ncol(fft_f_target_mat))
-    for (id_replicate in 1:N_trial) {
+    for (id_trial in 1:N_trial) {
       fft_f_origin_shifted = 0
       for (id_component in 1:N_component) {
-        n0_trialwise = round(v_trialwise_vec_list[[id_component]][id_replicate] / t_unit)
+        n0_trialwise = round(v_trialwise_vec_list[[id_component]][id_trial] / t_unit)
         fft_curr_comp_shifted = exp(1i*2*pi*l_vec*(-(n0_vec[id_component]+n0_trialwise))/N) * fft_f_origin_mat[id_component, ]
         fft_f_origin_shifted = fft_f_origin_shifted + fft_curr_comp_shifted
       }
       if (length(fft_f_origin_shifted)==0) {
         browser()
       }
-      fft_f_origin_shifted_mat[id_replicate, ] = fft_f_origin_shifted
+      fft_f_origin_shifted_mat[id_trial, ] = fft_f_origin_shifted
     }
     
     dist_upd = 0
-    for (id_replicate in 1:N_trial) {
-      d = sum(abs( fft_f_origin_shifted_mat[id_replicate, ] - fft_f_target_mat[id_replicate, ] )^2)  
+    for (id_trial in 1:N_trial) {
+      d = sum(abs( fft_f_origin_shifted_mat[id_trial, ] - fft_f_target_mat[id_trial, ] )^2)  
       d = sqrt(t_unit / N * d)
-      d = d * N_spks_trialwise_vec[id_replicate]
+      d = d * N_spks_trialwise_vec[id_trial]
       dist_upd = dist_upd + d
     }
     dist_redu = (dist_curr - dist_upd) / dist_upd

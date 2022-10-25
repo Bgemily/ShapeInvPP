@@ -22,10 +22,10 @@ get_non_identifiability = function(spks_time_mlist,
     # Get W matrix
     N_spks_mat = matrix(nrow = N_subj, ncol = N_trial)
     for (id_subj in 1:N_subj) {
-      for (id_replicate in 1:N_trial) {
-        spks_time_vec = spks_time_mlist[id_subj, id_replicate][[1]]
+      for (id_trial in 1:N_trial) {
+        spks_time_vec = spks_time_mlist[id_subj, id_trial][[1]]
         spks_time_vec = spks_time_vec[which(spks_time_vec >= min(t_vec) & spks_time_vec <= max(t_vec))]
-        N_spks_mat[id_subj, id_replicate] = length(spks_time_vec)
+        N_spks_mat[id_subj, id_trial] = length(spks_time_vec)
       }
     }
     W_mat = diag(c(N_spks_mat))

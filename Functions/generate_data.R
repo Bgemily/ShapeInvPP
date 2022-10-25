@@ -193,22 +193,22 @@ generate_data = function(SEED=NULL,
   spks_time_mlist = matrix(list(), nrow = N_subj, ncol = N_trial)
   for (id_clus in 1:N_clus) {
     for (id_subj in clus_true_list[[id_clus]]) {
-      for (id_replicate in 1:N_trial) {
-        v_tmp_1 = v_mat_list[[1]][id_subj, id_replicate]
-        v_tmp_2 = v_mat_list[[2]][id_subj, id_replicate]
-        spks_time_mlist[id_subj, id_replicate] = list(c( rejection_sampling(density_vec = center_density_array_true[id_clus,1,], 
+      for (id_trial in 1:N_trial) {
+        v_tmp_1 = v_mat_list[[1]][id_subj, id_trial]
+        v_tmp_2 = v_mat_list[[2]][id_subj, id_trial]
+        spks_time_mlist[id_subj, id_trial] = list(c( rejection_sampling(density_vec = center_density_array_true[id_clus,1,], 
                                                                             t_vec = t_vec_extend, 
                                                                             N_sample = 0*center_N_spks_mat[id_clus,1]+
                                                                               1*rpois(n=1, lambda=center_N_spks_mat[id_clus,1]) )+
-                                                           stim_onset_vec[id_replicate]+v_tmp_1,
+                                                           stim_onset_vec[id_trial]+v_tmp_1,
                                                          rejection_sampling(density_vec = center_density_array_true[id_clus,2,], 
                                                                             t_vec = t_vec_extend, 
                                                                             N_sample = 0*center_N_spks_mat[id_clus,2]+
                                                                               1*rpois(n=1, lambda=center_N_spks_mat[id_clus,2]) )+
-                                                           stim_onset_vec[id_replicate]+v_tmp_2 ))
+                                                           stim_onset_vec[id_trial]+v_tmp_2 ))
         ### Only keep spike times during [-u_0, u_1] 
-        spks_time_vec = spks_time_mlist[id_subj,id_replicate][[1]]
-        spks_time_mlist[id_subj,id_replicate][[1]] = spks_time_vec[which(spks_time_vec >= -u_0 & 
+        spks_time_vec = spks_time_mlist[id_subj,id_trial][[1]]
+        spks_time_mlist[id_subj,id_trial][[1]] = spks_time_vec[which(spks_time_vec >= -u_0 & 
                                                                            spks_time_vec <= u_1)]
       }
     }
