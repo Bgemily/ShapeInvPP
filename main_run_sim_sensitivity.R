@@ -18,9 +18,9 @@ library(doParallel)
 # User input setup --------------------------------------------------------
 
 N_replicate_total = 50
-split = 5
+N_split = 5
 
-N_replicate = N_replicate_total/split
+N_replicate = N_replicate_total/N_split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -40,8 +40,8 @@ method = 'ShapeInvPP'
 freq_trun_vec = c(1,5,10,15,20,25,30)
 
 default_setting = 'N_spks_total=30,N_subj=100,clus_sep=1.6'
-for (id_split in 1:split) {
-  if (save_res_details & (id_split == 1)) {
+for (id_N_split in 1:N_split) {
+  if (save_res_details & (id_N_split == 1)) {
     save_center_pdf_array = TRUE
   } else {
     save_center_pdf_array = FALSE
@@ -86,8 +86,8 @@ for (id_split in 1:split) {
 
 
 default_setting = 'N_spks_total=50,N_subj=100,clus_sep=1.6'
-for (id_split in 1:split) {
-  if (save_res_details & (id_split == 1)) {
+for (id_N_split in 1:N_split) {
+  if (save_res_details & (id_N_split == 1)) {
     save_center_pdf_array = TRUE
   } else {
     save_center_pdf_array = FALSE
@@ -132,8 +132,8 @@ for (id_split in 1:split) {
 
 
 default_setting = 'N_spks_total=100,N_subj=100,clus_sep=1.6'
-for (id_split in 1:split) {
-  if (save_res_details & (id_split == 1)) {
+for (id_N_split in 1:N_split) {
+  if (save_res_details & (id_N_split == 1)) {
     save_center_pdf_array = TRUE
   } else {
     save_center_pdf_array = FALSE

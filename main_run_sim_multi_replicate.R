@@ -20,9 +20,9 @@ library(parallel)
 # User input setup --------------------------------------------------------
 
 N_replicate_total = 20
-split = 2
+N_split = 2
 
-N_replicate = N_replicate_total/split
+N_replicate = N_replicate_total/N_split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -48,8 +48,8 @@ for (id_N_trial in 1:length(N_trial_list)) {
   N_trial = N_trial_list[[id_N_trial]]
   method = paste0('shape_inv_pp_v2','_N_trial',N_trial)
   default_setting = 'N_spks_total=100,N_subj=100,N_clus=4,clus_sep=1.3,N_comp=2'
-  for (id_split in 1:split) {
-    if (save_res_details & (id_split == 1)) {
+  for (id_N_split in 1:N_split) {
+    if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
     } else {
       save_center_pdf_array = FALSE

@@ -18,9 +18,9 @@ library(doParallel)
 # User input setup --------------------------------------------------------
 
 N_replicate_total = 20
-split = 2
+N_split = 2
 
-N_replicate = N_replicate_total/split
+N_replicate = N_replicate_total/N_split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -41,8 +41,8 @@ N_trial_list = list(1,2,3,4,5)
 for (jitter_level in c(0, 0.1, 0.2, 0.3, 0.5, 0.8)) {
   method = paste0('jitter_level_', as.character(jitter_level))
   default_setting = 'N_spks_total=100,N_subj=100,N_clus=4,clus_sep=1.3,N_comp=2'
-  for (id_split in 1:split) {
-    if (save_res_details & (id_split == 1)) {
+  for (id_N_split in 1:N_split) {
+    if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
     } else {
       save_center_pdf_array = FALSE

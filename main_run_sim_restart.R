@@ -18,9 +18,9 @@ library(parallel)
 # User input setup --------------------------------------------------------
 
 N_replicate_total = 50
-split = 5
+N_split = 5
 
-N_replicate = N_replicate_total/split
+N_replicate = N_replicate_total/N_split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -45,8 +45,8 @@ if (test_random_restart) {
     N_restart = N_restart_algo_list[[id_method]]
     method = paste0('shape_inv_pp_v2_', 'Rand_init_v2_Nrestart_algo', as.character(N_restart) )
     default_setting = 'N_spks_total=100,N_subj=100,N_clus=4,clus_sep=2,N_comp=2'
-    for (id_split in 1:split) {
-      if (save_res_details & (id_split == 1)) {
+    for (id_N_split in 1:N_split) {
+      if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
       } else {
         save_center_pdf_array = FALSE
@@ -54,7 +54,7 @@ if (test_random_restart) {
       for (id_N_trial in 1:length(N_trial_list)) {
         N_trial = N_trial_list[[id_N_trial]]
         results <- foreach(id_replicate = 1:N_replicate) %dopar% {
-          SEED = id_split * 1000 + id_N_trial * 100 + id_replicate + 10
+          SEED = id_N_split * 1000 + id_N_trial * 100 + id_replicate + 10
           print(paste0("SEED: ", SEED))
           tryCatch(main_v5_pdf(SEED = SEED,
                                N_subj = 100,
@@ -94,8 +94,8 @@ if (test_random_restart) {
   }
   method = paste0('shape_inv_pp_v2_', 'Nrestart_algo1_kmean5' )
   default_setting = 'N_spks_total=100,N_subj=100,N_clus=4,clus_sep=2,N_comp=2'
-  for (id_split in 1:split) {
-    if (save_res_details & (id_split == 1)) {
+  for (id_N_split in 1:N_split) {
+    if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
     } else {
       save_center_pdf_array = FALSE
@@ -103,7 +103,7 @@ if (test_random_restart) {
     for (id_N_trial in 1:length(N_trial_list)) {
       N_trial = N_trial_list[[id_N_trial]]
       results <- foreach(id_replicate = 1:N_replicate) %dopar% {
-        SEED = id_split * 1000 + id_N_trial * 100 + id_replicate + 10
+        SEED = id_N_split * 1000 + id_N_trial * 100 + id_replicate + 10
         print(paste0("SEED: ", SEED))
         tryCatch(main_v5_pdf(SEED = SEED,
                              N_subj = 100,
@@ -152,8 +152,8 @@ if (test_algorithm_restart) {
     method = paste0('Nrestart', '_algo', as.character(N_restart), 
                     '_kmean', as.character(N_start_kmean) )
     default_setting = 'N_spks_total=100,N_subj=100,N_clus=4,clus_sep=1.3,N_comp=2'
-    for (id_split in 1:split) {
-      if (save_res_details & (id_split == 1)) {
+    for (id_N_split in 1:N_split) {
+      if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
       } else {
         save_center_pdf_array = FALSE

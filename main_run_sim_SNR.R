@@ -18,9 +18,9 @@ library(doParallel)
 # User input setup --------------------------------------------------------
 
 N_replicate_total = 20
-split = 2
+N_split = 2
 
-N_replicate = N_replicate_total/split
+N_replicate = N_replicate_total/N_split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -43,8 +43,8 @@ N_subj_list = list(100, 200, 300, 400, 500)
 clus_sep_list = list(1.5, 1.6, 1.7, 1.8, 1.9, 2.0)
 
 default_setting = 'N_spks_total=50,N_subj=100,clus_sep=1.5'
-for (id_split in 1:split) {
-  if (save_res_details & (id_split == 1)) {
+for (id_N_split in 1:N_split) {
+  if (save_res_details & (id_N_split == 1)) {
     save_center_pdf_array = TRUE
   } else {
     save_center_pdf_array = FALSE

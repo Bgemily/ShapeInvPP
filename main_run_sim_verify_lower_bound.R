@@ -20,9 +20,9 @@ library(doParallel)
 # User input setup --------------------------------------------------------
 
 N_replicate_total = 20
-split = 2
+N_split = 2
 
-N_replicate = N_replicate_total/split
+N_replicate = N_replicate_total/N_split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -52,8 +52,8 @@ if (test_var_timeshift) {
   for (method in c('shape_inv_pp', 'v_eq_0')) {
     fix_timeshift = ifelse(method == 'v_eq_0', yes = TRUE, no = FALSE)
     default_setting = 'N_spks_total=30,N_subj=100,N_clus=1,N_comp=1'
-    for (id_split in 1:split) {
-      if (save_res_details & (id_split == 1)) {
+    for (id_N_split in 1:N_split) {
+      if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
       } else {
         save_center_pdf_array = FALSE
@@ -101,8 +101,8 @@ if (test_var_timeshift) {
 if (test_N_spks) {
   method = 'shape_inv_pp'
   default_setting = 'N_spks_total_varies,N_subj=100,N_clus=1,N_comp=1'
-  for (id_split in 1:split) {
-    if (save_res_details & (id_split == 1)) {
+  for (id_N_split in 1:N_split) {
+    if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
     } else {
       save_center_pdf_array = FALSE
