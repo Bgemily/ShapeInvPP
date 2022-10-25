@@ -47,7 +47,7 @@ select_model = function(spks_time_mlist,
     for (id_clus in 1:N_clus_tmp) {
       for (id_subj in clusters_list_tmp[[id_clus]]){
         for (id_replicate in 1:N_replicate) {
-          ### Calculate estimated intensity for current (node, replicate)
+          ### Calculate estimated intensity for current (subj, replicate)
           intensity_est = rep(0, length(t_vec))
           for (id_component in 1:N_component) {
             time_shift_tmp = v_mat_list_tmp[[id_component]][id_subj, id_replicate]
@@ -60,7 +60,7 @@ select_model = function(spks_time_mlist,
           log_intensity_est = rep(0, length(t_vec))
           log_intensity_est[which(intensity_est>0)] = log(intensity_est[which(intensity_est>0)])
           
-          ### Calculate observed intensity for current (node, replicate)
+          ### Calculate observed intensity for current (subj, replicate)
           event_time_vec_tmp = unlist(spks_time_mlist[id_subj, id_replicate])
           if(length(event_time_vec_tmp)==0){
             next

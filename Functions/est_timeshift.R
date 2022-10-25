@@ -111,7 +111,7 @@ est_timeshift = function(spks_time_mlist,
       
       dist_tmp_vec = rep(0, N_replicate)
       for (id_replicate in 1:N_replicate) {
-        # Get un-smoothed node density ----
+        # Get un-smoothed subj density ----
         spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
         spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial >= min(t_vec) & spks_time_subjtrial <= max(t_vec))]
         tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 

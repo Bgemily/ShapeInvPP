@@ -21,7 +21,7 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   N_clus = dim(center_density_array)[1]
   N_component = dim(center_density_array)[2]
   
-  ### Get time shift between each node and each cluster -----
+  ### Get time shift between each subj and each cluster -----
   if (is.null(v_mat_list)) {
     v_mat_list = rep(list(matrix(0, nrow = N_subj, ncol = N_replicate)), N_component)
     if (!is.null(v_trialwise_vec_list)) {
@@ -48,7 +48,7 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   dist_mat_tmp = tmp$dist_mat
   
   
-  ### Get distance between each node and each cluster -----
+  ### Get distance between each subj and each cluster -----
   dist_mat = matrix(0, nrow=N_subj, ncol=N_clus)
   for (id_clus in 1:N_clus) {
     N_spks_mat = matrix(nrow=N_subj, ncol=N_replicate)

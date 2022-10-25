@@ -687,7 +687,7 @@ load("/Users/ztzhang/Documents/Academic/SC/graphon/Results/Rdata/SNR_Vnot0_v4/ma
 lapply(results,'[[','F_mean_sq_err_history')->F_mean_sq_err_history_list_3
 
 plot(0:10,rep(0,11),type='l',ylim=c(0,1),col=0,xlab = 'Iteration',ylab="1-ARI",
-     main = 'Black/Red/Green: 30/66/150 nodes')
+     main = 'Black/Red/Green: 30/66/150 subjs')
 lines(1-ARI_history_list[[3]])
 lines(1-ARI_history_list_2[[4]],col=2)
 lines(1-ARI_history_list_3[[2]],col=3)
