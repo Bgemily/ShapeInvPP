@@ -17,10 +17,10 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_simtrial_total = 20
+N_xxxxxxxx_total = 20
 split = 2
 
-N_simtrial = N_simtrial_total/split
+N_xxxxxxxx = N_xxxxxxxx_total/split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -49,7 +49,7 @@ for (jitter_level in c(0, 0.1, 0.2, 0.3, 0.5, 0.8)) {
     }
     for (id_N_replicate in 1:length(N_replicate_list)) {
       N_replicate = N_replicate_list[[id_N_replicate]]
-      results <- foreach(j = 1:N_simtrial) %dopar% {
+      results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_v5_pdf(SEED = SEED,
                              N_subj = 100,
@@ -79,8 +79,8 @@ for (jitter_level in c(0, 0.1, 0.2, 0.3, 0.5, 0.8)) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
+      now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
       rm(results)
     }
   }

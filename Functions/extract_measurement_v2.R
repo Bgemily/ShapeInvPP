@@ -11,18 +11,18 @@ extract_measurement_v2 = function(folder_path, param_name=NULL, measurement=c("A
     file_name_vec = list.files(path = paste0(folder_path,"/",param_value), full.names = T, recursive = TRUE)
     for (file in file_name_vec) {
       load(file)
-      # Size of meas_value_mat: N_meas*N_simtrial
+      # Size of meas_value_mat: N_meas*N_xxxxxxxx
       if (FALSE){
         ind = which(measurement=='time_estimation')
-        time_est_value_vec = sapply(results, function(one_trial) tryCatch(as.numeric(one_trial[["time_estimation"]],
+        time_est_value_vec = sapply(results, function(one_xxxxxxxx) tryCatch(as.numeric(one_xxxxxxxx[["time_estimation"]],
                                                                                       units = 'secs'), 
                                                                           error=function(x)NA))  
-        meas_value_mat = sapply(results[sapply(results,is.list)], function(one_trial) tryCatch(unlist(one_trial[measurement[-ind]]), 
+        meas_value_mat = sapply(results[sapply(results,is.list)], function(one_xxxxxxxx) tryCatch(unlist(one_xxxxxxxx[measurement[-ind]]), 
                                                                       error=function(x)NA)) 
         meas_value_mat = rbind(meas_value_mat, time_est_value_vec)
         
       } else{
-        meas_value_mat = sapply(results[sapply(results,is.list)], function(one_trial) tryCatch(unlist(one_trial[measurement]), 
+        meas_value_mat = sapply(results[sapply(results,is.list)], function(one_xxxxxxxx) tryCatch(unlist(one_xxxxxxxx[measurement]), 
                                                                       error=function(x)NA))  
       }
       if (is.vector(meas_value_mat)) 

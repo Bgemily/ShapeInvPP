@@ -19,10 +19,10 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_simtrial_total = 10
+N_xxxxxxxx_total = 10
 split = 1
 
-N_simtrial = N_simtrial_total/split
+N_xxxxxxxx = N_xxxxxxxx_total/split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -59,7 +59,7 @@ if (test_N_component_2) {
     }
     for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
       timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
-      results <- foreach(j = 1:N_simtrial) %dopar% {
+      results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_kmeans_align(SEED = SEED,
                              N_subj = 100,
@@ -85,13 +85,13 @@ if (test_N_component_2) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
+      now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
       rm(results)
     }
     for (id_clus_sep in 1:length(clus_sep_list)) {
       clus_sep = clus_sep_list[[id_clus_sep]]
-      results <- foreach(j = 1:N_simtrial) %dopar% {
+      results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_kmeans_align(SEED = SEED,
                                    N_subj = 100,
@@ -117,13 +117,13 @@ if (test_N_component_2) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
+      now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
       rm(results)
     }
     for (id_N_subj in 1:length(N_subj_list)) {
       N_subj = N_subj_list[[id_N_subj]]
-      results <- foreach(j = 1:N_simtrial) %dopar% {
+      results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_kmeans_align(SEED = SEED,
                                    N_subj = N_subj,
@@ -149,8 +149,8 @@ if (test_N_component_2) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
+      now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
       rm(results)
     }
   }
@@ -167,7 +167,7 @@ if (test_N_component_1) {
     }
     for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
       timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
-      results <- foreach(j = 1:N_simtrial) %dopar% {
+      results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_kmeans_align(SEED = SEED,
                              N_subj = 100,
@@ -193,13 +193,13 @@ if (test_N_component_1) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
+      now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
       rm(results)
     }
     for (id_clus_sep in 1:length(clus_sep_list)) {
       clus_sep = clus_sep_list[[id_clus_sep]]
-      results <- foreach(j = 1:N_simtrial) %dopar% {
+      results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_kmeans_align(SEED = SEED,
                            N_subj = 100,
@@ -225,13 +225,13 @@ if (test_N_component_1) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
+      now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
       rm(results)
     }
     for (id_N_subj in 1:length(N_subj_list)) {
       N_subj = N_subj_list[[id_N_subj]]
-      results <- foreach(j = 1:N_simtrial) %dopar% {
+      results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_kmeans_align(SEED = SEED,
                                    N_subj = N_subj,
@@ -257,8 +257,8 @@ if (test_N_component_1) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
+      now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
       rm(results)
     }
   }
@@ -273,7 +273,7 @@ if (test_N_clus_1) {
   }
   for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
     timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
-    results <- foreach(j = 1:N_simtrial) %dopar% {
+    results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_kmeans_align(SEED = SEED,
                                  N_subj = 100,
@@ -297,13 +297,13 @@ if (test_N_clus_1) {
                          '/', param_name, '/', param_value)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     
-    now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
-    save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
+    now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
     rm(results)
   }
   for (id_N_subj in 1:length(N_subj_list)) {
     N_subj = N_subj_list[[id_N_subj]]
-    results <- foreach(j = 1:N_simtrial) %dopar% {
+    results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_kmeans_align(SEED = SEED,
                                  N_subj = N_subj,
@@ -327,8 +327,8 @@ if (test_N_clus_1) {
                          '/', param_name, '/', param_value)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     
-    now_simtrial = format(Sys.time(), "%Y%m%d_%H%M%S")
-    save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_simtrial, '.Rdata'))
+    now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
     rm(results)
   }
 }
