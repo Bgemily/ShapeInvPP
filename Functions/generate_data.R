@@ -9,6 +9,7 @@ generate_data = function(SEED=NULL,
                          t_vec_extend = t_vec,
                          N_spks_total = 1000,
                          timeshift_subj_max_vec = c(1/8, 1/32),
+                         timeshift_trial_max = 1/8,
                          ### params when N_clus==4:
                          clus_sep = 2,
                          ### params when N_clus==1:
@@ -31,7 +32,7 @@ generate_data = function(SEED=NULL,
   # Generate trial-wise time shifts -----------------------------------
   v_trialwise_vec_list = list()
   for (id_component in 1:2) {
-    v_tmp = runif(n = N_trial, min = 0, max = 1/8)
+    v_tmp = runif(n = N_trial, min = 0, max = timeshift_trial_max)
     v_tmp = v_tmp - min(v_tmp)
     v_trialwise_vec_list[[id_component]] = v_tmp
   }

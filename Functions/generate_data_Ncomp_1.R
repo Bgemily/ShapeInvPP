@@ -9,6 +9,7 @@ generate_data_Ncomp_1 = function(SEED=NULL,
                                  t_vec = seq(-u_0,u_1,by=0.01),
                                  t_vec_extend = t_vec,
                                  timeshift_subj_max_vec = c(1/8),
+                                 timeshift_trial_max = 1/8,
                                  ### params when N_clus==4:
                                  clus_sep = 2,
                                  ### unused params:
@@ -31,7 +32,7 @@ generate_data_Ncomp_1 = function(SEED=NULL,
   # Generate trial-wise time shifts -----------------------------------
   v_trialwise_vec_list = list()
   for (id_component in 1:1) {
-    v_tmp = runif(n = N_trial, min = 0, max = 1/8)
+    v_tmp = runif(n = N_trial, min = 0, max = timeshift_trial_max)
     v_tmp = v_tmp - min(v_tmp)
     v_trialwise_vec_list[[id_component]] = v_tmp
   }
