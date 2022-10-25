@@ -51,7 +51,7 @@ N_spks_list = list(50, 75, 100, 125, 150, 175, 200)
 if (test_var_timeshift) {
   for (method in c('shape_inv_pp', 'v_eq_0')) {
     fix_timeshift = ifelse(method == 'v_eq_0', yes = TRUE, no = FALSE)
-    default_setting = 'N_spks_total=30,N_node=100,N_clus=1,N_comp=1'
+    default_setting = 'N_spks_total=30,N_subj=100,N_clus=1,N_comp=1'
     for (id_split in 1:split) {
       if (save_res_details & (id_split == 1)) {
         save_center_pdf_array = TRUE
@@ -63,7 +63,7 @@ if (test_var_timeshift) {
         results <- foreach(j = 1:N_trial) %dopar% {
           SEED = sample(1:1e7,1)
           tryCatch(main_v5_pdf(SEED = SEED, 
-                               N_node = 100,
+                               N_subj = 100,
                                N_clus = 1, 
                                N_component_true = 1,
                                N_spks_total = 30,
@@ -100,7 +100,7 @@ if (test_var_timeshift) {
 
 if (test_N_spks) {
   method = 'shape_inv_pp'
-  default_setting = 'N_spks_total_varies,N_node=100,N_clus=1,N_comp=1'
+  default_setting = 'N_spks_total_varies,N_subj=100,N_clus=1,N_comp=1'
   for (id_split in 1:split) {
     if (save_res_details & (id_split == 1)) {
       save_center_pdf_array = TRUE
@@ -112,7 +112,7 @@ if (test_N_spks) {
       results <- foreach(j = 1:N_trial) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_v5_pdf(SEED = SEED, 
-                             N_node = 100,
+                             N_subj = 100,
                              N_clus = 1, 
                              N_component_true = 1,
                              N_spks_total = N_spks_total,

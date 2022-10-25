@@ -44,7 +44,7 @@ if (test_random_restart) {
   for (id_method in 1:length(N_restart_algo_list)) {
     N_restart = N_restart_algo_list[[id_method]]
     method = paste0('shape_inv_pp_v2_', 'Rand_init_v2_Nrestart_algo', as.character(N_restart) )
-    default_setting = 'N_spks_total=100,N_node=100,N_clus=4,clus_sep=2,N_comp=2'
+    default_setting = 'N_spks_total=100,N_subj=100,N_clus=4,clus_sep=2,N_comp=2'
     for (id_split in 1:split) {
       if (save_res_details & (id_split == 1)) {
         save_center_pdf_array = TRUE
@@ -57,7 +57,7 @@ if (test_random_restart) {
           SEED = id_split * 1000 + id_N_replicate * 100 + id_trial + 10
           print(paste0("SEED: ", SEED))
           tryCatch(main_v5_pdf(SEED = SEED,
-                               N_node = 100,
+                               N_subj = 100,
                                N_clus = 4,
                                N_component_true = 2,
                                t_vec = seq(-1, 1, by=0.01),
@@ -93,7 +93,7 @@ if (test_random_restart) {
     }
   }
   method = paste0('shape_inv_pp_v2_', 'Nrestart_algo1_kmean5' )
-  default_setting = 'N_spks_total=100,N_node=100,N_clus=4,clus_sep=2,N_comp=2'
+  default_setting = 'N_spks_total=100,N_subj=100,N_clus=4,clus_sep=2,N_comp=2'
   for (id_split in 1:split) {
     if (save_res_details & (id_split == 1)) {
       save_center_pdf_array = TRUE
@@ -106,7 +106,7 @@ if (test_random_restart) {
         SEED = id_split * 1000 + id_N_replicate * 100 + id_trial + 10
         print(paste0("SEED: ", SEED))
         tryCatch(main_v5_pdf(SEED = SEED,
-                             N_node = 100,
+                             N_subj = 100,
                              N_clus = 4,
                              N_component_true = 2,
                              t_vec = seq(-1, 1, by=0.01),
@@ -151,7 +151,7 @@ if (test_algorithm_restart) {
     N_start_kmean = N_restart_algo_N_start_kmean_list[[id_method]][2]
     method = paste0('Nrestart', '_algo', as.character(N_restart), 
                     '_kmean', as.character(N_start_kmean) )
-    default_setting = 'N_spks_total=100,N_node=100,N_clus=4,clus_sep=1.3,N_comp=2'
+    default_setting = 'N_spks_total=100,N_subj=100,N_clus=4,clus_sep=1.3,N_comp=2'
     for (id_split in 1:split) {
       if (save_res_details & (id_split == 1)) {
         save_center_pdf_array = TRUE
@@ -163,7 +163,7 @@ if (test_algorithm_restart) {
         results <- foreach(j = 1:N_trial) %dopar% {
           SEED = sample(1:1e7,1)
           tryCatch(main_v5_pdf(SEED = SEED,
-                               N_node = 100,
+                               N_subj = 100,
                                N_clus = 4,
                                N_component_true = 2,
                                t_vec = seq(-1, 1, by=0.01),

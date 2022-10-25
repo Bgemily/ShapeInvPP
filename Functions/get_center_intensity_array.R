@@ -21,7 +21,7 @@ get_center_intensity_array = function(spks_time_mlist,
 {  
   t_unit = t_vec[2]-t_vec[1]
   N_clus = length(clusters_list)
-  N_node = nrow(spks_time_mlist)
+  N_subj = nrow(spks_time_mlist)
   N_replicate = ncol(spks_time_mlist)
   
   

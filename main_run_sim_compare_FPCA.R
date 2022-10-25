@@ -47,7 +47,7 @@ timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
                               c(1/4, 1/16)*1.25, c(1/4, 1/16)*1.75)
 
 if (test_N_component_2){
-  default_setting = 'N_spks_total=100,N_node=100,N_clus=1,N_comp=2'
+  default_setting = 'N_spks_total=100,N_subj=100,N_clus=1,N_comp=2'
   for (id_split in 1:split) {
     if (save_res_details & (id_split == 1)) {
       save_center_pdf_array = TRUE
@@ -60,7 +60,7 @@ if (test_N_component_2){
       results <- foreach(j = 1:N_trial) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_fpca(SEED = SEED,
-                           N_node = 100,
+                           N_subj = 100,
                            N_clus = 1,
                            N_component_true = 2,
                            N_spks_total = 100,
@@ -91,7 +91,7 @@ if (test_N_component_2){
 }
 
 if (test_N_component_1) {
-  default_setting = 'N_spks_total=100,N_node=100,N_clus=1,N_comp=1'
+  default_setting = 'N_spks_total=100,N_subj=100,N_clus=1,N_comp=1'
   for (id_split in 1:split) {
     if (save_res_details & (id_split == 1)) {
       save_center_pdf_array = TRUE
@@ -104,7 +104,7 @@ if (test_N_component_1) {
       results <- foreach(j = 1:N_trial) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_fpca(SEED = SEED,
-                           N_node = 100,
+                           N_subj = 100,
                            N_clus = 1,
                            N_component_true = 1,
                            N_spks_total = 100,

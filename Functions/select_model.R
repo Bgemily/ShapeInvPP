@@ -13,7 +13,7 @@ select_model = function(spks_time_mlist,
   clus_entropy_vec = rep(0,length(result_list))
   penalty_vec = rep(0,length(result_list))
   
-  N_node = nrow(spks_time_mlist)
+  N_subj = nrow(spks_time_mlist)
   N_replicate = ncol(spks_time_mlist)
   
   for (id_res in 1:length(result_list)) {
@@ -26,7 +26,7 @@ select_model = function(spks_time_mlist,
     center_intensity_array_tmp = res_tmp$center_intensity_array
     center_Nspks_mat_tmp = res_tmp$center_Nspks_mat
     pi_vec = clus_size_vec / sum(clus_size_vec)
-    tau_mat = matrix(0, nrow = N_node*N_replicate, ncol = N_clus_tmp)
+    tau_mat = matrix(0, nrow = N_subj*N_replicate, ncol = N_clus_tmp)
     ### Let tau_{(i,r),q} == 1  if z_{i}=q
     for (q in 1:N_clus_tmp) {
       if (length(clusters_list_tmp[[q]]) >= 1){
@@ -87,7 +87,7 @@ select_model = function(spks_time_mlist,
       degr_free_curr_comp = length(which( (key_times_vec[id_component]<=t_vec) & (t_vec<=u_1-max(v_mat_list_tmp[[id_component]])) ))
       degr_free_vec[id_component] = degr_free_curr_comp
     }
-    penalty_tmp = 1/2 * log(N_node*N_replicate) * 
+    penalty_tmp = 1/2 * log(N_subj*N_replicate) * 
       ( (N_clus_tmp - 1) + N_clus_tmp * sum(degr_free_vec) ) 
       
     ### Compute ICL

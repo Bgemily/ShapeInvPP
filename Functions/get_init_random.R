@@ -22,7 +22,7 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
 {
   
   t_unit = t_vec[2] - t_vec[1]
-  N_node = nrow(spks_time_mlist)
+  N_subj = nrow(spks_time_mlist)
   N_replicate = ncol(spks_time_mlist)
   
   # Initialize time shifts -------------
@@ -37,13 +37,13 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
         }
       }
     } else{
-      v_vec = matrix(default_timeshift, nrow = N_node, ncol = N_replicate)
+      v_vec = matrix(default_timeshift, nrow = N_subj, ncol = N_replicate)
       v_mat_list = rep(list(v_vec), N_component)
     }
   } else{
     ### Use earliest spike times as subject-wise time shifts
-    v_subjwise_vec_list = rep(list(rep(0, N_node)), N_component)
-    for (id_node in 1:N_node) {
+    v_subjwise_vec_list = rep(list(rep(0, N_subj)), N_component)
+    for (id_node in 1:N_subj) {
       for (id_component in 1:N_component){
         spks_time_shifted_vec = c()
         for (id_replicate in 1:N_replicate) {
@@ -68,11 +68,11 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
     }
     
     ### Force minimum time shifts in each component to be trial-wise time shift
-    v_mat_list = rep(list(matrix(0, nrow = N_node, ncol = N_replicate)), N_component)
+    v_mat_list = rep(list(matrix(0, nrow = N_subj, ncol = N_replicate)), N_component)
     for (id_component in 1:N_component){
       v_subjwise_vec = v_subjwise_vec_list[[id_component]] - min(v_subjwise_vec_list[[id_component]])
       v_trialwise_vec = v_trialwise_vec_list[[id_component]]
-      v_mat_list[[id_component]] = matrix(v_subjwise_vec, nrow = N_node, ncol = N_replicate) + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_node, ncol = N_replicate)
+      v_mat_list[[id_component]] = matrix(v_subjwise_vec, nrow = N_subj, ncol = N_replicate) + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_subj, ncol = N_replicate)
       v_mat_list[[id_component]] = round(v_mat_list[[id_component]]/t_unit)*t_unit
     }
     
@@ -85,10 +85,10 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
   
   # Initialize clusters ---------------------------------------
   ### Smooth the point process 
-  node_intensity_array = array(dim=c(N_node, 1, length(t_vec)))
-  node_density_array = array(dim=c(N_node, 1, length(t_vec)))
-  node_Nspks_mat = matrix(nrow=N_node, ncol=1)
-  for (id_node in 1:N_node) {
+  node_intensity_array = array(dim=c(N_subj, 1, length(t_vec)))
+  node_density_array = array(dim=c(N_subj, 1, length(t_vec)))
+  node_Nspks_mat = matrix(nrow=N_subj, ncol=1)
+  for (id_node in 1:N_subj) {
     spks_time_vec_tmp = unlist(spks_time_mlist[id_node, ])
     tmp = get_smoothed_pp(event_time_vec = spks_time_vec_tmp, 
                           freq_trun = freq_trun, 

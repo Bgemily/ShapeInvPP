@@ -16,18 +16,18 @@ get_timeshift_and_clusters = function(spks_time_mlist,
                                       gamma)
 {
   t_unit = t_vec[2]-t_vec[1]
-  N_node = nrow(spks_time_mlist)
+  N_subj = nrow(spks_time_mlist)
   N_replicate = ncol(spks_time_mlist)
   N_clus = dim(center_density_array)[1]
   N_component = dim(center_density_array)[2]
   
   ### Get time shift between each node and each cluster -----
   if (is.null(v_mat_list)) {
-    v_mat_list = rep(list(matrix(0, nrow = N_node, ncol = N_replicate)), N_component)
+    v_mat_list = rep(list(matrix(0, nrow = N_subj, ncol = N_replicate)), N_component)
     if (!is.null(v_trialwise_vec_list)) {
       for (id_component in 1:N_component) {
         v_trialwise_vec = v_trialwise_vec_list[[id_component]]
-        v_mat_list[[id_component]] = v_mat_list[[id_component]]  + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_node, ncol = N_replicate)
+        v_mat_list[[id_component]] = v_mat_list[[id_component]]  + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_subj, ncol = N_replicate)
       }
     }
   }
@@ -49,10 +49,10 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   
   
   ### Get distance between each node and each cluster -----
-  dist_mat = matrix(0, nrow=N_node, ncol=N_clus)
+  dist_mat = matrix(0, nrow=N_subj, ncol=N_clus)
   for (id_clus in 1:N_clus) {
-    N_spks_mat = matrix(nrow=N_node, ncol=N_replicate)
-    for (id_node in 1:N_node) {
+    N_spks_mat = matrix(nrow=N_subj, ncol=N_replicate)
+    for (id_node in 1:N_subj) {
       for (id_replicate in 1:N_replicate) {
         spks_time_mi_vec = spks_time_mlist[id_node, id_replicate][[1]] - stim_onset_vec[id_replicate] 
         spks_time_mi_vec = spks_time_mi_vec[which(spks_time_mi_vec<=max(t_vec) &
@@ -71,9 +71,9 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   
   
   ### Select memberships to minimize total distance -----
-  membership = numeric(N_node)
-  dist_to_centr_vec = numeric(N_node)
-  for (i in 1:N_node) {
+  membership = numeric(N_subj)
+  dist_to_centr_vec = numeric(N_subj)
+  for (i in 1:N_subj) {
     dist_vec_tmp = dist_mat[i, ]
     mem_tmp = which.min(dist_vec_tmp)
     if(length(mem_tmp)>1){

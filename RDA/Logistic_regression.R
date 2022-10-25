@@ -64,19 +64,19 @@ for (method in method_vec){
              #            brain_area=as_factor(brain_area,),
              mem=as_factor(mem)) %>%
       group_by(id_trial, id_session, response_type, brain_area, mem, .drop=F) %>%
-      summarise(N_node_pertrialmem=n()) %>%
+      summarise(N_subj_pertrialmem=n()) %>%
       group_by(id_trial, id_session, response_type, brain_area, .drop=F) %>%
-      mutate(N_node_pertrial=sum(N_node_pertrialmem), 
-             prop_node_pertrialmem=N_node_pertrialmem/(N_node_pertrial+.Machine$double.eps)) %>%
-      filter(N_node_pertrial>0) %>%
+      mutate(N_subj_pertrial=sum(N_subj_pertrialmem), 
+             prop_node_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
+      filter(N_subj_pertrial>0) %>%
       group_by(response_type, brain_area, mem) %>%
-      mutate(N_node_perresptype_mem = sum(N_node_pertrialmem)) %>%
+      mutate(N_subj_perresptype_mem = sum(N_subj_pertrialmem)) %>%
       group_by(response_type, brain_area) %>%
-      mutate(prop_node_perresptype_mem = N_node_perresptype_mem/sum(N_node_pertrialmem)) %>%
+      mutate(prop_node_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
       group_by(response_type, brain_area, id_session, mem) %>%
-      mutate(N_node_perresptype_session_mem = sum(N_node_pertrialmem)) %>%
+      mutate(N_subj_perresptype_session_mem = sum(N_subj_pertrialmem)) %>%
       group_by(response_type, brain_area, id_session) %>%
-      mutate(prop_node_perresptype_session_mem = N_node_perresptype_session_mem/sum(N_node_pertrialmem)) %>%
+      mutate(prop_node_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
       mutate(brain_area=factor(brain_area)) %>%
       ungroup()
     df_long = df_tmp3.1
@@ -177,19 +177,19 @@ for (method in method_vec){
              #            brain_area=as_factor(brain_area,),
              mem=as_factor(mem)) %>%
       group_by(id_trial, id_session, pre_feedback_type, brain_area, mem, .drop=F) %>%
-      summarise(N_node_pertrialmem=n()) %>%
+      summarise(N_subj_pertrialmem=n()) %>%
       group_by(id_trial, id_session, pre_feedback_type, brain_area, .drop=F) %>%
-      mutate(N_node_pertrial=sum(N_node_pertrialmem), 
-             prop_node_pertrialmem=N_node_pertrialmem/(N_node_pertrial+.Machine$double.eps)) %>%
-      filter(N_node_pertrial>0) %>%
+      mutate(N_subj_pertrial=sum(N_subj_pertrialmem), 
+             prop_node_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
+      filter(N_subj_pertrial>0) %>%
       group_by(pre_feedback_type, brain_area, mem) %>%
-      mutate(N_node_perresptype_mem = sum(N_node_pertrialmem)) %>%
+      mutate(N_subj_perresptype_mem = sum(N_subj_pertrialmem)) %>%
       group_by(pre_feedback_type, brain_area) %>%
-      mutate(prop_node_perresptype_mem = N_node_perresptype_mem/sum(N_node_pertrialmem)) %>%
+      mutate(prop_node_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
       group_by(pre_feedback_type, brain_area, id_session, mem) %>%
-      mutate(N_node_perresptype_session_mem = sum(N_node_pertrialmem)) %>%
+      mutate(N_subj_perresptype_session_mem = sum(N_subj_pertrialmem)) %>%
       group_by(pre_feedback_type, brain_area, id_session) %>%
-      mutate(prop_node_perresptype_session_mem = N_node_perresptype_session_mem/sum(N_node_pertrialmem)) %>%
+      mutate(prop_node_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
       mutate(brain_area=factor(brain_area)) %>%
       ungroup()
     df_long = df_tmp3.1
@@ -322,19 +322,19 @@ for (method in method_vec){
 #              #            brain_area=as_factor(brain_area,),
 #              mem=as_factor(mem)) %>%
 #       group_by(id_trial, id_session, response_type, brain_area, mem, .drop=F) %>%
-#       summarise(N_node_pertrialmem=n()) %>%
+#       summarise(N_subj_pertrialmem=n()) %>%
 #       group_by(id_trial, id_session, response_type, brain_area, .drop=F) %>%
-#       mutate(N_node_pertrial=sum(N_node_pertrialmem), 
-#              prop_node_pertrialmem=N_node_pertrialmem/(N_node_pertrial+.Machine$double.eps)) %>%
-#       filter(N_node_pertrial>0) %>%
+#       mutate(N_subj_pertrial=sum(N_subj_pertrialmem), 
+#              prop_node_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
+#       filter(N_subj_pertrial>0) %>%
 #       group_by(response_type, brain_area, mem) %>%
-#       mutate(N_node_perresptype_mem = sum(N_node_pertrialmem)) %>%
+#       mutate(N_subj_perresptype_mem = sum(N_subj_pertrialmem)) %>%
 #       group_by(response_type, brain_area) %>%
-#       mutate(prop_node_perresptype_mem = N_node_perresptype_mem/sum(N_node_pertrialmem)) %>%
+#       mutate(prop_node_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
 #       group_by(response_type, brain_area, id_session, mem) %>%
-#       mutate(N_node_perresptype_session_mem = sum(N_node_pertrialmem)) %>%
+#       mutate(N_subj_perresptype_session_mem = sum(N_subj_pertrialmem)) %>%
 #       group_by(response_type, brain_area, id_session) %>%
-#       mutate(prop_node_perresptype_session_mem = N_node_perresptype_session_mem/sum(N_node_pertrialmem)) %>%
+#       mutate(prop_node_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
 #       mutate(brain_area=factor(brain_area)) %>%
 #       ungroup()
 #     df_long = df_tmp3.1
@@ -435,19 +435,19 @@ for (method in method_vec){
 #              #            brain_area=as_factor(brain_area,),
 #              mem=as_factor(mem)) %>%
 #       group_by(id_trial, id_session, pre_feedback_type, brain_area, mem, .drop=F) %>%
-#       summarise(N_node_pertrialmem=n()) %>%
+#       summarise(N_subj_pertrialmem=n()) %>%
 #       group_by(id_trial, id_session, pre_feedback_type, brain_area, .drop=F) %>%
-#       mutate(N_node_pertrial=sum(N_node_pertrialmem), 
-#              prop_node_pertrialmem=N_node_pertrialmem/(N_node_pertrial+.Machine$double.eps)) %>%
-#       filter(N_node_pertrial>0) %>%
+#       mutate(N_subj_pertrial=sum(N_subj_pertrialmem), 
+#              prop_node_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
+#       filter(N_subj_pertrial>0) %>%
 #       group_by(pre_feedback_type, brain_area, mem) %>%
-#       mutate(N_node_perresptype_mem = sum(N_node_pertrialmem)) %>%
+#       mutate(N_subj_perresptype_mem = sum(N_subj_pertrialmem)) %>%
 #       group_by(pre_feedback_type, brain_area) %>%
-#       mutate(prop_node_perresptype_mem = N_node_perresptype_mem/sum(N_node_pertrialmem)) %>%
+#       mutate(prop_node_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
 #       group_by(pre_feedback_type, brain_area, id_session, mem) %>%
-#       mutate(N_node_perresptype_session_mem = sum(N_node_pertrialmem)) %>%
+#       mutate(N_subj_perresptype_session_mem = sum(N_subj_pertrialmem)) %>%
 #       group_by(pre_feedback_type, brain_area, id_session) %>%
-#       mutate(prop_node_perresptype_session_mem = N_node_perresptype_session_mem/sum(N_node_pertrialmem)) %>%
+#       mutate(prop_node_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
 #       mutate(brain_area=factor(brain_area)) %>%
 #       ungroup()
 #     df_long = df_tmp3.1

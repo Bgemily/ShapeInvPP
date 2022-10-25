@@ -98,21 +98,21 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %dopar% {
         brain_area_1 = dat$brain_area[id_node_vec_1]
         
         
-        ### Reshape: N_node x N_trial -> (N_node*N_trial) x 1
-        N_node = length(id_node_vec_1)
+        ### Reshape: N_subj x N_trial -> (N_subj*N_trial) x 1
+        N_subj = length(id_node_vec_1)
         N_trial = length(id_trial_vec_1)
         spks_time_mlist_2 = matrix(t(spks_time_mlist_1),
                                    nrow=length(spks_time_mlist_1),
                                    ncol=1)
-        stim_onset_vec_2 = rep(stim_onset_vec_1, N_node)
-        id_trial_vec_2 = rep(id_trial_vec_1, N_node)
-        pre_feedback_type_vec_2 = rep(pre_feedback_type_vec_1, N_node)
-        response_type_vec_2 = rep(response_type_vec_1, N_node)
-        is_passive_vec_2 = rep(is_passive_vec_1, N_node)
+        stim_onset_vec_2 = rep(stim_onset_vec_1, N_subj)
+        id_trial_vec_2 = rep(id_trial_vec_1, N_subj)
+        pre_feedback_type_vec_2 = rep(pre_feedback_type_vec_1, N_subj)
+        response_type_vec_2 = rep(response_type_vec_1, N_subj)
+        is_passive_vec_2 = rep(is_passive_vec_1, N_subj)
         id_node_vec_2 = rep(id_node_vec_1, each=N_trial)
         brain_area_2 = rep(brain_area_1, each=N_trial)
         
-        ### Align (N_node*N_trial) spike trains by their stimuli onset time
+        ### Align (N_subj*N_trial) spike trains by their stimuli onset time
         spks_time_mlist_3 = spks_time_mlist_2
         for (id_nodetrial in 1:nrow(spks_time_mlist_2)) {
           spks_time_mlist_3[id_nodetrial,1] = list(spks_time_mlist_2[id_nodetrial,1][[1]] - stim_onset_vec_2[id_nodetrial])
@@ -149,10 +149,10 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %dopar% {
     t_vec=seq(0-v1, v0, length.out=200)
     id_clus_splitted_vec = c(1)
     
-    N_node = nrow(spks_time_mlist_full)
+    N_subj = nrow(spks_time_mlist_full)
     N_trial = ncol(spks_time_mlist_full)
-    N_spks_vec = rep(0, N_node)
-    for (id_node in 1:N_node){
+    N_spks_vec = rep(0, N_subj)
+    for (id_node in 1:N_subj){
       for (id_trial in 1:N_trial){
         spks_time_tmp = unlist(spks_time_mlist_full[id_node,id_trial]) - stim_onset_vec_full[id_trial]
         spks_time_tmp = spks_time_tmp[which(spks_time_tmp<=max(t_vec) & 

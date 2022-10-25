@@ -17,14 +17,14 @@ est_timeshift = function(spks_time_mlist,
                          bw=0)
 {
   t_unit = t_vec[2]-t_vec[1]
-  N_node = nrow(spks_time_mlist)
+  N_subj = nrow(spks_time_mlist)
   N_replicate = ncol(spks_time_mlist)
   N_clus = dim(center_density_array)[1]
   
   
-  v_mat = matrix(nrow = N_node, ncol = N_clus)
-  v_array_list = rep(list(array(dim = c(N_node, N_replicate, N_clus))), N_component)
-  dist_mat = matrix(nrow = N_node, ncol = N_clus)
+  v_mat = matrix(nrow = N_subj, ncol = N_clus)
+  v_array_list = rep(list(array(dim = c(N_subj, N_replicate, N_clus))), N_component)
+  dist_mat = matrix(nrow = N_subj, ncol = N_clus)
   center_density_smooth_array = 0 * center_density_array
   for (id_clus in 1:N_clus) {
     # Smooth center densities -----
@@ -40,7 +40,7 @@ est_timeshift = function(spks_time_mlist,
     f_origin_mat = matrix(nrow = N_component, ncol = length(t_vec))
     f_origin_mat[1:N_component, ] = center_density_smooth_array[id_clus, 1:N_component, ]
     
-    for (id_node in 1:N_node) {
+    for (id_node in 1:N_subj) {
       # Smooth point process -------
       f_target_mat = matrix(nrow = N_replicate, ncol = length(t_vec))
       N_spks_trialwise_vec = rep(0, N_replicate)

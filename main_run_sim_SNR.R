@@ -39,10 +39,10 @@ method = 'timeshifts_est_v1.4'
 ### Parameters' possible values:
 N_spks_total_list = list(50, 100, 150, 200, 250)
 N_replicate_list = list(1,2,3,4,5)
-N_node_list = list(100, 200, 300, 400, 500)
+N_subj_list = list(100, 200, 300, 400, 500)
 clus_sep_list = list(1.5, 1.6, 1.7, 1.8, 1.9, 2.0)
 
-default_setting = 'N_spks_total=50,N_node=100,clus_sep=1.5'
+default_setting = 'N_spks_total=50,N_subj=100,clus_sep=1.5'
 for (id_split in 1:split) {
   if (save_res_details & (id_split == 1)) {
     save_center_pdf_array = TRUE
@@ -55,7 +55,7 @@ for (id_split in 1:split) {
     results <- foreach(j = 1:N_trial) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_v5_pdf(SEED = SEED,
-                           N_node = 100,
+                           N_subj = 100,
                            N_clus = 4,
                            N_component_true = 2,
                            t_vec = seq(-1, 1, by=0.01),
@@ -92,7 +92,7 @@ for (id_split in 1:split) {
     results <- foreach(j = 1:N_trial) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_v5_pdf(SEED = SEED,
-                           N_node = 100,
+                           N_subj = 100,
                            N_clus = 4,
                            N_component_true = 2,
                            t_vec = seq(-1, 1, by=0.01),
@@ -123,13 +123,13 @@ for (id_split in 1:split) {
     rm(results)
   }
   
-  ### N_node
-  for (id_N_node in 1:length(N_node_list)) {
-    N_node = N_node_list[[id_N_node]]
+  ### N_subj
+  for (id_N_subj in 1:length(N_subj_list)) {
+    N_subj = N_subj_list[[id_N_subj]]
     results <- foreach(j = 1:N_trial) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_v5_pdf(SEED = SEED,
-                           N_node = N_node,
+                           N_subj = N_subj,
                            N_clus = 4,
                            N_component_true = 2,
                            t_vec = seq(-1, 1, by=0.01),
@@ -146,8 +146,8 @@ for (id_split in 1:split) {
                            save_center_pdf_array = save_center_pdf_array ),
                error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
-    param_name = "N_node"
-    param_value = N_node
+    param_name = "N_subj"
+    param_value = N_subj
     folder_path = paste0(top_level_folder,
                          '/', setup,
                          '/', method, 

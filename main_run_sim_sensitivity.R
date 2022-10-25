@@ -39,7 +39,7 @@ method = 'ShapeInvPP'
 ### Parameters' possible values:
 freq_trun_vec = c(1,5,10,15,20,25,30)
 
-default_setting = 'N_spks_total=30,N_node=100,clus_sep=1.6'
+default_setting = 'N_spks_total=30,N_subj=100,clus_sep=1.6'
 for (id_split in 1:split) {
   if (save_res_details & (id_split == 1)) {
     save_center_pdf_array = TRUE
@@ -51,7 +51,7 @@ for (id_split in 1:split) {
     results <- foreach(j = 1:N_trial) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_v5_pdf(SEED = SEED,
-                           N_node = 100,
+                           N_subj = 100,
                            N_clus = 4,
                            N_component_true = 2,
                            t_vec = seq(-1, 1, by=0.01),
@@ -85,7 +85,7 @@ for (id_split in 1:split) {
 }
 
 
-default_setting = 'N_spks_total=50,N_node=100,clus_sep=1.6'
+default_setting = 'N_spks_total=50,N_subj=100,clus_sep=1.6'
 for (id_split in 1:split) {
   if (save_res_details & (id_split == 1)) {
     save_center_pdf_array = TRUE
@@ -97,7 +97,7 @@ for (id_split in 1:split) {
     results <- foreach(j = 1:N_trial) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_v5_pdf(SEED = SEED,
-                           N_node = 100,
+                           N_subj = 100,
                            N_clus = 4,
                            N_component_true = 2,
                            t_vec = seq(-1, 1, by=0.01),
@@ -131,7 +131,7 @@ for (id_split in 1:split) {
 }
 
 
-default_setting = 'N_spks_total=100,N_node=100,clus_sep=1.6'
+default_setting = 'N_spks_total=100,N_subj=100,clus_sep=1.6'
 for (id_split in 1:split) {
   if (save_res_details & (id_split == 1)) {
     save_center_pdf_array = TRUE
@@ -143,7 +143,7 @@ for (id_split in 1:split) {
     results <- foreach(j = 1:N_trial) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_v5_pdf(SEED = SEED,
-                           N_node = 100,
+                           N_subj = 100,
                            N_clus = 4,
                            N_component_true = 2,
                            t_vec = seq(-1, 1, by=0.01),

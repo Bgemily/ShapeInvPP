@@ -1,9 +1,9 @@
 ### Generate synthetic point processes
 generate_data = function(SEED=NULL,
-                         N_node=100, 
+                         N_subj=100, 
                          N_replicate=1,
                          N_clus=2, 
-                         clus_size_vec = rep(N_node/N_clus, N_clus),
+                         clus_size_vec = rep(N_subj/N_clus, N_clus),
                          u_1 = 1, u_0 = 1,
                          t_vec = seq(-u_0,u_1,by=0.01),
                          t_vec_extend = t_vec,
@@ -38,23 +38,23 @@ generate_data = function(SEED=NULL,
   
   # Generate time shifts ----------------------------------------------------
   v_mat_list = list()
-  v_mat_list[[1]] = runif(n=N_node, 
+  v_mat_list[[1]] = runif(n=N_subj, 
                           min = 0,
                           max = timeshift_max_vec[1])  
-  v_mat_list[[1]] = matrix(v_mat_list[[1]], nrow = N_node, ncol = N_replicate)
-  v_mat_list[[2]] = runif(n = N_node,
+  v_mat_list[[1]] = matrix(v_mat_list[[1]], nrow = N_subj, ncol = N_replicate)
+  v_mat_list[[2]] = runif(n = N_subj,
                           min = 0,
                           max = timeshift_max_vec[2] )
-  v_mat_list[[2]] = matrix(v_mat_list[[2]], nrow = N_node, ncol = N_replicate)
+  v_mat_list[[2]] = matrix(v_mat_list[[2]], nrow = N_subj, ncol = N_replicate)
   for(id_clus in 1:N_clus){
     v_mat_list[[1]][clus_true_list[[id_clus]], ] = v_mat_list[[1]][clus_true_list[[id_clus]], ] - min(v_mat_list[[1]][clus_true_list[[id_clus]], ])
     v_mat_list[[2]][clus_true_list[[id_clus]], ] = v_mat_list[[2]][clus_true_list[[id_clus]], ] - min(v_mat_list[[2]][clus_true_list[[id_clus]], ])
   }
   
   v_mat_list[[1]] = v_mat_list[[1]] + matrix(v_trialwise_vec_list[[1]], byrow = TRUE, 
-                                             nrow = N_node, ncol = N_replicate)
+                                             nrow = N_subj, ncol = N_replicate)
   v_mat_list[[2]] = v_mat_list[[2]] + matrix(v_trialwise_vec_list[[2]], byrow = TRUE, 
-                                             nrow = N_node, ncol = N_replicate)
+                                             nrow = N_subj, ncol = N_replicate)
   
   
   # Generate expected number of spikes --------------------------------------------
@@ -190,7 +190,7 @@ generate_data = function(SEED=NULL,
   
   
   stim_onset_vec = rep(0, N_replicate)
-  spks_time_mlist = matrix(list(), nrow = N_node, ncol = N_replicate)
+  spks_time_mlist = matrix(list(), nrow = N_subj, ncol = N_replicate)
   for (id_clus in 1:N_clus) {
     for (id_node in clus_true_list[[id_clus]]) {
       for (id_replicate in 1:N_replicate) {

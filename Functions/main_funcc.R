@@ -3,7 +3,7 @@
 
 main_funcc = function(### Parameters for generative model
   SEED, 
-  N_node = 100,
+  N_subj = 100,
   N_replicate = 1,
   N_clus=2, 
   N_component_true = 2,
@@ -35,7 +35,7 @@ main_funcc = function(### Parameters for generative model
   # Generate data -------------------------------------------------------
   ### Extract network related parameters 
   data_param = list(SEED=SEED,
-                    N_node=N_node,
+                    N_subj=N_subj,
                     N_replicate=N_replicate,
                     N_clus=N_clus, 
                     u_1=u_1, u_0=u_0,
@@ -68,8 +68,8 @@ main_funcc = function(### Parameters for generative model
   v_true_mat_list = data_generated$v_mat_list
   
   # Prepare data for FunCC ######
-  density_array = array(dim = c(N_node, N_component, length(t_vec)))
-  for (id_node in 1:N_node){
+  density_array = array(dim = c(N_subj, N_component, length(t_vec)))
+  for (id_node in 1:N_subj){
     res_smooth = density(spks_time_mlist[[id_node]], bw = bw, 
                          from = min(t_vec), to = max(t_vec),
                          n = length(t_vec))
@@ -98,8 +98,8 @@ main_funcc = function(### Parameters for generative model
     mem = as.numeric(as.factor(mem))
     clusters_list_est = mem2clus(mem, N_clus_min = length(unique(mem)))
   } else {
-    mem = rep(1, N_node)
-    clusters_list_est = list(1:N_node)
+    mem = rep(1, N_subj)
+    clusters_list_est = list(1:N_subj)
   }
   
   # Get densities

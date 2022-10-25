@@ -47,7 +47,7 @@ timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*0.75,
                               c(1/4, 1/16)*1.25, c(1/4, 1/16)*1.5,
                               c(1/4, 1/16)*1.75, c(1/4, 1/16)*2)
 
-default_setting = 'N_spks_total=100,N_node=100,N_clus=1,N_comp=2'
+default_setting = 'N_spks_total=100,N_subj=100,N_clus=1,N_comp=2'
 for (id_split in 1:split) {
   if (save_res_details & (id_split == 1)) {
     save_center_pdf_array = TRUE
@@ -59,7 +59,7 @@ for (id_split in 1:split) {
     results <- foreach(j = 1:N_trial) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_v5_pdf(SEED = SEED, 
-                           N_node = 100,
+                           N_subj = 100,
                            N_clus = 1, 
                            N_component_true = 2,
                            N_spks_total = 100,

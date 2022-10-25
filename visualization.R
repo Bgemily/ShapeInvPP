@@ -311,7 +311,7 @@ for (param_name in param_name_vec) {
                   "time_per_iter"='Cmpt time per iter (s)',
                   "N_iteration"='Number of iterations',
                   measurement) ) +
-      xlab(switch(param_name, 'n'='N_node',param_name))
+      xlab(switch(param_name, 'n'='N_subj',param_name))
     if (measurement=='time_est') {
       g = g +
         scale_x_continuous(limits = c(30,150), breaks=c(30,60,90,120,150))+
@@ -768,7 +768,7 @@ for (param_name in param_name_vec) {
                                          "f_mse" = c(0,0.025),
                                          "1-ARI" = c(0,1) )) +
       ylab(measurement) +
-      xlab(switch(param_name, 'n'='N_node',param_name))
+      xlab(switch(param_name, 'n'='N_subj',param_name))
     
     print(g)
     dev.off()
@@ -778,7 +778,7 @@ for (param_name in param_name_vec) {
 
 
 
-# pdf performance vs N_node (V!=0) ------------------------------------------------------------
+# pdf performance vs N_subj (V!=0) ------------------------------------------------------------
 path_vec = rep(0,5)
 
 path_vec[1] = "../Results/Rdata/SNR_Vnot0_v4/main_v5_cdf_v2_multi_Nclus/pr=0.9,n=60,beta=1.9,V=80,N_grid=20/"
@@ -803,7 +803,7 @@ for (param_name in param_name_vec) {
   for (measurement in c("1-ARI","f_mse","V_mse")) {
     pdf(file=paste0("../Results/Plots/Temp/", 
                     if_else(measurement=="1-ARI", true = "ARI", false = measurement),
-                    '_', 'vs', '_', "N_node", ".pdf"), 
+                    '_', 'vs', '_', "N_subj", ".pdf"), 
         width = 4, height = 4)
     g = results_df %>% 
       ggplot(aes(x=param_value, 
@@ -826,7 +826,7 @@ for (param_name in param_name_vec) {
                                          "1-ARI" = c(0,1),
                                          "f_mse" = c())) +
       ylab(measurement) +
-      xlab("N_node")
+      xlab("N_subj")
     
     print(g)
     dev.off()
@@ -870,7 +870,7 @@ for (param_name in param_name_vec) {
   for (measurement in c("1-ARI","f_mse","V_mse")) {
     pdf(file=paste0("../Results/Plots/Temp/", 
                     if_else(measurement=="1-ARI", true = "ARI", false = measurement),
-                    '_', 'vs', '_', "N_node", ".pdf"), 
+                    '_', 'vs', '_', "N_subj", ".pdf"), 
         width = 4, height = 4)
     g = results_df %>% 
       ggplot(aes(x=param_value, 
@@ -893,7 +893,7 @@ for (param_name in param_name_vec) {
                                          "1-ARI" = c(0,1),
                                          "f_mse" = c())) +
       ylab(measurement) +
-      xlab("N_node")
+      xlab("N_subj")
     
     print(g)
     dev.off()
@@ -930,7 +930,7 @@ for (param_name in param_name_vec) {
   ### Plot ARI/F_mse vs n/beta/V
   for (measurement in c("N_clus_est")) {
     pdf(file=paste0("../Results/Plots/Temp/", 
-                    switch(param_name, "beta"="Beta", "n"="N_node", "V"="V"), '_', 
+                    switch(param_name, "beta"="Beta", "n"="N_subj", "V"="V"), '_', 
                     if_else(measurement=="1-ARI", true = "ARI", false = measurement), ".pdf"), 
         width = 4, height = 2.5)
     g = results_df %>% 
@@ -1013,7 +1013,7 @@ for (param_name in param_name_vec) {
   ### Plot ARI/F_mse vs n/beta/V
   for (measurement in c("1-ARI","f_mse","V_mse")) {
     pdf(file=paste0("../Results/Plots/Temp/", 
-                    switch(param_name, "beta"="Beta", "n"="N_node", "V"="V"), '_', 
+                    switch(param_name, "beta"="Beta", "n"="N_subj", "V"="V"), '_', 
                     if_else(measurement=="1-ARI", true = "ARI", false = measurement), ".pdf"), 
         width = 6, height = 3)
     g = results_df %>% 
@@ -1076,7 +1076,7 @@ for (param_name in param_name_vec) {
   ### Plot ARI/F_mse vs n/beta/V
   for (measurement in c("1-ARI","f_mse")) {
     pdf(file=paste0("../Results/Plots/Temp/", 
-                    switch(param_name, "beta"="Beta", "n"="N_node", "V"="V"), '_', 
+                    switch(param_name, "beta"="Beta", "n"="N_subj", "V"="V"), '_', 
                     if_else(measurement=="1-ARI", true = "ARI", false = measurement), ".pdf"), 
         width = 4, height = 2.5)
     g = results_df %>% 
