@@ -11,7 +11,7 @@ main_kcfc = function(### Parameters for generative model
   t_vec = seq(-u_0,u_1,by=0.01),
   t_vec_extend = t_vec,
   N_spks_total = 1000,
-  timeshift_max_vec = c(1/8, 1/32),
+  timeshift_subj_max_vec = c(1/8, 1/32),
   ### params when N_clus==4:
   clus_sep = 2,
   ### params when N_clus==1:
@@ -39,7 +39,7 @@ main_kcfc = function(### Parameters for generative model
                     t_vec=t_vec,
                     t_vec_extend=t_vec_extend,
                     N_spks_total = N_spks_total,
-                    timeshift_max_vec = timeshift_max_vec,
+                    timeshift_subj_max_vec = timeshift_subj_max_vec,
                     clus_sep = clus_sep,
                     N_spks_ratio = N_spks_ratio,
                     sd_shrinkage = sd_shrinkage,
@@ -134,7 +134,7 @@ main_kcfc = function(### Parameters for generative model
       v_fpca_vec = -fpc_scores_mat[, id_component] * (inner_prod^(-1))
       v_mean_fpca_vec = -min(v_fpca_vec)
       if (v_mean_fpca_vec > (max(t_vec)-min(t_vec)) ) {
-        v_mean_fpca_vec = 1/2 * data_param$timeshift_max_vec[id_component]
+        v_mean_fpca_vec = 1/2 * data_param$timeshift_subj_max_vec[id_component]
       }
       
       density_shifted_vec = calculate_antideriv(x_vec = t_fpca_vec, gradient_vec = derivative_density_shifted_vec)
@@ -275,7 +275,7 @@ main_kcfc = function(### Parameters for generative model
     # Compute error of time shifts, i.e. w, v --------------------------------------------
     v_mean_sq_err_vec = sapply(1:N_component, function(id_component){
       mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2) /
-        ( 2*timeshift_max_vec[id_component] )^2
+        ( 2*timeshift_subj_max_vec[id_component] )^2
     })
     v_mean_sq_err = mean(v_mean_sq_err_vec)
     

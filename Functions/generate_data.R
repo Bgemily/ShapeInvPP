@@ -8,7 +8,7 @@ generate_data = function(SEED=NULL,
                          t_vec = seq(-u_0,u_1,by=0.01),
                          t_vec_extend = t_vec,
                          N_spks_total = 1000,
-                         timeshift_max_vec = c(1/8, 1/32),
+                         timeshift_subj_max_vec = c(1/8, 1/32),
                          ### params when N_clus==4:
                          clus_sep = 2,
                          ### params when N_clus==1:
@@ -40,11 +40,11 @@ generate_data = function(SEED=NULL,
   v_mat_list = list()
   v_mat_list[[1]] = runif(n=N_subj, 
                           min = 0,
-                          max = timeshift_max_vec[1])  
+                          max = timeshift_subj_max_vec[1])  
   v_mat_list[[1]] = matrix(v_mat_list[[1]], nrow = N_subj, ncol = N_trial)
   v_mat_list[[2]] = runif(n = N_subj,
                           min = 0,
-                          max = timeshift_max_vec[2] )
+                          max = timeshift_subj_max_vec[2] )
   v_mat_list[[2]] = matrix(v_mat_list[[2]], nrow = N_subj, ncol = N_trial)
   for(id_clus in 1:N_clus){
     v_mat_list[[1]][clus_true_list[[id_clus]], ] = v_mat_list[[1]][clus_true_list[[id_clus]], ] - min(v_mat_list[[1]][clus_true_list[[id_clus]], ])

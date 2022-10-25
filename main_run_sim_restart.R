@@ -61,7 +61,7 @@ if (test_random_restart) {
                                N_clus = 4,
                                N_component_true = 2,
                                t_vec = seq(-1, 1, by=0.01),
-                               timeshift_max_vec = c(1/4, 1/16),
+                               timeshift_subj_max_vec = c(1/4, 1/16),
                                ### params when N_clus==4:
                                N_spks_total = 100,
                                N_trial = N_trial,
@@ -110,7 +110,7 @@ if (test_random_restart) {
                              N_clus = 4,
                              N_component_true = 2,
                              t_vec = seq(-1, 1, by=0.01),
-                             timeshift_max_vec = c(1/4, 1/16),
+                             timeshift_subj_max_vec = c(1/4, 1/16),
                              ### params when N_clus==4:
                              N_spks_total = 100,
                              N_trial = N_trial,
@@ -167,7 +167,7 @@ if (test_algorithm_restart) {
                                N_clus = 4,
                                N_component_true = 2,
                                t_vec = seq(-1, 1, by=0.01),
-                               timeshift_max_vec = c(1/4, 1/16),
+                               timeshift_subj_max_vec = c(1/4, 1/16),
                                ### params when N_clus==4:
                                N_spks_total = 100,
                                N_trial = N_trial,
