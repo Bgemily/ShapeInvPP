@@ -85,9 +85,9 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
   
   # Initialize clusters ---------------------------------------
   ### Smooth the point process 
-  node_intensity_array = array(dim=c(N_subj, 1, length(t_vec)))
-  node_density_array = array(dim=c(N_subj, 1, length(t_vec)))
-  node_Nspks_mat = matrix(nrow=N_subj, ncol=1)
+  subj_intensity_array = array(dim=c(N_subj, 1, length(t_vec)))
+  subj_density_array = array(dim=c(N_subj, 1, length(t_vec)))
+  subj_Nspks_mat = matrix(nrow=N_subj, ncol=1)
   for (id_subj in 1:N_subj) {
     spks_time_vec_tmp = unlist(spks_time_mlist[id_subj, ])
     tmp = get_smoothed_pp(event_time_vec = spks_time_vec_tmp, 
@@ -105,16 +105,16 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
     F_hat_tmp = sqrt( mean(N_spks_nodetrial_vec_tmp^2) )
     intensity_tmp = density_tmp*F_hat_tmp
     
-    node_intensity_array[id_subj,1,] = intensity_tmp
-    node_density_array[id_subj,1,] = density_tmp
-    node_Nspks_mat[id_subj,1] = F_hat_tmp
+    subj_intensity_array[id_subj,1,] = intensity_tmp
+    subj_density_array[id_subj,1,] = density_tmp
+    subj_Nspks_mat[id_subj,1] = F_hat_tmp
   }
   
   ### Apply k-means algorithm
   if (rmv_conn_prob){
-    membership = kmeans(x=node_density_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
+    membership = kmeans(x=subj_density_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
   } else{
-    membership = kmeans(x=node_intensity_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
+    membership = kmeans(x=subj_intensity_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
   }
   clusters = mem2clus(membership = membership, N_clus_min = N_clus)
   clusters_list = clusters

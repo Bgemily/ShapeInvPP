@@ -80,9 +80,9 @@ get_init = function(spks_time_mlist, stim_onset_vec,
   }
   
   # Initialize clusters -------------
-  node_intensity_array = array(dim=c(N_subj, 1, length(t_vec)))
-  node_density_array = array(dim=c(N_subj, 1, length(t_vec)))
-  node_Nspks_mat = matrix(nrow=N_subj, ncol=1)
+  subj_intensity_array = array(dim=c(N_subj, 1, length(t_vec)))
+  subj_density_array = array(dim=c(N_subj, 1, length(t_vec)))
+  subj_Nspks_mat = matrix(nrow=N_subj, ncol=1)
   for (id_subj in 1:N_subj) {
     intensity_tmp = rep(0, length(t_vec))
     density_tmp = rep(0, length(t_vec))
@@ -131,15 +131,15 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     
     
     
-    node_intensity_array[id_subj,1,] = intensity_tmp
-    node_density_array[id_subj,1,] = density_tmp
-    node_Nspks_mat[id_subj,1] = F_hat_tmp
+    subj_intensity_array[id_subj,1,] = intensity_tmp
+    subj_density_array[id_subj,1,] = density_tmp
+    subj_Nspks_mat[id_subj,1] = F_hat_tmp
   }
   
   if (rmv_conn_prob){
-    membership = kmeans(x=node_density_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
+    membership = kmeans(x=subj_density_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
   } else{
-    membership = kmeans(x=node_intensity_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
+    membership = kmeans(x=subj_intensity_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
   }
   
   clusters = mem2clus(membership = membership, N_clus_min = N_clus)

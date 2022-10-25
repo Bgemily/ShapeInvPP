@@ -51,9 +51,9 @@ est_timeshift = function(spks_time_mlist,
                               freq_trun = freq_trun, 
                               t_vec = t_vec, 
                               bw = bw)
-        node_intensity_smooth = tmp$intens_vec
-        node_density_smooth = node_intensity_smooth / length(spks_time_vec)
-        f_target_mat[id_replicate, ] = node_density_smooth
+        subj_intensity_smooth = tmp$intens_vec
+        subj_density_smooth = subj_intensity_smooth / length(spks_time_vec)
+        f_target_mat[id_replicate, ] = subj_density_smooth
         N_spks_trialwise_vec[id_replicate] = length(spks_time_vec)
       }
       
@@ -118,12 +118,12 @@ est_timeshift = function(spks_time_mlist,
                               freq_trun = Inf, 
                               t_vec = t_vec, 
                               bw = 0)
-        node_intensity_unsmooth = tmp$intens_vec
-        node_density_unsmooth = node_intensity_unsmooth / length(spks_time_vec)
+        subj_intensity_unsmooth = tmp$intens_vec
+        subj_density_unsmooth = subj_intensity_unsmooth / length(spks_time_vec)
         
         # Calculate distance between (id_subj, id_replicate) and id_clus ----
-        fft_node_density = fft(node_density_unsmooth) / length(node_density_unsmooth)
-        N = length(node_density_unsmooth)
+        fft_subj_density = fft(subj_density_unsmooth) / length(subj_density_unsmooth)
+        N = length(subj_density_unsmooth)
         l_vec = 0:(N-1)
         l_vec = c( head(l_vec, N-(N-1)%/%2),
                    tail(l_vec, (N-1)%/%2) - N )
@@ -133,7 +133,7 @@ est_timeshift = function(spks_time_mlist,
           fft_curr_comp_shifted = exp(-1i*2*pi*l_vec*(n0_vec_update[id_component]+n0_trialwise)/N) * fft_center_density_mat[id_component, ]
           fft_center_density_shifted = fft_center_density_shifted + fft_curr_comp_shifted
         }
-        dist_tmp_vec[id_replicate] = sum(abs( fft_center_density_shifted - fft_node_density )^2) * length(spks_time_vec)
+        dist_tmp_vec[id_replicate] = sum(abs( fft_center_density_shifted - fft_subj_density )^2) * length(spks_time_vec)
       }
       dist_mat[id_subj,id_clus] = sum(dist_tmp_vec)
     }

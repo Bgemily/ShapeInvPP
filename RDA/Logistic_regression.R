@@ -67,16 +67,16 @@ for (method in method_vec){
       summarise(N_subj_pertrialmem=n()) %>%
       group_by(id_trial, id_session, response_type, brain_area, .drop=F) %>%
       mutate(N_subj_pertrial=sum(N_subj_pertrialmem), 
-             prop_node_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
+             prop_subj_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
       filter(N_subj_pertrial>0) %>%
       group_by(response_type, brain_area, mem) %>%
       mutate(N_subj_perresptype_mem = sum(N_subj_pertrialmem)) %>%
       group_by(response_type, brain_area) %>%
-      mutate(prop_node_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
+      mutate(prop_subj_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
       group_by(response_type, brain_area, id_session, mem) %>%
       mutate(N_subj_perresptype_session_mem = sum(N_subj_pertrialmem)) %>%
       group_by(response_type, brain_area, id_session) %>%
-      mutate(prop_node_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
+      mutate(prop_subj_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
       mutate(brain_area=factor(brain_area)) %>%
       ungroup()
     df_long = df_tmp3.1
@@ -85,11 +85,11 @@ for (method in method_vec){
     
     ### Fit multinomial logistic regression
     df_multinom = df_long %>% 
-      select(id_trial, id_session, response_type, brain_area, mem, prop_node_pertrialmem) %>%
+      select(id_trial, id_session, response_type, brain_area, mem, prop_subj_pertrialmem) %>%
       filter(mem != max(levels(df_long$mem)), id_session==id_session_tmp) %>%
       pivot_wider(id_cols = c(id_trial, id_session, response_type), 
                   names_from = c(brain_area, mem), 
-                  values_from = prop_node_pertrialmem) %>%
+                  values_from = prop_subj_pertrialmem) %>%
       select(!c(id_trial, id_session))
     
     
@@ -180,16 +180,16 @@ for (method in method_vec){
       summarise(N_subj_pertrialmem=n()) %>%
       group_by(id_trial, id_session, pre_feedback_type, brain_area, .drop=F) %>%
       mutate(N_subj_pertrial=sum(N_subj_pertrialmem), 
-             prop_node_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
+             prop_subj_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
       filter(N_subj_pertrial>0) %>%
       group_by(pre_feedback_type, brain_area, mem) %>%
       mutate(N_subj_perresptype_mem = sum(N_subj_pertrialmem)) %>%
       group_by(pre_feedback_type, brain_area) %>%
-      mutate(prop_node_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
+      mutate(prop_subj_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
       group_by(pre_feedback_type, brain_area, id_session, mem) %>%
       mutate(N_subj_perresptype_session_mem = sum(N_subj_pertrialmem)) %>%
       group_by(pre_feedback_type, brain_area, id_session) %>%
-      mutate(prop_node_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
+      mutate(prop_subj_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
       mutate(brain_area=factor(brain_area)) %>%
       ungroup()
     df_long = df_tmp3.1
@@ -199,11 +199,11 @@ for (method in method_vec){
     ### Fit multinomial logistic regression
     df_multinom = df_long %>% 
       filter( !is.na(pre_feedback_type) ) %>%
-      select(id_trial, id_session, pre_feedback_type, brain_area, mem, prop_node_pertrialmem) %>%
+      select(id_trial, id_session, pre_feedback_type, brain_area, mem, prop_subj_pertrialmem) %>%
       filter(mem != max(levels(df_long$mem)), id_session==id_session_tmp) %>%
       pivot_wider(id_cols = c(id_trial, id_session, pre_feedback_type), 
                   names_from = c(brain_area, mem), 
-                  values_from = prop_node_pertrialmem) %>%
+                  values_from = prop_subj_pertrialmem) %>%
       select(!c(id_trial, id_session))
     
     
@@ -325,16 +325,16 @@ for (method in method_vec){
 #       summarise(N_subj_pertrialmem=n()) %>%
 #       group_by(id_trial, id_session, response_type, brain_area, .drop=F) %>%
 #       mutate(N_subj_pertrial=sum(N_subj_pertrialmem), 
-#              prop_node_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
+#              prop_subj_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
 #       filter(N_subj_pertrial>0) %>%
 #       group_by(response_type, brain_area, mem) %>%
 #       mutate(N_subj_perresptype_mem = sum(N_subj_pertrialmem)) %>%
 #       group_by(response_type, brain_area) %>%
-#       mutate(prop_node_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
+#       mutate(prop_subj_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
 #       group_by(response_type, brain_area, id_session, mem) %>%
 #       mutate(N_subj_perresptype_session_mem = sum(N_subj_pertrialmem)) %>%
 #       group_by(response_type, brain_area, id_session) %>%
-#       mutate(prop_node_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
+#       mutate(prop_subj_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
 #       mutate(brain_area=factor(brain_area)) %>%
 #       ungroup()
 #     df_long = df_tmp3.1
@@ -343,11 +343,11 @@ for (method in method_vec){
 #     
 #     ### Fit multinomial logistic regression
 #     df_multinom = df_long %>% 
-#       select(id_trial, id_session, response_type, brain_area, mem, prop_node_pertrialmem) %>%
+#       select(id_trial, id_session, response_type, brain_area, mem, prop_subj_pertrialmem) %>%
 #       filter(mem != max(levels(df_long$mem)), id_session==id_session_tmp) %>%
 #       pivot_wider(id_cols = c(id_trial, id_session, response_type), 
 #                   names_from = c(brain_area, mem), 
-#                   values_from = prop_node_pertrialmem) %>%
+#                   values_from = prop_subj_pertrialmem) %>%
 #       select(!c(id_trial, id_session))
 #     
 #     
@@ -438,16 +438,16 @@ for (method in method_vec){
 #       summarise(N_subj_pertrialmem=n()) %>%
 #       group_by(id_trial, id_session, pre_feedback_type, brain_area, .drop=F) %>%
 #       mutate(N_subj_pertrial=sum(N_subj_pertrialmem), 
-#              prop_node_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
+#              prop_subj_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
 #       filter(N_subj_pertrial>0) %>%
 #       group_by(pre_feedback_type, brain_area, mem) %>%
 #       mutate(N_subj_perresptype_mem = sum(N_subj_pertrialmem)) %>%
 #       group_by(pre_feedback_type, brain_area) %>%
-#       mutate(prop_node_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
+#       mutate(prop_subj_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
 #       group_by(pre_feedback_type, brain_area, id_session, mem) %>%
 #       mutate(N_subj_perresptype_session_mem = sum(N_subj_pertrialmem)) %>%
 #       group_by(pre_feedback_type, brain_area, id_session) %>%
-#       mutate(prop_node_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
+#       mutate(prop_subj_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
 #       mutate(brain_area=factor(brain_area)) %>%
 #       ungroup()
 #     df_long = df_tmp3.1
@@ -457,11 +457,11 @@ for (method in method_vec){
 #     ### Fit multinomial logistic regression
 #     df_multinom = df_long %>% 
 #       filter( !is.na(pre_feedback_type) ) %>%
-#       select(id_trial, id_session, pre_feedback_type, brain_area, mem, prop_node_pertrialmem) %>%
+#       select(id_trial, id_session, pre_feedback_type, brain_area, mem, prop_subj_pertrialmem) %>%
 #       filter(mem != max(levels(df_long$mem)), id_session==id_session_tmp) %>%
 #       pivot_wider(id_cols = c(id_trial, id_session, pre_feedback_type), 
 #                   names_from = c(brain_area, mem), 
-#                   values_from = prop_node_pertrialmem) %>%
+#                   values_from = prop_subj_pertrialmem) %>%
 #       select(!c(id_trial, id_session))
 #     
 #     
