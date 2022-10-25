@@ -1,6 +1,6 @@
 ### Generate data, run our algorithm, and output measurements of errors.
  
-main_v5_pdf = function(### Parameters for generative model
+main_shapeinvpp = function(### Parameters for generative model
                         SEED, 
                         N_subj = 100,
                         N_trial = 1,

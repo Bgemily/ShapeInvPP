@@ -60,7 +60,7 @@ if (test_N_component_2){
       timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED, 
+        tryCatch(main_shapeinvpp(SEED = SEED, 
                              N_subj = 100,
                              N_clus = 4, 
                              N_component_true = 2,
@@ -94,7 +94,7 @@ if (test_N_component_2){
       clus_sep = clus_sep_list[[id_clus_sep]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED, 
+        tryCatch(main_shapeinvpp(SEED = SEED, 
                              N_subj = 100,
                              N_clus = 4, 
                              N_component_true = 2,
@@ -129,7 +129,7 @@ if (test_N_component_2){
       N_subj = N_subj_list[[id_N_subj]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED, 
+        tryCatch(main_shapeinvpp(SEED = SEED, 
                              N_subj = N_subj,
                              N_clus = 4, 
                              N_component_true = 2,
@@ -175,7 +175,7 @@ if (test_N_component_1) {
       timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED, 
+        tryCatch(main_shapeinvpp(SEED = SEED, 
                              N_subj = 100,
                              N_clus = 4, 
                              N_component_true = 1,
@@ -209,7 +209,7 @@ if (test_N_component_1) {
       clus_sep = clus_sep_list[[id_clus_sep]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED, 
+        tryCatch(main_shapeinvpp(SEED = SEED, 
                              N_subj = 100,
                              N_clus = 4, 
                              N_component_true = 1,
@@ -244,7 +244,7 @@ if (test_N_component_1) {
       N_subj = N_subj_list[[id_N_subj]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED, 
+        tryCatch(main_shapeinvpp(SEED = SEED, 
                              N_subj = N_subj,
                              N_clus = 4, 
                              N_component_true = 1,
@@ -290,7 +290,7 @@ if (test_N_clus_1) {
       timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED, 
+        tryCatch(main_shapeinvpp(SEED = SEED, 
                              N_subj = 100,
                              N_clus = 1, 
                              N_component_true = 2,
@@ -323,7 +323,7 @@ if (test_N_clus_1) {
       N_subj = N_subj_list[[id_N_subj]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED, 
+        tryCatch(main_shapeinvpp(SEED = SEED, 
                              N_subj = N_subj,
                              N_clus = 1, 
                              N_component_true = 2,

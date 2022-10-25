@@ -56,7 +56,7 @@ for (id_N_split in 1:N_split) {
       N_spks_total = N_spks_total_list[[id_N_spks_total]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED,
+        tryCatch(main_shapeinvpp(SEED = SEED,
                              N_subj = 100,
                              N_clus = 4,
                              N_component_true = 2,
@@ -100,7 +100,7 @@ for (id_N_split in 1:N_split) {
       N_trial = N_trial_list[[id_N_trial]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED,
+        tryCatch(main_shapeinvpp(SEED = SEED,
                              N_subj = 100,
                              N_trial = N_trial,
                              N_clus = 4,
@@ -145,7 +145,7 @@ for (id_N_split in 1:N_split) {
       N_subj = N_subj_list[[id_N_subj]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED,
+        tryCatch(main_shapeinvpp(SEED = SEED,
                              N_subj = N_subj,
                              N_clus = 4,
                              N_component_true = 2,

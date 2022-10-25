@@ -56,7 +56,7 @@ if (test_random_restart) {
         results <- foreach(id_replicate = 1:N_replicate) %dopar% {
           SEED = id_N_split * 1000 + id_N_trial * 100 + id_replicate + 10
           print(paste0("SEED: ", SEED))
-          tryCatch(main_v5_pdf(SEED = SEED,
+          tryCatch(main_shapeinvpp(SEED = SEED,
                                N_subj = 100,
                                N_clus = 4,
                                N_component_true = 2,
@@ -105,7 +105,7 @@ if (test_random_restart) {
       results <- foreach(id_replicate = 1:N_replicate) %dopar% {
         SEED = id_N_split * 1000 + id_N_trial * 100 + id_replicate + 10
         print(paste0("SEED: ", SEED))
-        tryCatch(main_v5_pdf(SEED = SEED,
+        tryCatch(main_shapeinvpp(SEED = SEED,
                              N_subj = 100,
                              N_clus = 4,
                              N_component_true = 2,
@@ -162,7 +162,7 @@ if (test_algorithm_restart) {
         N_trial = N_trial_list[[id_N_trial]]
         results <- foreach(j = 1:N_replicate) %dopar% {
           SEED = sample(1:1e7,1)
-          tryCatch(main_v5_pdf(SEED = SEED,
+          tryCatch(main_shapeinvpp(SEED = SEED,
                                N_subj = 100,
                                N_clus = 4,
                                N_component_true = 2,

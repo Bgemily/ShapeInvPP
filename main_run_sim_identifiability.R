@@ -58,7 +58,7 @@ for (id_N_split in 1:N_split) {
     timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
     results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
       SEED = sample(1:1e7,1)
-      tryCatch(main_v5_pdf(SEED = SEED, 
+      tryCatch(main_shapeinvpp(SEED = SEED, 
                            N_subj = 100,
                            N_clus = 1, 
                            N_component_true = 2,

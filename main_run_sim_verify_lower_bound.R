@@ -62,7 +62,7 @@ if (test_var_timeshift) {
         timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
         results <- foreach(j = 1:N_replicate) %dopar% {
           SEED = sample(1:1e7,1)
-          tryCatch(main_v5_pdf(SEED = SEED, 
+          tryCatch(main_shapeinvpp(SEED = SEED, 
                                N_subj = 100,
                                N_clus = 1, 
                                N_component_true = 1,
@@ -111,7 +111,7 @@ if (test_N_spks) {
       N_spks_total = N_spks_list[[id_N_spks]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED, 
+        tryCatch(main_shapeinvpp(SEED = SEED, 
                              N_subj = 100,
                              N_clus = 1, 
                              N_component_true = 1,
