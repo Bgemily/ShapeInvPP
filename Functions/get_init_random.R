@@ -23,7 +23,7 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
   
   t_unit = t_vec[2] - t_vec[1]
   N_subj = nrow(spks_time_mlist)
-  N_replicate = ncol(spks_time_mlist)
+  N_trial = ncol(spks_time_mlist)
   
   # Initialize time shifts -------------
   if (fix_timeshift) {
@@ -37,7 +37,7 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
         }
       }
     } else{
-      v_vec = matrix(default_timeshift, nrow = N_subj, ncol = N_replicate)
+      v_vec = matrix(default_timeshift, nrow = N_subj, ncol = N_trial)
       v_mat_list = rep(list(v_vec), N_component)
     }
   } else{
@@ -46,7 +46,7 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
     for (id_subj in 1:N_subj) {
       for (id_component in 1:N_component){
         spks_time_shifted_vec = c()
-        for (id_replicate in 1:N_replicate) {
+        for (id_replicate in 1:N_trial) {
           spks_time_tmp = spks_time_mlist[id_subj, id_replicate][[1]]-stim_onset_vec[id_replicate]
           time_start_curr_comp = key_times_vec[id_component] 
           time_end_curr_comp = key_times_vec[id_component + 1]
@@ -68,11 +68,11 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
     }
     
     ### Force minimum time shifts in each component to be trial-wise time shift
-    v_mat_list = rep(list(matrix(0, nrow = N_subj, ncol = N_replicate)), N_component)
+    v_mat_list = rep(list(matrix(0, nrow = N_subj, ncol = N_trial)), N_component)
     for (id_component in 1:N_component){
       v_subjwise_vec = v_subjwise_vec_list[[id_component]] - min(v_subjwise_vec_list[[id_component]])
       v_trialwise_vec = v_trialwise_vec_list[[id_component]]
-      v_mat_list[[id_component]] = matrix(v_subjwise_vec, nrow = N_subj, ncol = N_replicate) + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_subj, ncol = N_replicate)
+      v_mat_list[[id_component]] = matrix(v_subjwise_vec, nrow = N_subj, ncol = N_trial) + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_subj, ncol = N_trial)
       v_mat_list[[id_component]] = round(v_mat_list[[id_component]]/t_unit)*t_unit
     }
     
@@ -128,7 +128,7 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
         v_subjwise_vec = v_mat_list[[id_component]][clusters_list[[id_clus]], id_replicate] - v_trialwise_vec_list[[id_component]][id_replicate]
         v_subjwise_vec = v_subjwise_vec - min(v_subjwise_vec)
         v_trialwise_vec = v_trialwise_vec_list[[id_component]]
-        v_mat_list[[id_component]][clusters_list[[id_clus]], ] = matrix(v_subjwise_vec, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate) + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate)
+        v_mat_list[[id_component]][clusters_list[[id_clus]], ] = matrix(v_subjwise_vec, nrow = length(clusters_list[[id_clus]]), ncol = N_trial) + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[id_clus]]), ncol = N_trial)
         v_mat_list[[id_component]] = round(v_mat_list[[id_component]]/t_unit)*t_unit
       }
     }

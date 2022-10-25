@@ -4,7 +4,7 @@
 main_fpca = function(### Parameters for generative model
                       SEED, 
                       N_subj = 100,
-                      N_replicate = 1,
+                      N_trial = 1,
                       N_clus=2, 
                       N_component_true = 2,
                       u_1 = 1, u_0 = 1,
@@ -33,7 +33,7 @@ main_fpca = function(### Parameters for generative model
   ### Extract network related parameters 
   data_param = list(SEED=SEED,
                     N_subj=N_subj,
-                    N_replicate=N_replicate,
+                    N_trial=N_trial,
                     N_clus=N_clus, 
                     u_1=u_1, u_0=u_0,
                     t_vec=t_vec,
@@ -136,7 +136,7 @@ main_fpca = function(### Parameters for generative model
     center_density_array_est[1, id_component, ] = density_vec
     
     v_fpca_vec = v_fpca_vec + v_mean_fpca_vec
-    v_mat_list_est[[id_component]] = matrix(data = v_fpca_vec, nrow = N_subj, ncol = N_replicate)
+    v_mat_list_est[[id_component]] = matrix(data = v_fpca_vec, nrow = N_subj, ncol = N_trial)
   }
   center_density_array_est = round(center_density_array_est, digits = 4)
   

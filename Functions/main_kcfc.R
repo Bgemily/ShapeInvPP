@@ -4,7 +4,7 @@
 main_kcfc = function(### Parameters for generative model
   SEED, 
   N_subj = 100,
-  N_replicate = 1,
+  N_trial = 1,
   N_clus=2, 
   N_component_true = 2,
   u_1 = 1, u_0 = 1,
@@ -33,7 +33,7 @@ main_kcfc = function(### Parameters for generative model
   ### Extract network related parameters 
   data_param = list(SEED=SEED,
                     N_subj=N_subj,
-                    N_replicate=N_replicate,
+                    N_trial=N_trial,
                     N_clus=N_clus, 
                     u_1=u_1, u_0=u_0,
                     t_vec=t_vec,
@@ -209,7 +209,7 @@ main_kcfc = function(### Parameters for generative model
   center_density_array_est_permn = center_density_fpca_array_permn
   v_mat_list_est = list()
   for (id_component in 1:N_component) {
-    v_mat_list_est[[id_component]] = matrix(data = v_fpca_mat_permn[, id_component], nrow = N_subj, ncol = N_replicate)
+    v_mat_list_est[[id_component]] = matrix(data = v_fpca_mat_permn[, id_component], nrow = N_subj, ncol = N_trial)
   }
   
   # Other estimates

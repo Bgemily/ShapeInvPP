@@ -1,7 +1,7 @@
 ### Generate synthetic point processes
 generate_data = function(SEED=NULL,
                          N_subj=100, 
-                         N_replicate=1,
+                         N_trial=1,
                          N_clus=2, 
                          clus_size_vec = rep(N_subj/N_clus, N_clus),
                          u_1 = 1, u_0 = 1,
@@ -31,7 +31,7 @@ generate_data = function(SEED=NULL,
   # Generate trial-wise time shifts -----------------------------------
   v_trialwise_vec_list = list()
   for (id_component in 1:2) {
-    v_tmp = runif(n = N_replicate, min = 0, max = 1/8)
+    v_tmp = runif(n = N_trial, min = 0, max = 1/8)
     v_tmp = v_tmp - min(v_tmp)
     v_trialwise_vec_list[[id_component]] = v_tmp
   }
@@ -41,20 +41,20 @@ generate_data = function(SEED=NULL,
   v_mat_list[[1]] = runif(n=N_subj, 
                           min = 0,
                           max = timeshift_max_vec[1])  
-  v_mat_list[[1]] = matrix(v_mat_list[[1]], nrow = N_subj, ncol = N_replicate)
+  v_mat_list[[1]] = matrix(v_mat_list[[1]], nrow = N_subj, ncol = N_trial)
   v_mat_list[[2]] = runif(n = N_subj,
                           min = 0,
                           max = timeshift_max_vec[2] )
-  v_mat_list[[2]] = matrix(v_mat_list[[2]], nrow = N_subj, ncol = N_replicate)
+  v_mat_list[[2]] = matrix(v_mat_list[[2]], nrow = N_subj, ncol = N_trial)
   for(id_clus in 1:N_clus){
     v_mat_list[[1]][clus_true_list[[id_clus]], ] = v_mat_list[[1]][clus_true_list[[id_clus]], ] - min(v_mat_list[[1]][clus_true_list[[id_clus]], ])
     v_mat_list[[2]][clus_true_list[[id_clus]], ] = v_mat_list[[2]][clus_true_list[[id_clus]], ] - min(v_mat_list[[2]][clus_true_list[[id_clus]], ])
   }
   
   v_mat_list[[1]] = v_mat_list[[1]] + matrix(v_trialwise_vec_list[[1]], byrow = TRUE, 
-                                             nrow = N_subj, ncol = N_replicate)
+                                             nrow = N_subj, ncol = N_trial)
   v_mat_list[[2]] = v_mat_list[[2]] + matrix(v_trialwise_vec_list[[2]], byrow = TRUE, 
-                                             nrow = N_subj, ncol = N_replicate)
+                                             nrow = N_subj, ncol = N_trial)
   
   
   # Generate expected number of spikes --------------------------------------------
@@ -189,11 +189,11 @@ generate_data = function(SEED=NULL,
   }
   
   
-  stim_onset_vec = rep(0, N_replicate)
-  spks_time_mlist = matrix(list(), nrow = N_subj, ncol = N_replicate)
+  stim_onset_vec = rep(0, N_trial)
+  spks_time_mlist = matrix(list(), nrow = N_subj, ncol = N_trial)
   for (id_clus in 1:N_clus) {
     for (id_subj in clus_true_list[[id_clus]]) {
-      for (id_replicate in 1:N_replicate) {
+      for (id_replicate in 1:N_trial) {
         v_tmp_1 = v_mat_list[[1]][id_subj, id_replicate]
         v_tmp_2 = v_mat_list[[2]][id_subj, id_replicate]
         spks_time_mlist[id_subj, id_replicate] = list(c( rejection_sampling(density_vec = center_density_array_true[id_clus,1,], 

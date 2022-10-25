@@ -17,17 +17,17 @@ get_timeshift_and_clusters = function(spks_time_mlist,
 {
   t_unit = t_vec[2]-t_vec[1]
   N_subj = nrow(spks_time_mlist)
-  N_replicate = ncol(spks_time_mlist)
+  N_trial = ncol(spks_time_mlist)
   N_clus = dim(center_density_array)[1]
   N_component = dim(center_density_array)[2]
   
   ### Get time shift between each subj and each cluster -----
   if (is.null(v_mat_list)) {
-    v_mat_list = rep(list(matrix(0, nrow = N_subj, ncol = N_replicate)), N_component)
+    v_mat_list = rep(list(matrix(0, nrow = N_subj, ncol = N_trial)), N_component)
     if (!is.null(v_trialwise_vec_list)) {
       for (id_component in 1:N_component) {
         v_trialwise_vec = v_trialwise_vec_list[[id_component]]
-        v_mat_list[[id_component]] = v_mat_list[[id_component]]  + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_subj, ncol = N_replicate)
+        v_mat_list[[id_component]] = v_mat_list[[id_component]]  + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_subj, ncol = N_trial)
       }
     }
   }
@@ -51,9 +51,9 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   ### Get distance between each subj and each cluster -----
   dist_mat = matrix(0, nrow=N_subj, ncol=N_clus)
   for (id_clus in 1:N_clus) {
-    N_spks_mat = matrix(nrow=N_subj, ncol=N_replicate)
+    N_spks_mat = matrix(nrow=N_subj, ncol=N_trial)
     for (id_subj in 1:N_subj) {
-      for (id_replicate in 1:N_replicate) {
+      for (id_replicate in 1:N_trial) {
         spks_time_mi_vec = spks_time_mlist[id_subj, id_replicate][[1]] - stim_onset_vec[id_replicate] 
         spks_time_mi_vec = spks_time_mi_vec[which(spks_time_mi_vec<=max(t_vec) &
                                                     spks_time_mi_vec>=min(t_vec))]
@@ -89,7 +89,7 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   ### Extract time shifts based on selected memberships -----
   for (id_clus in 1:N_clus) {
     for (id_component in 1:N_component) {
-      v_mat_list[[id_component]][clusters_list[[id_clus]], 1:N_replicate] = v_array_list_tmp[[id_component]][clusters_list[[id_clus]], 1:N_replicate, id_clus]
+      v_mat_list[[id_component]][clusters_list[[id_clus]], 1:N_trial] = v_array_list_tmp[[id_component]][clusters_list[[id_clus]], 1:N_trial, id_clus]
     }
   }
   ### For each cluster, force the minimum time shifts to be trial-wise time shift
@@ -101,7 +101,7 @@ get_timeshift_and_clusters = function(spks_time_mlist,
         v_subjwise_vec = v_mat_list[[id_component]][clusters_list[[id_clus]], id_replicate] - v_trialwise_vec_list[[id_component]][id_replicate]
         v_subjwise_vec = v_subjwise_vec - min(v_subjwise_vec)
         v_trialwise_vec = v_trialwise_vec_list[[id_component]]
-        v_mat_list[[id_component]][clusters_list[[id_clus]], ] = matrix(v_subjwise_vec, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate) + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate)
+        v_mat_list[[id_component]][clusters_list[[id_clus]], ] = matrix(v_subjwise_vec, nrow = length(clusters_list[[id_clus]]), ncol = N_trial) + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[id_clus]]), ncol = N_trial)
       }
     }
   }

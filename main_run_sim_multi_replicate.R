@@ -42,11 +42,11 @@ timeshift_max_vec_list = list(c(1/4, 1/16),
                               c(1/4, 1/16)*0.5, c(1/4, 1/16)*0.75, 
                               c(1/4, 1/16)*0.25, c(1/4, 1/16)*0.125,
                               c(1/4, 1/16)*1.25, c(1/4, 1/16)*1.5 )
-N_replicate_list = list(1,2,4,8)
+N_trial_list = list(1,2,4,8)
 
-for (id_N_replicate in 1:length(N_replicate_list)) {
-  N_replicate = N_replicate_list[[id_N_replicate]]
-  method = paste0('shape_inv_pp_v2','_N_replicate',N_replicate)
+for (id_N_trial in 1:length(N_trial_list)) {
+  N_trial = N_trial_list[[id_N_trial]]
+  method = paste0('shape_inv_pp_v2','_N_trial',N_trial)
   default_setting = 'N_spks_total=100,N_subj=100,N_clus=4,clus_sep=1.3,N_comp=2'
   for (id_split in 1:split) {
     if (save_res_details & (id_split == 1)) {
@@ -59,7 +59,7 @@ for (id_N_replicate in 1:length(N_replicate_list)) {
       results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_v5_pdf(SEED = SEED, 
-                             N_replicate = N_replicate,
+                             N_trial = N_trial,
                              N_subj = 100,
                              N_clus = 4, 
                              N_component_true = 2,

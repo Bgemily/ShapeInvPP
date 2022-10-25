@@ -47,7 +47,7 @@ if (select_tuning_parameter) {
     # Generate synthetic data
     data_param = list(SEED = SEED,
                       N_subj = 100,
-                      N_replicate = 1,
+                      N_trial = 1,
                       N_clus = 4, 
                       u_1 = 1, u_0 = 1,
                       t_vec = seq(-1, 1, by = 0.01),

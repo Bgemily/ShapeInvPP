@@ -39,7 +39,7 @@ setup = 'Multi_restart_v2.1'
 
 if (test_random_restart) {
   ### Parameters' possible values:
-  N_replicate_list = list(1,2,3,4,5)
+  N_trial_list = list(1,2,3,4,5)
   N_restart_algo_list = list(1, 3, 5, 10)
   for (id_method in 1:length(N_restart_algo_list)) {
     N_restart = N_restart_algo_list[[id_method]]
@@ -51,10 +51,10 @@ if (test_random_restart) {
       } else {
         save_center_pdf_array = FALSE
       }
-      for (id_N_replicate in 1:length(N_replicate_list)) {
-        N_replicate = N_replicate_list[[id_N_replicate]]
+      for (id_N_trial in 1:length(N_trial_list)) {
+        N_trial = N_trial_list[[id_N_trial]]
         results <- foreach(id_xxxxxxxx = 1:N_xxxxxxxx) %dopar% {
-          SEED = id_split * 1000 + id_N_replicate * 100 + id_xxxxxxxx + 10
+          SEED = id_split * 1000 + id_N_trial * 100 + id_xxxxxxxx + 10
           print(paste0("SEED: ", SEED))
           tryCatch(main_v5_pdf(SEED = SEED,
                                N_subj = 100,
@@ -64,7 +64,7 @@ if (test_random_restart) {
                                timeshift_max_vec = c(1/4, 1/16),
                                ### params when N_clus==4:
                                N_spks_total = 100,
-                               N_replicate = N_replicate,
+                               N_trial = N_trial,
                                clus_sep = 2,
                                ### Parameters for algorithms
                                rand_init = TRUE,
@@ -78,8 +78,8 @@ if (test_random_restart) {
                                save_center_pdf_array = save_center_pdf_array ),
                    error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
         }
-        param_name = "N_replicate"
-        param_value = N_replicate
+        param_name = "N_trial"
+        param_value = N_trial
         folder_path = paste0(top_level_folder, '/', setup,
                              '/', method, 
                              '/', default_setting,
@@ -100,10 +100,10 @@ if (test_random_restart) {
     } else {
       save_center_pdf_array = FALSE
     }
-    for (id_N_replicate in 1:length(N_replicate_list)) {
-      N_replicate = N_replicate_list[[id_N_replicate]]
+    for (id_N_trial in 1:length(N_trial_list)) {
+      N_trial = N_trial_list[[id_N_trial]]
       results <- foreach(id_xxxxxxxx = 1:N_xxxxxxxx) %dopar% {
-        SEED = id_split * 1000 + id_N_replicate * 100 + id_xxxxxxxx + 10
+        SEED = id_split * 1000 + id_N_trial * 100 + id_xxxxxxxx + 10
         print(paste0("SEED: ", SEED))
         tryCatch(main_v5_pdf(SEED = SEED,
                              N_subj = 100,
@@ -113,7 +113,7 @@ if (test_random_restart) {
                              timeshift_max_vec = c(1/4, 1/16),
                              ### params when N_clus==4:
                              N_spks_total = 100,
-                             N_replicate = N_replicate,
+                             N_trial = N_trial,
                              clus_sep = 2,
                              ### Parameters for algorithms
                              N_restart = 1, 
@@ -126,8 +126,8 @@ if (test_random_restart) {
                              save_center_pdf_array = save_center_pdf_array ),
                  error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
-      param_name = "N_replicate"
-      param_value = N_replicate
+      param_name = "N_trial"
+      param_value = N_trial
       folder_path = paste0(top_level_folder, '/', setup,
                            '/', method, 
                            '/', default_setting,
@@ -144,7 +144,7 @@ if (test_random_restart) {
 
 if (test_algorithm_restart) {
   ### Parameters' possible values:
-  N_replicate_list = list(1,2,3,4,5)
+  N_trial_list = list(1,2,3,4,5)
   N_restart_algo_N_start_kmean_list = list(c(1,5), c(1,1), c(3,1), c(5,1), c(3,5), c(10,1) )
   for (id_method in 1:length(N_restart_algo_N_start_kmean_list)) {
     N_restart = N_restart_algo_N_start_kmean_list[[id_method]][1]
@@ -158,8 +158,8 @@ if (test_algorithm_restart) {
       } else {
         save_center_pdf_array = FALSE
       }
-      for (id_N_replicate in 1:length(N_replicate_list)) {
-        N_replicate = N_replicate_list[[id_N_replicate]]
+      for (id_N_trial in 1:length(N_trial_list)) {
+        N_trial = N_trial_list[[id_N_trial]]
         results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
           SEED = sample(1:1e7,1)
           tryCatch(main_v5_pdf(SEED = SEED,
@@ -170,7 +170,7 @@ if (test_algorithm_restart) {
                                timeshift_max_vec = c(1/4, 1/16),
                                ### params when N_clus==4:
                                N_spks_total = 100,
-                               N_replicate = N_replicate,
+                               N_trial = N_trial,
                                clus_sep = 1.3,
                                ### Parameters for algorithms
                                N_restart = N_restart, 
@@ -183,8 +183,8 @@ if (test_algorithm_restart) {
                                save_center_pdf_array = save_center_pdf_array ),
                    error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
         }
-        param_name = "N_replicate"
-        param_value = N_replicate
+        param_name = "N_trial"
+        param_value = N_trial
         folder_path = paste0(top_level_folder, '/', setup,
                              '/', method, 
                              '/', default_setting,

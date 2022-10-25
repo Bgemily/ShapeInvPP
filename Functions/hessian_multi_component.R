@@ -5,13 +5,13 @@ hessian_multi_component = function(fft_f_target_mat,
                                    t_unit,
                                    n0_vec)
 {
-  N_replicate = nrow(fft_f_target_mat)
+  N_trial = nrow(fft_f_target_mat)
   N_timegrid = ncol(fft_f_target_mat)
   N_component = nrow(fft_f_origin_mat)
   if(N_timegrid != ncol(fft_f_origin_mat)) 
     stop("Length of fft_f_target_mat and fft_f_origin's do not match.")
   
-  for (id_replicate in 1:N_replicate) {
+  for (id_replicate in 1:N_trial) {
     fft_curr_comp = fft_f_target_mat[id_replicate, ]
     fft_f_target_mat[id_replicate, ] = c(tail(fft_curr_comp, (N_timegrid-1)%/%2), 
                                          head(fft_curr_comp, N_timegrid-(N_timegrid-1)%/%2) )
@@ -28,8 +28,8 @@ hessian_multi_component = function(fft_f_target_mat,
   
   hessian_mat = matrix(nrow = N_component, ncol = N_component)
   for (id_component in 1:N_component) {
-    gd_order2_vec = rep(0, N_replicate)
-    for (id_replicate in 1:N_replicate) {
+    gd_order2_vec = rep(0, N_trial)
+    for (id_replicate in 1:N_trial) {
       fft_f_target = fft_f_target_mat[id_replicate, ]
       fft_f_origin_no_curr_comp = 0
       for (id_component_2 in 1:N_component) {
@@ -49,8 +49,8 @@ hessian_multi_component = function(fft_f_target_mat,
     
     for (id_component_2 in 1:N_component) {
       if (id_component_2 != id_component) {
-        gd_order2_vec = rep(0, N_replicate)
-        for (id_replicate in 1:N_replicate) {
+        gd_order2_vec = rep(0, N_trial)
+        for (id_replicate in 1:N_trial) {
           n0_trialwise = round(v_trialwise_vec_list[[id_component]][id_replicate] / t_unit)
           n0_trialwise_2 = round(v_trialwise_vec_list[[id_component_2]][id_replicate] / t_unit)
           gd_order2 = 2 * sum( Re( (-1i*2*pi*(l_vec/N_timegrid) * 

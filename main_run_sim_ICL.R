@@ -38,7 +38,7 @@ method = 'timeshifts_est_v1.2'
 
 ### Parameters' possible values:
 N_spks_total_list = list(50, 100, 150, 200, 250)
-N_replicate_list = list(1,2,3,4,5)
+N_trial_list = list(1,2,3,4,5)
 N_subj_list = list(100, 200, 300, 400, 500)
 clus_sep_list = list(1.7, 1.8, 1.9, 2.0)
 
@@ -93,16 +93,16 @@ for (id_split in 1:split) {
       rm(results)
     }
   }
-  ### interaction(clus_sep, N_replicate)
+  ### interaction(clus_sep, N_trial)
   for (id_clus_sep in 1:length(clus_sep_list)){
     clus_sep = clus_sep_list[[id_clus_sep]]
-    for (id_N_replicate in 1:length(N_replicate_list)) {
-      N_replicate = N_replicate_list[[id_N_replicate]]
+    for (id_N_trial in 1:length(N_trial_list)) {
+      N_trial = N_trial_list[[id_N_trial]]
       results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_v5_pdf(SEED = SEED,
                              N_subj = 100,
-                             N_replicate = N_replicate,
+                             N_trial = N_trial,
                              N_clus = 4,
                              N_component_true = 2,
                              t_vec = seq(-1, 1, by=0.01),
@@ -123,8 +123,8 @@ for (id_split in 1:split) {
       }
       param_name_0 = "clus_sep"
       param_value_0 = clus_sep
-      param_name = "N_replicate"
-      param_value = N_replicate
+      param_name = "N_trial"
+      param_value = N_trial
       folder_path = paste0(top_level_folder,
                            '/', setup,
                            '/', method, 

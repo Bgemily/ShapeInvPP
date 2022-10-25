@@ -8,7 +8,7 @@ jitter_init_timeshift = function(v_mat_list_init,
   } else {
     N_component = length(v_mat_list_init)
     N_subj = nrow(v_mat_list_init[[1]])
-    N_replicate = ncol(v_mat_list_init[[1]])
+    N_trial = ncol(v_mat_list_init[[1]])
     for (id_component in 1:N_component) {
       range = max(v_mat_list_init[[id_component]]) - min(v_mat_list_init[[id_component]])
       v_mat_list_init[[id_component]] = runif(n = length(v_mat_list_init[[id_component]]),

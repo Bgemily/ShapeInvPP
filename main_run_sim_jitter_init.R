@@ -36,7 +36,7 @@ top_level_folder = "../Results/Rdata"
 setup = 'Jitter_init'
 
 ### Parameters' possible values:
-N_replicate_list = list(1,2,3,4,5)
+N_trial_list = list(1,2,3,4,5)
 
 for (jitter_level in c(0, 0.1, 0.2, 0.3, 0.5, 0.8)) {
   method = paste0('jitter_level_', as.character(jitter_level))
@@ -47,8 +47,8 @@ for (jitter_level in c(0, 0.1, 0.2, 0.3, 0.5, 0.8)) {
     } else {
       save_center_pdf_array = FALSE
     }
-    for (id_N_replicate in 1:length(N_replicate_list)) {
-      N_replicate = N_replicate_list[[id_N_replicate]]
+    for (id_N_trial in 1:length(N_trial_list)) {
+      N_trial = N_trial_list[[id_N_trial]]
       results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_v5_pdf(SEED = SEED,
@@ -59,7 +59,7 @@ for (jitter_level in c(0, 0.1, 0.2, 0.3, 0.5, 0.8)) {
                              timeshift_max_vec = c(1/4, 1/16),
                              ### params when N_clus==4:
                              N_spks_total = 100,
-                             N_replicate = N_replicate,
+                             N_trial = N_trial,
                              clus_sep = 1.3,
                              ### Parameters for algorithms
                              jitter_level = jitter_level,
@@ -71,8 +71,8 @@ for (jitter_level in c(0, 0.1, 0.2, 0.3, 0.5, 0.8)) {
                              save_center_pdf_array = save_center_pdf_array ),
                  error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
-      param_name = "N_replicate"
-      param_value = N_replicate
+      param_name = "N_trial"
+      param_value = N_trial
       folder_path = paste0(top_level_folder, '/', setup,
                            '/', method, 
                            '/', default_setting,

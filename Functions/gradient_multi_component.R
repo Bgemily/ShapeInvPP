@@ -5,13 +5,13 @@ gradient_multi_component = function(fft_f_target_mat,
                                     N_spks_trialwise_vec,
                                     t_unit)
 {
-  N_replicate = nrow(fft_f_target_mat)
+  N_trial = nrow(fft_f_target_mat)
   N_timegrid = ncol(fft_f_target_mat)
   N_component = nrow(fft_f_origin_mat)
   if(N_timegrid != ncol(fft_f_origin_mat)) 
     stop("Length of fft_f_target_mat and fft_f_origin's do not match.")
   
-  for (id_replicate in 1:N_replicate) {
+  for (id_replicate in 1:N_trial) {
     fft_curr_comp = fft_f_target_mat[id_replicate, ]
     fft_f_target_mat[id_replicate, ] = c(tail(fft_curr_comp, (N_timegrid-1)%/%2), 
                                          head(fft_curr_comp, N_timegrid-(N_timegrid-1)%/%2) )
@@ -29,7 +29,7 @@ gradient_multi_component = function(fft_f_target_mat,
   gd_vec = c()
   for (id_component in 1:N_component) {
     gd_curr_comp_vec = c()
-    for (id_replicate in 1:N_replicate) {
+    for (id_replicate in 1:N_trial) {
       fft_f_target = fft_f_target_mat[id_replicate, ]
       fft_f_origin_no_curr_comp = 0
       for (id_component_2 in 1:N_component) {

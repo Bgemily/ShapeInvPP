@@ -20,9 +20,9 @@ align_multi_components = function(f_target_mat,
   } else{
     extend = function(f) {return(c( rep(head(f,1),length(f)-1), f, rep(tail(f,1),2*round(length(f)/2)) ))} # make N:=length_of_func odd
   }
-  N_replicate = nrow(f_target_mat)
+  N_trial = nrow(f_target_mat)
   f_target_mat_extend = c()
-  for (id_replicate in 1:N_replicate) {
+  for (id_replicate in 1:N_trial) {
     f_target_extend_tmp = extend(f_target_mat[id_replicate, ])
     f_target_mat_extend = rbind(f_target_mat_extend, f_target_extend_tmp)
   }
@@ -37,7 +37,7 @@ align_multi_components = function(f_target_mat,
   
   ### Compute terms needed in gradients
   fft_f_target_mat = 0 * f_target_mat
-  for (id_replicate in 1:N_replicate) {
+  for (id_replicate in 1:N_trial) {
     fft_f_target_mat[id_replicate, ] = fft(f_target_mat[id_replicate, ]) #/ length(f_target_mat[id_replicate, ])
   }
   fft_f_origin_mat = 0 * f_origin_mat
@@ -82,8 +82,8 @@ align_multi_components = function(f_target_mat,
     l_vec = 0:(N-1)
     l_vec = c( head(l_vec, N-(N-1)%/%2),
                tail(l_vec, (N-1)%/%2) - N )
-    fft_f_origin_shifted_mat = matrix(nrow = N_replicate, ncol = ncol(fft_f_target_mat))
-    for (id_replicate in 1:N_replicate) {
+    fft_f_origin_shifted_mat = matrix(nrow = N_trial, ncol = ncol(fft_f_target_mat))
+    for (id_replicate in 1:N_trial) {
       fft_f_origin_shifted = 0
       for (id_component in 1:N_component) {
         n0_trialwise = round(v_trialwise_vec_list[[id_component]][id_replicate] / t_unit)
@@ -97,7 +97,7 @@ align_multi_components = function(f_target_mat,
     }
     
     dist_upd = 0
-    for (id_replicate in 1:N_replicate) {
+    for (id_replicate in 1:N_trial) {
       d = sum(abs( fft_f_origin_shifted_mat[id_replicate, ] - fft_f_target_mat[id_replicate, ] )^2)  
       d = sqrt(t_unit / N * d)
       d = d * N_spks_trialwise_vec[id_replicate]

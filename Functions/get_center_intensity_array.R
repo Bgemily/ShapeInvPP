@@ -22,7 +22,7 @@ get_center_intensity_array = function(spks_time_mlist,
   t_unit = t_vec[2]-t_vec[1]
   N_clus = length(clusters_list)
   N_subj = nrow(spks_time_mlist)
-  N_replicate = ncol(spks_time_mlist)
+  N_trial = ncol(spks_time_mlist)
   
   
   center_intensity_array = array(0, dim=c(N_clus, N_component, length(t_vec)))
@@ -33,7 +33,7 @@ get_center_intensity_array = function(spks_time_mlist,
     intensity_q_mat = matrix(0, nrow = N_component, ncol = length(t_vec))
     density_q_mat = matrix(0, nrow = N_component, ncol = length(t_vec))
     F_hat_q = 0
-    if (length(clusters_list[[q]])*N_replicate>=2) {
+    if (length(clusters_list[[q]])*N_trial>=2) {
       ### Temporarily force the minimum time shift of second component to be zero
       if (!fix_timeshift) {
         for (id_component in 1:N_component){
@@ -42,21 +42,21 @@ get_center_intensity_array = function(spks_time_mlist,
             v_subjwise_vec = v_mat_list[[id_component]][clusters_list[[q]], id_replicate] - v_trialwise_vec_list[[id_component]][id_replicate]
             v_subjwise_vec = v_subjwise_vec - min(v_subjwise_vec)
             v_trialwise_vec = v_trialwise_vec_list[[id_component]]
-            v_mat_list[[id_component]][clusters_list[[q]], ] = matrix(v_subjwise_vec, nrow = length(clusters_list[[q]]), ncol = N_replicate) + 
-              matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[q]]), ncol = N_replicate)
+            v_mat_list[[id_component]][clusters_list[[q]], ] = matrix(v_subjwise_vec, nrow = length(clusters_list[[q]]), ncol = N_trial) + 
+              matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[q]]), ncol = N_trial)
           }
         }
       }
       
       ### Calculate terms in the analytical solution of least-squares-estimator 
-      Y_mat_q = matrix(nrow = length(t_vec), ncol = length(clusters_list[[q]])*N_replicate )
-      X_array_q = array(dim = c(length(t_vec), length(clusters_list[[q]])*N_replicate, N_component))
+      Y_mat_q = matrix(nrow = length(t_vec), ncol = length(clusters_list[[q]])*N_trial )
+      X_array_q = array(dim = c(length(t_vec), length(clusters_list[[q]])*N_trial, N_component))
       N_spks_subjtrial_vec_q = c()
       mid = length(t_vec) %/% 2
       l_vec = c( 0:mid, (mid+1-length(t_vec)):(-1))
       for(id_subj_tmp in 1:length(clusters_list[[q]])){
         id_subj = clusters_list[[q]][id_subj_tmp]    
-        for (id_replicate in 1:N_replicate) {
+        for (id_replicate in 1:N_trial) {
           spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
           spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial>=min(t_vec) & 
                                                       spks_time_subjtrial<=max(t_vec))]
@@ -71,9 +71,9 @@ get_center_intensity_array = function(spks_time_mlist,
           density = intensity/length(spks_time_vec)
           
           ### Save terms in the analytical solution of least-squares-estimator 
-          Y_mat_q[ , (id_subj_tmp-1)*N_replicate+id_replicate] = fft(density) / length(t_vec)
+          Y_mat_q[ , (id_subj_tmp-1)*N_trial+id_replicate] = fft(density) / length(t_vec)
           for (id_component in 1:N_component) {
-            X_array_q[ , (id_subj_tmp-1)*N_replicate+id_replicate, id_component] = exp(-1i*2*pi*l_vec*v_mat_list[[id_component]][id_subj, id_replicate]/(max(t_vec)-min(t_vec)))
+            X_array_q[ , (id_subj_tmp-1)*N_trial+id_replicate, id_component] = exp(-1i*2*pi*l_vec*v_mat_list[[id_component]][id_subj, id_replicate]/(max(t_vec)-min(t_vec)))
           }
         }
       }
@@ -151,7 +151,7 @@ get_center_intensity_array = function(spks_time_mlist,
         intensity_q_mat[id_component, ] = density_q_mat[id_component, ] * F_hat_q
       }
       
-    } else if (length(clusters_list[[q]])*N_replicate==1){
+    } else if (length(clusters_list[[q]])*N_trial==1){
       id_subj_tmp = 1
       id_subj = clusters_list[[q]][id_subj_tmp]    
       id_replicate = 1

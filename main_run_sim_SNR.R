@@ -38,7 +38,7 @@ method = 'timeshifts_est_v1.4'
 
 ### Parameters' possible values:
 N_spks_total_list = list(50, 100, 150, 200, 250)
-N_replicate_list = list(1,2,3,4,5)
+N_trial_list = list(1,2,3,4,5)
 N_subj_list = list(100, 200, 300, 400, 500)
 clus_sep_list = list(1.5, 1.6, 1.7, 1.8, 1.9, 2.0)
 
@@ -86,9 +86,9 @@ for (id_split in 1:split) {
     rm(results)
   }
   
-  ### N_replicate
-  for (id_N_replicate in 1:length(N_replicate_list)) {
-    N_replicate = N_replicate_list[[id_N_replicate]]
+  ### N_trial
+  for (id_N_trial in 1:length(N_trial_list)) {
+    N_trial = N_trial_list[[id_N_trial]]
     results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_v5_pdf(SEED = SEED,
@@ -99,7 +99,7 @@ for (id_split in 1:split) {
                            timeshift_max_vec = c(1/4, 1/16),
                            ### params when N_clus==4:
                            N_spks_total = 50,
-                           N_replicate = N_replicate,
+                           N_trial = N_trial,
                            clus_sep = 1.5,
                            ### Parameters for algorithms
                            freq_trun = 10,
@@ -110,8 +110,8 @@ for (id_split in 1:split) {
                            save_center_pdf_array = save_center_pdf_array ),
                error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
-    param_name = "N_replicate"
-    param_value = N_replicate
+    param_name = "N_trial"
+    param_value = N_trial
     folder_path = paste0(top_level_folder, '/', setup,
                          '/', method, 
                          '/', default_setting,

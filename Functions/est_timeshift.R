@@ -18,12 +18,12 @@ est_timeshift = function(spks_time_mlist,
 {
   t_unit = t_vec[2]-t_vec[1]
   N_subj = nrow(spks_time_mlist)
-  N_replicate = ncol(spks_time_mlist)
+  N_trial = ncol(spks_time_mlist)
   N_clus = dim(center_density_array)[1]
   
   
   v_mat = matrix(nrow = N_subj, ncol = N_clus)
-  v_array_list = rep(list(array(dim = c(N_subj, N_replicate, N_clus))), N_component)
+  v_array_list = rep(list(array(dim = c(N_subj, N_trial, N_clus))), N_component)
   dist_mat = matrix(nrow = N_subj, ncol = N_clus)
   center_density_smooth_array = 0 * center_density_array
   for (id_clus in 1:N_clus) {
@@ -42,9 +42,9 @@ est_timeshift = function(spks_time_mlist,
     
     for (id_subj in 1:N_subj) {
       # Smooth point process -------
-      f_target_mat = matrix(nrow = N_replicate, ncol = length(t_vec))
-      N_spks_trialwise_vec = rep(0, N_replicate)
-      for (id_replicate in 1:N_replicate) {
+      f_target_mat = matrix(nrow = N_trial, ncol = length(t_vec))
+      N_spks_trialwise_vec = rep(0, N_trial)
+      for (id_replicate in 1:N_trial) {
         spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
         spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial >= min(t_vec) & spks_time_subjtrial <= max(t_vec))]
         tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
@@ -68,7 +68,7 @@ est_timeshift = function(spks_time_mlist,
       if (fix_timeshift) {
         n0_vec_update = n0_vec_current
         for (id_component in 1:N_component) {
-          v_array_list[[id_component]][id_subj, 1:N_replicate, id_clus] = v_mat_list[[id_component]][id_subj, 1:N_replicate]
+          v_array_list[[id_component]][id_subj, 1:N_trial, id_clus] = v_mat_list[[id_component]][id_subj, 1:N_trial]
         }
       } else{
         # u_0 = v1, u_1 = v0
@@ -94,10 +94,10 @@ est_timeshift = function(spks_time_mlist,
                                                # pad = 0,
                                                periodic = TRUE)$n0_vec
         for (id_component in 1:N_component) {
-          v_array_list[[id_component]][id_subj,1:N_replicate,id_clus] = n0_vec_update[id_component]*t_unit + v_trialwise_vec_list[[id_component]]
+          v_array_list[[id_component]][id_subj,1:N_trial,id_clus] = n0_vec_update[id_component]*t_unit + v_trialwise_vec_list[[id_component]]
         }
         if (fix_comp1_timeshift_only) {
-          v_array_list[[1]][id_subj,1:N_replicate,id_clus] = v_mat_list[[1]][id_subj,1:N_replicate]
+          v_array_list[[1]][id_subj,1:N_trial,id_clus] = v_mat_list[[1]][id_subj,1:N_trial]
         }
       }
       
@@ -109,8 +109,8 @@ est_timeshift = function(spks_time_mlist,
         fft_center_density_mat[id_component, ] = fft(center_density_vec_tmp) / length(center_density_vec_tmp)
       }
       
-      dist_tmp_vec = rep(0, N_replicate)
-      for (id_replicate in 1:N_replicate) {
+      dist_tmp_vec = rep(0, N_trial)
+      for (id_replicate in 1:N_trial) {
         # Get un-smoothed subj density ----
         spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
         spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial >= min(t_vec) & spks_time_subjtrial <= max(t_vec))]

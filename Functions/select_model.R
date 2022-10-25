@@ -14,7 +14,7 @@ select_model = function(spks_time_mlist,
   penalty_vec = rep(0,length(result_list))
   
   N_subj = nrow(spks_time_mlist)
-  N_replicate = ncol(spks_time_mlist)
+  N_trial = ncol(spks_time_mlist)
   
   for (id_res in 1:length(result_list)) {
     ### Retrieve estimates 
@@ -26,11 +26,11 @@ select_model = function(spks_time_mlist,
     center_intensity_array_tmp = res_tmp$center_intensity_array
     center_Nspks_mat_tmp = res_tmp$center_Nspks_mat
     pi_vec = clus_size_vec / sum(clus_size_vec)
-    tau_mat = matrix(0, nrow = N_subj*N_replicate, ncol = N_clus_tmp)
+    tau_mat = matrix(0, nrow = N_subj*N_trial, ncol = N_clus_tmp)
     ### Let tau_{(i,r),q} == 1  if z_{i}=q
     for (q in 1:N_clus_tmp) {
       if (length(clusters_list_tmp[[q]]) >= 1){
-        id_subj_vec_tmp = rep((clusters_list_tmp[[q]]-1)*N_replicate, each=N_replicate) + rep(1:N_replicate, times=length(clusters_list_tmp[[q]]))
+        id_subj_vec_tmp = rep((clusters_list_tmp[[q]]-1)*N_trial, each=N_trial) + rep(1:N_trial, times=length(clusters_list_tmp[[q]]))
         tau_mat[id_subj_vec_tmp, q] = 1
       }
     } 
@@ -46,7 +46,7 @@ select_model = function(spks_time_mlist,
     log_lik_tmp_2 = 0
     for (id_clus in 1:N_clus_tmp) {
       for (id_subj in clusters_list_tmp[[id_clus]]){
-        for (id_replicate in 1:N_replicate) {
+        for (id_replicate in 1:N_trial) {
           ### Calculate estimated intensity for current (subj, replicate)
           intensity_est = rep(0, length(t_vec))
           for (id_component in 1:N_component) {
@@ -87,7 +87,7 @@ select_model = function(spks_time_mlist,
       degr_free_curr_comp = length(which( (key_times_vec[id_component]<=t_vec) & (t_vec<=u_1-max(v_mat_list_tmp[[id_component]])) ))
       degr_free_vec[id_component] = degr_free_curr_comp
     }
-    penalty_tmp = 1/2 * log(N_subj*N_replicate) * 
+    penalty_tmp = 1/2 * log(N_subj*N_trial) * 
       ( (N_clus_tmp - 1) + N_clus_tmp * sum(degr_free_vec) ) 
       
     ### Compute ICL
