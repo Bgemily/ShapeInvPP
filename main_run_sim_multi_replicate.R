@@ -19,10 +19,10 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_trial_total = 20
+N_simtrial_total = 20
 split = 2
 
-N_trial = N_trial_total/split
+N_simtrial = N_simtrial_total/split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -56,7 +56,7 @@ for (id_N_replicate in 1:length(N_replicate_list)) {
     }
     for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
       timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
-      results <- foreach(j = 1:N_trial) %dopar% {
+      results <- foreach(j = 1:N_simtrial) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_v5_pdf(SEED = SEED, 
                              N_replicate = N_replicate,
@@ -86,7 +86,7 @@ for (id_N_replicate in 1:length(N_replicate_list)) {
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
       now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_trial, '.Rdata'))
       rm(results)
     }
   }

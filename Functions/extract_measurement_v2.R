@@ -11,7 +11,7 @@ extract_measurement_v2 = function(folder_path, param_name=NULL, measurement=c("A
     file_name_vec = list.files(path = paste0(folder_path,"/",param_value), full.names = T, recursive = TRUE)
     for (file in file_name_vec) {
       load(file)
-      # Size of meas_value_mat: N_meas*N_trial
+      # Size of meas_value_mat: N_meas*N_simtrial
       if (FALSE){
         ind = which(measurement=='time_estimation')
         time_est_value_vec = sapply(results, function(one_trial) tryCatch(as.numeric(one_trial[["time_estimation"]],

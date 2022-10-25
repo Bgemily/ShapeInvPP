@@ -17,10 +17,10 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_trial_total = 50
+N_simtrial_total = 50
 split = 5
 
-N_trial = N_trial_total/split
+N_simtrial = N_simtrial_total/split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -53,7 +53,7 @@ if (test_random_restart) {
       }
       for (id_N_replicate in 1:length(N_replicate_list)) {
         N_replicate = N_replicate_list[[id_N_replicate]]
-        results <- foreach(id_trial = 1:N_trial) %dopar% {
+        results <- foreach(id_trial = 1:N_simtrial) %dopar% {
           SEED = id_split * 1000 + id_N_replicate * 100 + id_trial + 10
           print(paste0("SEED: ", SEED))
           tryCatch(main_v5_pdf(SEED = SEED,
@@ -87,7 +87,7 @@ if (test_random_restart) {
         dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
         
         now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-        save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+        save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_trial, '.Rdata'))
         rm(results)
       }
     }
@@ -102,7 +102,7 @@ if (test_random_restart) {
     }
     for (id_N_replicate in 1:length(N_replicate_list)) {
       N_replicate = N_replicate_list[[id_N_replicate]]
-      results <- foreach(id_trial = 1:N_trial) %dopar% {
+      results <- foreach(id_trial = 1:N_simtrial) %dopar% {
         SEED = id_split * 1000 + id_N_replicate * 100 + id_trial + 10
         print(paste0("SEED: ", SEED))
         tryCatch(main_v5_pdf(SEED = SEED,
@@ -135,7 +135,7 @@ if (test_random_restart) {
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
       now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+      save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_trial, '.Rdata'))
       rm(results)
     }
   }
@@ -160,7 +160,7 @@ if (test_algorithm_restart) {
       }
       for (id_N_replicate in 1:length(N_replicate_list)) {
         N_replicate = N_replicate_list[[id_N_replicate]]
-        results <- foreach(j = 1:N_trial) %dopar% {
+        results <- foreach(j = 1:N_simtrial) %dopar% {
           SEED = sample(1:1e7,1)
           tryCatch(main_v5_pdf(SEED = SEED,
                                N_subj = 100,
@@ -192,7 +192,7 @@ if (test_algorithm_restart) {
         dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
         
         now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-        save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+        save(results, file = paste0(folder_path, '/', 'N_simtrial', N_simtrial, '_', now_trial, '.Rdata'))
         rm(results)
       }
     }
