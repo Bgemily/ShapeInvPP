@@ -7,8 +7,8 @@ jitter_init_timeshift = function(v_mat_list_init,
     return(v_mat_list_init)
   } else {
     N_component = length(v_mat_list_init)
-    N_node = nrow(v_mat_list_init[[1]])
-    N_replicate = ncol(v_mat_list_init[[1]])
+    N_subj = nrow(v_mat_list_init[[1]])
+    N_trial = ncol(v_mat_list_init[[1]])
     for (id_component in 1:N_component) {
       range = max(v_mat_list_init[[id_component]]) - min(v_mat_list_init[[id_component]])
       v_mat_list_init[[id_component]] = runif(n = length(v_mat_list_init[[id_component]]),
@@ -27,8 +27,8 @@ jitter_init_membership = function(clusters_list_init, jitter_level) {
     return(clusters_list_init)
   } else {
     membership_init = clus2mem(clusters = clusters_list_init)
-    N_node = length(membership_init)
-    ind_switch_mem = sample(x = 1:N_node, size = round(N_node * jitter_level), replace = FALSE)
+    N_subj = length(membership_init)
+    ind_switch_mem = sample(x = 1:N_subj, size = round(N_subj * jitter_level), replace = FALSE)
     membership_jitter = membership_init
     for (ind in ind_switch_mem) {
       membership_jitter[ind] = sample(setdiff(1:N_clus, membership_init[ind]), size = 1)

@@ -16,18 +16,18 @@ get_timeshift_and_clusters = function(spks_time_mlist,
                                       gamma)
 {
   t_unit = t_vec[2]-t_vec[1]
-  N_node = nrow(spks_time_mlist)
-  N_replicate = ncol(spks_time_mlist)
+  N_subj = nrow(spks_time_mlist)
+  N_trial = ncol(spks_time_mlist)
   N_clus = dim(center_density_array)[1]
   N_component = dim(center_density_array)[2]
   
-  ### Get time shift between each node and each cluster -----
+  ### Get time shift between each subj and each cluster -----
   if (is.null(v_mat_list)) {
-    v_mat_list = rep(list(matrix(0, nrow = N_node, ncol = N_replicate)), N_component)
+    v_mat_list = rep(list(matrix(0, nrow = N_subj, ncol = N_trial)), N_component)
     if (!is.null(v_trialwise_vec_list)) {
       for (id_component in 1:N_component) {
         v_trialwise_vec = v_trialwise_vec_list[[id_component]]
-        v_mat_list[[id_component]] = v_mat_list[[id_component]]  + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_node, ncol = N_replicate)
+        v_mat_list[[id_component]] = v_mat_list[[id_component]]  + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_subj, ncol = N_trial)
       }
     }
   }
@@ -48,17 +48,17 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   dist_mat_tmp = tmp$dist_mat
   
   
-  ### Get distance between each node and each cluster -----
-  dist_mat = matrix(0, nrow=N_node, ncol=N_clus)
+  ### Get distance between each subj and each cluster -----
+  dist_mat = matrix(0, nrow=N_subj, ncol=N_clus)
   for (id_clus in 1:N_clus) {
-    N_spks_mat = matrix(nrow=N_node, ncol=N_replicate)
-    for (id_node in 1:N_node) {
-      for (id_replicate in 1:N_replicate) {
-        spks_time_mi_vec = spks_time_mlist[id_node, id_replicate][[1]] - stim_onset_vec[id_replicate] 
+    N_spks_mat = matrix(nrow=N_subj, ncol=N_trial)
+    for (id_subj in 1:N_subj) {
+      for (id_trial in 1:N_trial) {
+        spks_time_mi_vec = spks_time_mlist[id_subj, id_trial][[1]] - stim_onset_vec[id_trial] 
         spks_time_mi_vec = spks_time_mi_vec[which(spks_time_mi_vec<=max(t_vec) &
                                                     spks_time_mi_vec>=min(t_vec))]
         N_spks_mi = length(spks_time_mi_vec)
-        N_spks_mat[id_node, id_replicate] = N_spks_mi
+        N_spks_mat[id_subj, id_trial] = N_spks_mi
       }
     }
     dist_1_vec = dist_mat_tmp[, id_clus]
@@ -71,9 +71,9 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   
   
   ### Select memberships to minimize total distance -----
-  membership = numeric(N_node)
-  dist_to_centr_vec = numeric(N_node)
-  for (i in 1:N_node) {
+  membership = numeric(N_subj)
+  dist_to_centr_vec = numeric(N_subj)
+  for (i in 1:N_subj) {
     dist_vec_tmp = dist_mat[i, ]
     mem_tmp = which.min(dist_vec_tmp)
     if(length(mem_tmp)>1){
@@ -89,7 +89,7 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   ### Extract time shifts based on selected memberships -----
   for (id_clus in 1:N_clus) {
     for (id_component in 1:N_component) {
-      v_mat_list[[id_component]][clusters_list[[id_clus]], 1:N_replicate] = v_array_list_tmp[[id_component]][clusters_list[[id_clus]], 1:N_replicate, id_clus]
+      v_mat_list[[id_component]][clusters_list[[id_clus]], 1:N_trial] = v_array_list_tmp[[id_component]][clusters_list[[id_clus]], 1:N_trial, id_clus]
     }
   }
   ### For each cluster, force the minimum time shifts to be trial-wise time shift
@@ -97,11 +97,11 @@ get_timeshift_and_clusters = function(spks_time_mlist,
     id_component = 1
     for (id_clus in 1:N_clus) {
       if (length(clusters_list[[id_clus]])>0) {
-        id_replicate = 1
-        v_subjwise_vec = v_mat_list[[id_component]][clusters_list[[id_clus]], id_replicate] - v_trialwise_vec_list[[id_component]][id_replicate]
+        id_trial = 1
+        v_subjwise_vec = v_mat_list[[id_component]][clusters_list[[id_clus]], id_trial] - v_trialwise_vec_list[[id_component]][id_trial]
         v_subjwise_vec = v_subjwise_vec - min(v_subjwise_vec)
         v_trialwise_vec = v_trialwise_vec_list[[id_component]]
-        v_mat_list[[id_component]][clusters_list[[id_clus]], ] = matrix(v_subjwise_vec, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate) + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[id_clus]]), ncol = N_replicate)
+        v_mat_list[[id_component]][clusters_list[[id_clus]], ] = matrix(v_subjwise_vec, nrow = length(clusters_list[[id_clus]]), ncol = N_trial) + matrix(v_trialwise_vec, byrow = TRUE, nrow = length(clusters_list[[id_clus]]), ncol = N_trial)
       }
     }
   }

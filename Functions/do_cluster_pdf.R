@@ -1,4 +1,4 @@
-### Input: spks_time_mlist: N_node * N_replicate with each element being a list of spike times
+### Input: spks_time_mlist: N_subj * N_trial with each element being a list of spike times
 ### Perform algorithm based on intensities 
 do_cluster_pdf = function(spks_time_mlist, stim_onset_vec, 
                           reaction_time_vec=NULL,
@@ -31,8 +31,8 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
   }
   
   t_unit = t_vec[2] - t_vec[1]
-  N_node = nrow(spks_time_mlist)
-  N_replicate = ncol(spks_time_mlist)
+  N_subj = nrow(spks_time_mlist)
+  N_trial = ncol(spks_time_mlist)
   
   clusters_history = list()
   loss_history = c()

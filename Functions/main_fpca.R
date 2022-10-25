@@ -3,8 +3,8 @@
 
 main_fpca = function(### Parameters for generative model
                       SEED, 
-                      N_node = 100,
-                      N_replicate = 1,
+                      N_subj = 100,
+                      N_trial = 1,
                       N_clus=2, 
                       N_component_true = 2,
                       u_1 = 1, u_0 = 1,
@@ -32,8 +32,8 @@ main_fpca = function(### Parameters for generative model
   # Generate data -------------------------------------------------------
   ### Extract network related parameters 
   data_param = list(SEED=SEED,
-                    N_node=N_node,
-                    N_replicate=N_replicate,
+                    N_subj=N_subj,
+                    N_trial=N_trial,
                     N_clus=N_clus, 
                     u_1=u_1, u_0=u_0,
                     t_vec=t_vec,
@@ -67,10 +67,10 @@ main_fpca = function(### Parameters for generative model
   # Prepare data for FPCA ######
   yList = list()
   tList = list()
-  for (id_node in 1:N_node){
-    res_smooth = density(spks_time_mlist[[id_node]], bw = bw, from = min(t_vec), to = max(t_vec))
-    yList[[id_node]] = res_smooth$y
-    tList[[id_node]] = res_smooth$x
+  for (id_subj in 1:N_subj){
+    res_smooth = density(spks_time_mlist[[id_subj]], bw = bw, from = min(t_vec), to = max(t_vec))
+    yList[[id_subj]] = res_smooth$y
+    tList[[id_subj]] = res_smooth$x
   }
   
   
@@ -83,7 +83,7 @@ main_fpca = function(### Parameters for generative model
   
   mean_density_vec = FPCAobj$mu
   eigenfuncs_mat = FPCAobj$phi[ , 1:N_component, drop=FALSE] # len(t_vec) x N_component
-  fpc_scores_mat = FPCAobj$xiEst[ , 1:N_component, drop=FALSE] # N_node x N_component
+  fpc_scores_mat = FPCAobj$xiEst[ , 1:N_component, drop=FALSE] # N_subj x N_component
   t_fpca_vec = FPCAobj$workGrid
   
   
@@ -136,7 +136,7 @@ main_fpca = function(### Parameters for generative model
     center_density_array_est[1, id_component, ] = density_vec
     
     v_fpca_vec = v_fpca_vec + v_mean_fpca_vec
-    v_mat_list_est[[id_component]] = matrix(data = v_fpca_vec, nrow = N_node, ncol = N_replicate)
+    v_mat_list_est[[id_component]] = matrix(data = v_fpca_vec, nrow = N_subj, ncol = N_trial)
   }
   center_density_array_est = round(center_density_array_est, digits = 4)
   
@@ -187,7 +187,7 @@ main_fpca = function(### Parameters for generative model
   
   # Other estimates
   N_clus_est = 1
-  clusters_list_est = list(1:N_node)
+  clusters_list_est = list(1:N_subj)
   center_intensity_array_est = NA
   center_Nspks_mat_est = NA
   loss_history = NA

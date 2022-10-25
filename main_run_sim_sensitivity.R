@@ -17,10 +17,10 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_trial_total = 50
-split = 5
+N_replicate_total = 50
+N_split = 5
 
-N_trial = N_trial_total/split
+N_replicate = N_replicate_total/N_split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -39,19 +39,19 @@ method = 'ShapeInvPP'
 ### Parameters' possible values:
 freq_trun_vec = c(1,5,10,15,20,25,30)
 
-default_setting = 'N_spks_total=30,N_node=100,clus_sep=1.6'
-for (id_split in 1:split) {
-  if (save_res_details & (id_split == 1)) {
+default_setting = 'N_spks_total=30,N_subj=100,clus_sep=1.6'
+for (id_N_split in 1:N_split) {
+  if (save_res_details & (id_N_split == 1)) {
     save_center_pdf_array = TRUE
   } else {
     save_center_pdf_array = FALSE
   }
   for (id_freq_trun in 1:length(freq_trun_vec)){
     freq_trun = freq_trun_vec[id_freq_trun]
-    results <- foreach(j = 1:N_trial) %dopar% {
+    results <- foreach(j = 1:N_replicate) %dopar% {
       SEED = sample(1:1e7,1)
-      tryCatch(main_v5_pdf(SEED = SEED,
-                           N_node = 100,
+      tryCatch(main_shapeinvpp(SEED = SEED,
+                           N_subj = 100,
                            N_clus = 4,
                            N_component_true = 2,
                            t_vec = seq(-1, 1, by=0.01),
@@ -77,27 +77,27 @@ for (id_split in 1:split) {
                          '/', param_name, '/', param_value)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
 
-    now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-    save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+    now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
     rm(results)
 
   }
 }
 
 
-default_setting = 'N_spks_total=50,N_node=100,clus_sep=1.6'
-for (id_split in 1:split) {
-  if (save_res_details & (id_split == 1)) {
+default_setting = 'N_spks_total=50,N_subj=100,clus_sep=1.6'
+for (id_N_split in 1:N_split) {
+  if (save_res_details & (id_N_split == 1)) {
     save_center_pdf_array = TRUE
   } else {
     save_center_pdf_array = FALSE
   }
   for (id_freq_trun in 1:length(freq_trun_vec)){
     freq_trun = freq_trun_vec[id_freq_trun]
-    results <- foreach(j = 1:N_trial) %dopar% {
+    results <- foreach(j = 1:N_replicate) %dopar% {
       SEED = sample(1:1e7,1)
-      tryCatch(main_v5_pdf(SEED = SEED,
-                           N_node = 100,
+      tryCatch(main_shapeinvpp(SEED = SEED,
+                           N_subj = 100,
                            N_clus = 4,
                            N_component_true = 2,
                            t_vec = seq(-1, 1, by=0.01),
@@ -123,27 +123,27 @@ for (id_split in 1:split) {
                          '/', param_name, '/', param_value)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
 
-    now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-    save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+    now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
     rm(results)
 
   }
 }
 
 
-default_setting = 'N_spks_total=100,N_node=100,clus_sep=1.6'
-for (id_split in 1:split) {
-  if (save_res_details & (id_split == 1)) {
+default_setting = 'N_spks_total=100,N_subj=100,clus_sep=1.6'
+for (id_N_split in 1:N_split) {
+  if (save_res_details & (id_N_split == 1)) {
     save_center_pdf_array = TRUE
   } else {
     save_center_pdf_array = FALSE
   }
   for (id_freq_trun in 1:length(freq_trun_vec)){
     freq_trun = freq_trun_vec[id_freq_trun]
-    results <- foreach(j = 1:N_trial) %dopar% {
+    results <- foreach(j = 1:N_replicate) %dopar% {
       SEED = sample(1:1e7,1)
-      tryCatch(main_v5_pdf(SEED = SEED,
-                           N_node = 100,
+      tryCatch(main_shapeinvpp(SEED = SEED,
+                           N_subj = 100,
                            N_clus = 4,
                            N_component_true = 2,
                            t_vec = seq(-1, 1, by=0.01),
@@ -169,8 +169,8 @@ for (id_split in 1:split) {
                          '/', param_name, '/', param_value)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
 
-    now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-    save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+    now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
     rm(results)
 
   }

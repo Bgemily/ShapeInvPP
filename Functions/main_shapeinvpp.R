@@ -1,9 +1,9 @@
 ### Generate data, run our algorithm, and output measurements of errors.
  
-main_v5_pdf = function(### Parameters for generative model
+main_shapeinvpp = function(### Parameters for generative model
                         SEED, 
-                        N_node = 100,
-                        N_replicate = 1,
+                        N_subj = 100,
+                        N_trial = 1,
                         N_clus=2, 
                         N_component_true = 2,
                         u_1 = 1, u_0 = 1,
@@ -49,8 +49,8 @@ main_v5_pdf = function(### Parameters for generative model
   # Generate data -------------------------------------------------------
   ### Extract network related parameters 
   data_param = list(SEED=SEED,
-                    N_node=N_node,
-                    N_replicate=N_replicate,
+                    N_subj=N_subj,
+                    N_trial=N_trial,
                     N_clus=N_clus, 
                     u_1=u_1, u_0=u_0,
                     t_vec=t_vec,

@@ -44,13 +44,13 @@ for (method in method_vec){
     mem = clus2mem(clusters_list)
     
     df_tmp3 = tibble(mem=mem, 
-                     id_node = data_res$id_node_vec, 
+                     id_subj = data_res$id_subj_vec, 
                      id_trial = data_res$id_trial_vec,
                      id_session = data_res$id_session_vec,
                      N_spks = data_res$N_spks_vec,
                      response_type = data_res$response_type_vec,
                      brain_area = data_res$brain_area_vec) %>%
-      mutate(id_node = as_factor(id_node))
+      mutate(id_subj = as_factor(id_subj))
     df_tmp3$response_type[is.na(df_tmp3$response_type)] = 'passive'
     
     df_tmp3.1 = df_tmp3
@@ -64,19 +64,19 @@ for (method in method_vec){
              #            brain_area=as_factor(brain_area,),
              mem=as_factor(mem)) %>%
       group_by(id_trial, id_session, response_type, brain_area, mem, .drop=F) %>%
-      summarise(N_node_pertrialmem=n()) %>%
+      summarise(N_subj_pertrialmem=n()) %>%
       group_by(id_trial, id_session, response_type, brain_area, .drop=F) %>%
-      mutate(N_node_pertrial=sum(N_node_pertrialmem), 
-             prop_node_pertrialmem=N_node_pertrialmem/(N_node_pertrial+.Machine$double.eps)) %>%
-      filter(N_node_pertrial>0) %>%
+      mutate(N_subj_pertrial=sum(N_subj_pertrialmem), 
+             prop_subj_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
+      filter(N_subj_pertrial>0) %>%
       group_by(response_type, brain_area, mem) %>%
-      mutate(N_node_perresptype_mem = sum(N_node_pertrialmem)) %>%
+      mutate(N_subj_perresptype_mem = sum(N_subj_pertrialmem)) %>%
       group_by(response_type, brain_area) %>%
-      mutate(prop_node_perresptype_mem = N_node_perresptype_mem/sum(N_node_pertrialmem)) %>%
+      mutate(prop_subj_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
       group_by(response_type, brain_area, id_session, mem) %>%
-      mutate(N_node_perresptype_session_mem = sum(N_node_pertrialmem)) %>%
+      mutate(N_subj_perresptype_session_mem = sum(N_subj_pertrialmem)) %>%
       group_by(response_type, brain_area, id_session) %>%
-      mutate(prop_node_perresptype_session_mem = N_node_perresptype_session_mem/sum(N_node_pertrialmem)) %>%
+      mutate(prop_subj_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
       mutate(brain_area=factor(brain_area)) %>%
       ungroup()
     df_long = df_tmp3.1
@@ -85,11 +85,11 @@ for (method in method_vec){
     
     ### Fit multinomial logistic regression
     df_multinom = df_long %>% 
-      select(id_trial, id_session, response_type, brain_area, mem, prop_node_pertrialmem) %>%
+      select(id_trial, id_session, response_type, brain_area, mem, prop_subj_pertrialmem) %>%
       filter(mem != max(levels(df_long$mem)), id_session==id_session_tmp) %>%
       pivot_wider(id_cols = c(id_trial, id_session, response_type), 
                   names_from = c(brain_area, mem), 
-                  values_from = prop_node_pertrialmem) %>%
+                  values_from = prop_subj_pertrialmem) %>%
       select(!c(id_trial, id_session))
     
     
@@ -160,13 +160,13 @@ for (method in method_vec){
     mem = clus2mem(clusters_list)
     
     df_tmp3 = tibble(mem=mem, 
-                     id_node = data_res$id_node_vec, 
+                     id_subj = data_res$id_subj_vec, 
                      id_trial = data_res$id_trial_vec,
                      id_session = data_res$id_session_vec,
                      N_spks = data_res$N_spks_vec,
                      pre_feedback_type = data_res$pre_feedback_type_vec,
                      brain_area = data_res$brain_area_vec) %>%
-      mutate(id_node = as_factor(id_node))
+      mutate(id_subj = as_factor(id_subj))
     
     df_tmp3.1 = df_tmp3
     
@@ -177,19 +177,19 @@ for (method in method_vec){
              #            brain_area=as_factor(brain_area,),
              mem=as_factor(mem)) %>%
       group_by(id_trial, id_session, pre_feedback_type, brain_area, mem, .drop=F) %>%
-      summarise(N_node_pertrialmem=n()) %>%
+      summarise(N_subj_pertrialmem=n()) %>%
       group_by(id_trial, id_session, pre_feedback_type, brain_area, .drop=F) %>%
-      mutate(N_node_pertrial=sum(N_node_pertrialmem), 
-             prop_node_pertrialmem=N_node_pertrialmem/(N_node_pertrial+.Machine$double.eps)) %>%
-      filter(N_node_pertrial>0) %>%
+      mutate(N_subj_pertrial=sum(N_subj_pertrialmem), 
+             prop_subj_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
+      filter(N_subj_pertrial>0) %>%
       group_by(pre_feedback_type, brain_area, mem) %>%
-      mutate(N_node_perresptype_mem = sum(N_node_pertrialmem)) %>%
+      mutate(N_subj_perresptype_mem = sum(N_subj_pertrialmem)) %>%
       group_by(pre_feedback_type, brain_area) %>%
-      mutate(prop_node_perresptype_mem = N_node_perresptype_mem/sum(N_node_pertrialmem)) %>%
+      mutate(prop_subj_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
       group_by(pre_feedback_type, brain_area, id_session, mem) %>%
-      mutate(N_node_perresptype_session_mem = sum(N_node_pertrialmem)) %>%
+      mutate(N_subj_perresptype_session_mem = sum(N_subj_pertrialmem)) %>%
       group_by(pre_feedback_type, brain_area, id_session) %>%
-      mutate(prop_node_perresptype_session_mem = N_node_perresptype_session_mem/sum(N_node_pertrialmem)) %>%
+      mutate(prop_subj_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
       mutate(brain_area=factor(brain_area)) %>%
       ungroup()
     df_long = df_tmp3.1
@@ -199,11 +199,11 @@ for (method in method_vec){
     ### Fit multinomial logistic regression
     df_multinom = df_long %>% 
       filter( !is.na(pre_feedback_type) ) %>%
-      select(id_trial, id_session, pre_feedback_type, brain_area, mem, prop_node_pertrialmem) %>%
+      select(id_trial, id_session, pre_feedback_type, brain_area, mem, prop_subj_pertrialmem) %>%
       filter(mem != max(levels(df_long$mem)), id_session==id_session_tmp) %>%
       pivot_wider(id_cols = c(id_trial, id_session, pre_feedback_type), 
                   names_from = c(brain_area, mem), 
-                  values_from = prop_node_pertrialmem) %>%
+                  values_from = prop_subj_pertrialmem) %>%
       select(!c(id_trial, id_session))
     
     
@@ -302,13 +302,13 @@ for (method in method_vec){
 #     mem = clus2mem(clusters_list)
 #     
 #     df_tmp3 = tibble(mem=mem, 
-#                      id_node = data_res$id_node_vec, 
+#                      id_subj = data_res$id_subj_vec, 
 #                      id_trial = data_res$id_trial_vec,
 #                      id_session = data_res$id_session_vec,
 #                      N_spks = data_res$N_spks_vec,
 #                      response_type = data_res$response_type_vec,
 #                      brain_area = data_res$brain_area_vec) %>%
-#       mutate(id_node = as_factor(id_node))
+#       mutate(id_subj = as_factor(id_subj))
 #     df_tmp3$response_type[is.na(df_tmp3$response_type)] = 'passive'
 #     
 #     df_tmp3.1 = df_tmp3
@@ -322,19 +322,19 @@ for (method in method_vec){
 #              #            brain_area=as_factor(brain_area,),
 #              mem=as_factor(mem)) %>%
 #       group_by(id_trial, id_session, response_type, brain_area, mem, .drop=F) %>%
-#       summarise(N_node_pertrialmem=n()) %>%
+#       summarise(N_subj_pertrialmem=n()) %>%
 #       group_by(id_trial, id_session, response_type, brain_area, .drop=F) %>%
-#       mutate(N_node_pertrial=sum(N_node_pertrialmem), 
-#              prop_node_pertrialmem=N_node_pertrialmem/(N_node_pertrial+.Machine$double.eps)) %>%
-#       filter(N_node_pertrial>0) %>%
+#       mutate(N_subj_pertrial=sum(N_subj_pertrialmem), 
+#              prop_subj_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
+#       filter(N_subj_pertrial>0) %>%
 #       group_by(response_type, brain_area, mem) %>%
-#       mutate(N_node_perresptype_mem = sum(N_node_pertrialmem)) %>%
+#       mutate(N_subj_perresptype_mem = sum(N_subj_pertrialmem)) %>%
 #       group_by(response_type, brain_area) %>%
-#       mutate(prop_node_perresptype_mem = N_node_perresptype_mem/sum(N_node_pertrialmem)) %>%
+#       mutate(prop_subj_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
 #       group_by(response_type, brain_area, id_session, mem) %>%
-#       mutate(N_node_perresptype_session_mem = sum(N_node_pertrialmem)) %>%
+#       mutate(N_subj_perresptype_session_mem = sum(N_subj_pertrialmem)) %>%
 #       group_by(response_type, brain_area, id_session) %>%
-#       mutate(prop_node_perresptype_session_mem = N_node_perresptype_session_mem/sum(N_node_pertrialmem)) %>%
+#       mutate(prop_subj_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
 #       mutate(brain_area=factor(brain_area)) %>%
 #       ungroup()
 #     df_long = df_tmp3.1
@@ -343,11 +343,11 @@ for (method in method_vec){
 #     
 #     ### Fit multinomial logistic regression
 #     df_multinom = df_long %>% 
-#       select(id_trial, id_session, response_type, brain_area, mem, prop_node_pertrialmem) %>%
+#       select(id_trial, id_session, response_type, brain_area, mem, prop_subj_pertrialmem) %>%
 #       filter(mem != max(levels(df_long$mem)), id_session==id_session_tmp) %>%
 #       pivot_wider(id_cols = c(id_trial, id_session, response_type), 
 #                   names_from = c(brain_area, mem), 
-#                   values_from = prop_node_pertrialmem) %>%
+#                   values_from = prop_subj_pertrialmem) %>%
 #       select(!c(id_trial, id_session))
 #     
 #     
@@ -418,13 +418,13 @@ for (method in method_vec){
 #     mem = clus2mem(clusters_list)
 #     
 #     df_tmp3 = tibble(mem=mem, 
-#                      id_node = data_res$id_node_vec, 
+#                      id_subj = data_res$id_subj_vec, 
 #                      id_trial = data_res$id_trial_vec,
 #                      id_session = data_res$id_session_vec,
 #                      N_spks = data_res$N_spks_vec,
 #                      pre_feedback_type = data_res$pre_feedback_type_vec,
 #                      brain_area = data_res$brain_area_vec) %>%
-#       mutate(id_node = as_factor(id_node))
+#       mutate(id_subj = as_factor(id_subj))
 #     
 #     df_tmp3.1 = df_tmp3
 #     
@@ -435,19 +435,19 @@ for (method in method_vec){
 #              #            brain_area=as_factor(brain_area,),
 #              mem=as_factor(mem)) %>%
 #       group_by(id_trial, id_session, pre_feedback_type, brain_area, mem, .drop=F) %>%
-#       summarise(N_node_pertrialmem=n()) %>%
+#       summarise(N_subj_pertrialmem=n()) %>%
 #       group_by(id_trial, id_session, pre_feedback_type, brain_area, .drop=F) %>%
-#       mutate(N_node_pertrial=sum(N_node_pertrialmem), 
-#              prop_node_pertrialmem=N_node_pertrialmem/(N_node_pertrial+.Machine$double.eps)) %>%
-#       filter(N_node_pertrial>0) %>%
+#       mutate(N_subj_pertrial=sum(N_subj_pertrialmem), 
+#              prop_subj_pertrialmem=N_subj_pertrialmem/(N_subj_pertrial+.Machine$double.eps)) %>%
+#       filter(N_subj_pertrial>0) %>%
 #       group_by(pre_feedback_type, brain_area, mem) %>%
-#       mutate(N_node_perresptype_mem = sum(N_node_pertrialmem)) %>%
+#       mutate(N_subj_perresptype_mem = sum(N_subj_pertrialmem)) %>%
 #       group_by(pre_feedback_type, brain_area) %>%
-#       mutate(prop_node_perresptype_mem = N_node_perresptype_mem/sum(N_node_pertrialmem)) %>%
+#       mutate(prop_subj_perresptype_mem = N_subj_perresptype_mem/sum(N_subj_pertrialmem)) %>%
 #       group_by(pre_feedback_type, brain_area, id_session, mem) %>%
-#       mutate(N_node_perresptype_session_mem = sum(N_node_pertrialmem)) %>%
+#       mutate(N_subj_perresptype_session_mem = sum(N_subj_pertrialmem)) %>%
 #       group_by(pre_feedback_type, brain_area, id_session) %>%
-#       mutate(prop_node_perresptype_session_mem = N_node_perresptype_session_mem/sum(N_node_pertrialmem)) %>%
+#       mutate(prop_subj_perresptype_session_mem = N_subj_perresptype_session_mem/sum(N_subj_pertrialmem)) %>%
 #       mutate(brain_area=factor(brain_area)) %>%
 #       ungroup()
 #     df_long = df_tmp3.1
@@ -457,11 +457,11 @@ for (method in method_vec){
 #     ### Fit multinomial logistic regression
 #     df_multinom = df_long %>% 
 #       filter( !is.na(pre_feedback_type) ) %>%
-#       select(id_trial, id_session, pre_feedback_type, brain_area, mem, prop_node_pertrialmem) %>%
+#       select(id_trial, id_session, pre_feedback_type, brain_area, mem, prop_subj_pertrialmem) %>%
 #       filter(mem != max(levels(df_long$mem)), id_session==id_session_tmp) %>%
 #       pivot_wider(id_cols = c(id_trial, id_session, pre_feedback_type), 
 #                   names_from = c(brain_area, mem), 
-#                   values_from = prop_node_pertrialmem) %>%
+#                   values_from = prop_subj_pertrialmem) %>%
 #       select(!c(id_trial, id_session))
 #     
 #     

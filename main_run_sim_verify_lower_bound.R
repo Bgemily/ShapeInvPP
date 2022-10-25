@@ -19,10 +19,10 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_trial_total = 20
-split = 2
+N_replicate_total = 20
+N_split = 2
 
-N_trial = N_trial_total/split
+N_replicate = N_replicate_total/N_split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -51,19 +51,19 @@ N_spks_list = list(50, 75, 100, 125, 150, 175, 200)
 if (test_var_timeshift) {
   for (method in c('shape_inv_pp', 'v_eq_0')) {
     fix_timeshift = ifelse(method == 'v_eq_0', yes = TRUE, no = FALSE)
-    default_setting = 'N_spks_total=30,N_node=100,N_clus=1,N_comp=1'
-    for (id_split in 1:split) {
-      if (save_res_details & (id_split == 1)) {
+    default_setting = 'N_spks_total=30,N_subj=100,N_clus=1,N_comp=1'
+    for (id_N_split in 1:N_split) {
+      if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
       } else {
         save_center_pdf_array = FALSE
       }
       for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
         timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
-        results <- foreach(j = 1:N_trial) %dopar% {
+        results <- foreach(j = 1:N_replicate) %dopar% {
           SEED = sample(1:1e7,1)
-          tryCatch(main_v5_pdf(SEED = SEED, 
-                               N_node = 100,
+          tryCatch(main_shapeinvpp(SEED = SEED, 
+                               N_subj = 100,
                                N_clus = 1, 
                                N_component_true = 1,
                                N_spks_total = 30,
@@ -87,8 +87,8 @@ if (test_var_timeshift) {
                              '/', param_name, '/', param_value)
         dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
         
-        now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-        save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+        now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+        save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
         rm(results)
       }
     }
@@ -100,19 +100,19 @@ if (test_var_timeshift) {
 
 if (test_N_spks) {
   method = 'shape_inv_pp'
-  default_setting = 'N_spks_total_varies,N_node=100,N_clus=1,N_comp=1'
-  for (id_split in 1:split) {
-    if (save_res_details & (id_split == 1)) {
+  default_setting = 'N_spks_total_varies,N_subj=100,N_clus=1,N_comp=1'
+  for (id_N_split in 1:N_split) {
+    if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
     } else {
       save_center_pdf_array = FALSE
     }
     for (id_N_spks in 1:length(N_spks_list)) {
       N_spks_total = N_spks_list[[id_N_spks]]
-      results <- foreach(j = 1:N_trial) %dopar% {
+      results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_v5_pdf(SEED = SEED, 
-                             N_node = 100,
+        tryCatch(main_shapeinvpp(SEED = SEED, 
+                             N_subj = 100,
                              N_clus = 1, 
                              N_component_true = 1,
                              N_spks_total = N_spks_total,
@@ -136,8 +136,8 @@ if (test_N_spks) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+      now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
       rm(results)
     }
   }

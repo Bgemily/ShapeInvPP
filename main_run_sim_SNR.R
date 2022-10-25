@@ -17,10 +17,10 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_trial_total = 20
-split = 2
+N_replicate_total = 20
+N_split = 2
 
-N_trial = N_trial_total/split
+N_replicate = N_replicate_total/N_split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -38,13 +38,13 @@ method = 'timeshifts_est_v1.4'
 
 ### Parameters' possible values:
 N_spks_total_list = list(50, 100, 150, 200, 250)
-N_replicate_list = list(1,2,3,4,5)
-N_node_list = list(100, 200, 300, 400, 500)
+N_trial_list = list(1,2,3,4,5)
+N_subj_list = list(100, 200, 300, 400, 500)
 clus_sep_list = list(1.5, 1.6, 1.7, 1.8, 1.9, 2.0)
 
-default_setting = 'N_spks_total=50,N_node=100,clus_sep=1.5'
-for (id_split in 1:split) {
-  if (save_res_details & (id_split == 1)) {
+default_setting = 'N_spks_total=50,N_subj=100,clus_sep=1.5'
+for (id_N_split in 1:N_split) {
+  if (save_res_details & (id_N_split == 1)) {
     save_center_pdf_array = TRUE
   } else {
     save_center_pdf_array = FALSE
@@ -52,10 +52,10 @@ for (id_split in 1:split) {
   ### N_spks_total
   for (id_N_spks_total in 1:length(N_spks_total_list)) {
     N_spks_total = N_spks_total_list[[id_N_spks_total]]
-    results <- foreach(j = 1:N_trial) %dopar% {
+    results <- foreach(j = 1:N_replicate) %dopar% {
       SEED = sample(1:1e7,1)
-      tryCatch(main_v5_pdf(SEED = SEED,
-                           N_node = 100,
+      tryCatch(main_shapeinvpp(SEED = SEED,
+                           N_subj = 100,
                            N_clus = 4,
                            N_component_true = 2,
                            t_vec = seq(-1, 1, by=0.01),
@@ -81,25 +81,25 @@ for (id_split in 1:split) {
                          '/', param_name, '/', param_value)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     
-    now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-    save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+    now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
     rm(results)
   }
   
-  ### N_replicate
-  for (id_N_replicate in 1:length(N_replicate_list)) {
-    N_replicate = N_replicate_list[[id_N_replicate]]
-    results <- foreach(j = 1:N_trial) %dopar% {
+  ### N_trial
+  for (id_N_trial in 1:length(N_trial_list)) {
+    N_trial = N_trial_list[[id_N_trial]]
+    results <- foreach(j = 1:N_replicate) %dopar% {
       SEED = sample(1:1e7,1)
-      tryCatch(main_v5_pdf(SEED = SEED,
-                           N_node = 100,
+      tryCatch(main_shapeinvpp(SEED = SEED,
+                           N_subj = 100,
                            N_clus = 4,
                            N_component_true = 2,
                            t_vec = seq(-1, 1, by=0.01),
                            timeshift_max_vec = c(1/4, 1/16),
                            ### params when N_clus==4:
                            N_spks_total = 50,
-                           N_replicate = N_replicate,
+                           N_trial = N_trial,
                            clus_sep = 1.5,
                            ### Parameters for algorithms
                            freq_trun = 10,
@@ -110,26 +110,26 @@ for (id_split in 1:split) {
                            save_center_pdf_array = save_center_pdf_array ),
                error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
-    param_name = "N_replicate"
-    param_value = N_replicate
+    param_name = "N_trial"
+    param_value = N_trial
     folder_path = paste0(top_level_folder, '/', setup,
                          '/', method, 
                          '/', default_setting,
                          '/', param_name, '/', param_value)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     
-    now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-    save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+    now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
     rm(results)
   }
   
-  ### N_node
-  for (id_N_node in 1:length(N_node_list)) {
-    N_node = N_node_list[[id_N_node]]
-    results <- foreach(j = 1:N_trial) %dopar% {
+  ### N_subj
+  for (id_N_subj in 1:length(N_subj_list)) {
+    N_subj = N_subj_list[[id_N_subj]]
+    results <- foreach(j = 1:N_replicate) %dopar% {
       SEED = sample(1:1e7,1)
-      tryCatch(main_v5_pdf(SEED = SEED,
-                           N_node = N_node,
+      tryCatch(main_shapeinvpp(SEED = SEED,
+                           N_subj = N_subj,
                            N_clus = 4,
                            N_component_true = 2,
                            t_vec = seq(-1, 1, by=0.01),
@@ -146,8 +146,8 @@ for (id_split in 1:split) {
                            save_center_pdf_array = save_center_pdf_array ),
                error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
-    param_name = "N_node"
-    param_value = N_node
+    param_name = "N_subj"
+    param_value = N_subj
     folder_path = paste0(top_level_folder,
                          '/', setup,
                          '/', method, 
@@ -155,8 +155,8 @@ for (id_split in 1:split) {
                          '/', param_name, '/', param_value)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     
-    now_trial = format(Sys.time(), "%Y%m%d_%H%M%S")
-    save(results, file = paste0(folder_path, '/', 'N_trial', N_trial, '_', now_trial, '.Rdata'))
+    now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
     rm(results)
   }
 }

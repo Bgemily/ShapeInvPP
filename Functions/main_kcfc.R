@@ -3,8 +3,8 @@
 
 main_kcfc = function(### Parameters for generative model
   SEED, 
-  N_node = 100,
-  N_replicate = 1,
+  N_subj = 100,
+  N_trial = 1,
   N_clus=2, 
   N_component_true = 2,
   u_1 = 1, u_0 = 1,
@@ -32,8 +32,8 @@ main_kcfc = function(### Parameters for generative model
   # Generate data -------------------------------------------------------
   ### Extract network related parameters 
   data_param = list(SEED=SEED,
-                    N_node=N_node,
-                    N_replicate=N_replicate,
+                    N_subj=N_subj,
+                    N_trial=N_trial,
                     N_clus=N_clus, 
                     u_1=u_1, u_0=u_0,
                     t_vec=t_vec,
@@ -67,10 +67,10 @@ main_kcfc = function(### Parameters for generative model
   # Prepare data for FPCA ######
   yList = list()
   tList = list()
-  for (id_node in 1:N_node){
-    res_smooth = density(spks_time_mlist[[id_node]], bw = bw, n = 256, from = min(t_vec), to = max(t_vec))
-    yList[[id_node]] = res_smooth$y
-    tList[[id_node]] = res_smooth$x
+  for (id_subj in 1:N_subj){
+    res_smooth = density(spks_time_mlist[[id_subj]], bw = bw, n = 256, from = min(t_vec), to = max(t_vec))
+    yList[[id_subj]] = res_smooth$y
+    tList[[id_subj]] = res_smooth$x
   }
   
   
@@ -115,14 +115,14 @@ main_kcfc = function(### Parameters for generative model
   }
   
   center_density_fpca_array_permn = array(dim = c(N_clus, N_component, length(t_vec)))
-  v_fpca_mat = matrix(nrow = N_node, ncol = N_component)
+  v_fpca_mat = matrix(nrow = N_subj, ncol = N_component)
   for (id_clus in 1:N_clus){
     ### Extract FPCA estimates
     FPCAobj = fpcaList_permn[[id_clus]]    
-    N_node_tmp = nrow(FPCAobj$xiEst)
+    N_subj_tmp = nrow(FPCAobj$xiEst)
     mean_density_vec = FPCAobj$mu
     eigenfuncs_mat = FPCAobj$phi[ , 1:N_component, drop=FALSE] # len(t_fpca_vec) x N_component
-    fpc_scores_mat = FPCAobj$xiEst[ , 1:N_component, drop=FALSE] # N_node_tmp x N_component
+    fpc_scores_mat = FPCAobj$xiEst[ , 1:N_component, drop=FALSE] # N_subj_tmp x N_component
     t_fpca_vec = FPCAobj$workGrid
     current_cluster = which(memb_est_vec_permn==id_clus)
     ### Calculate densities and time shifts
@@ -209,7 +209,7 @@ main_kcfc = function(### Parameters for generative model
   center_density_array_est_permn = center_density_fpca_array_permn
   v_mat_list_est = list()
   for (id_component in 1:N_component) {
-    v_mat_list_est[[id_component]] = matrix(data = v_fpca_mat_permn[, id_component], nrow = N_node, ncol = N_replicate)
+    v_mat_list_est[[id_component]] = matrix(data = v_fpca_mat_permn[, id_component], nrow = N_subj, ncol = N_trial)
   }
   
   # Other estimates
