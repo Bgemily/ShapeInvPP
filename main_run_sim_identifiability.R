@@ -19,10 +19,10 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_xxxxxxxx_total = 500
+N_replicate_total = 500
 split = 50
 
-N_xxxxxxxx = N_xxxxxxxx_total/split
+N_replicate = N_replicate_total/split
 
 
 # Parallel computing setup ------------------------------------------------

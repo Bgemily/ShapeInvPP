@@ -17,10 +17,10 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_xxxxxxxx_total = 50
+N_replicate_total = 50
 split = 5
 
-N_xxxxxxxx = N_xxxxxxxx_total/split
+N_replicate = N_replicate_total/split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -53,8 +53,8 @@ if (test_random_restart) {
       }
       for (id_N_trial in 1:length(N_trial_list)) {
         N_trial = N_trial_list[[id_N_trial]]
-        results <- foreach(id_xxxxxxxx = 1:N_xxxxxxxx) %dopar% {
-          SEED = id_split * 1000 + id_N_trial * 100 + id_xxxxxxxx + 10
+        results <- foreach(id_replicate = 1:N_replicate) %dopar% {
+          SEED = id_split * 1000 + id_N_trial * 100 + id_replicate + 10
           print(paste0("SEED: ", SEED))
           tryCatch(main_v5_pdf(SEED = SEED,
                                N_subj = 100,
@@ -86,8 +86,8 @@ if (test_random_restart) {
                              '/', param_name, '/', param_value)
         dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
         
-        now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
-        save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
+        now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+        save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
         rm(results)
       }
     }
@@ -102,8 +102,8 @@ if (test_random_restart) {
     }
     for (id_N_trial in 1:length(N_trial_list)) {
       N_trial = N_trial_list[[id_N_trial]]
-      results <- foreach(id_xxxxxxxx = 1:N_xxxxxxxx) %dopar% {
-        SEED = id_split * 1000 + id_N_trial * 100 + id_xxxxxxxx + 10
+      results <- foreach(id_replicate = 1:N_replicate) %dopar% {
+        SEED = id_split * 1000 + id_N_trial * 100 + id_replicate + 10
         print(paste0("SEED: ", SEED))
         tryCatch(main_v5_pdf(SEED = SEED,
                              N_subj = 100,
@@ -134,8 +134,8 @@ if (test_random_restart) {
                            '/', param_name, '/', param_value)
       dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
       
-      now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
-      save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
+      now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+      save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
       rm(results)
     }
   }
@@ -160,7 +160,7 @@ if (test_algorithm_restart) {
       }
       for (id_N_trial in 1:length(N_trial_list)) {
         N_trial = N_trial_list[[id_N_trial]]
-        results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
+        results <- foreach(j = 1:N_replicate) %dopar% {
           SEED = sample(1:1e7,1)
           tryCatch(main_v5_pdf(SEED = SEED,
                                N_subj = 100,
@@ -191,8 +191,8 @@ if (test_algorithm_restart) {
                              '/', param_name, '/', param_value)
         dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
         
-        now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
-        save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
+        now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+        save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
         rm(results)
       }
     }

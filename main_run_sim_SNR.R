@@ -17,10 +17,10 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_xxxxxxxx_total = 20
+N_replicate_total = 20
 split = 2
 
-N_xxxxxxxx = N_xxxxxxxx_total/split
+N_replicate = N_replicate_total/split
 
 
 # Parallel computing setup ------------------------------------------------
@@ -52,7 +52,7 @@ for (id_split in 1:split) {
   ### N_spks_total
   for (id_N_spks_total in 1:length(N_spks_total_list)) {
     N_spks_total = N_spks_total_list[[id_N_spks_total]]
-    results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
+    results <- foreach(j = 1:N_replicate) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_v5_pdf(SEED = SEED,
                            N_subj = 100,
@@ -81,15 +81,15 @@ for (id_split in 1:split) {
                          '/', param_name, '/', param_value)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     
-    now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
-    save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
+    now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
     rm(results)
   }
   
   ### N_trial
   for (id_N_trial in 1:length(N_trial_list)) {
     N_trial = N_trial_list[[id_N_trial]]
-    results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
+    results <- foreach(j = 1:N_replicate) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_v5_pdf(SEED = SEED,
                            N_subj = 100,
@@ -118,15 +118,15 @@ for (id_split in 1:split) {
                          '/', param_name, '/', param_value)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     
-    now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
-    save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
+    now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
     rm(results)
   }
   
   ### N_subj
   for (id_N_subj in 1:length(N_subj_list)) {
     N_subj = N_subj_list[[id_N_subj]]
-    results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
+    results <- foreach(j = 1:N_replicate) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_v5_pdf(SEED = SEED,
                            N_subj = N_subj,
@@ -155,8 +155,8 @@ for (id_split in 1:split) {
                          '/', param_name, '/', param_value)
     dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
     
-    now_xxxxxxxx = format(Sys.time(), "%Y%m%d_%H%M%S")
-    save(results, file = paste0(folder_path, '/', 'N_xxxxxxxx', N_xxxxxxxx, '_', now_xxxxxxxx, '.Rdata'))
+    now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
     rm(results)
   }
 }
