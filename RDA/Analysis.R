@@ -52,7 +52,7 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %dopar% {
     stim_onset_vec = c()
     id_session_vec = c()
     id_trial_vec = c()
-    id_node_vec = c()
+    id_subj_vec = c()
     pre_feedback_type_vec = c()
     response_type_vec = c()
     is_passive_vec = c()
@@ -67,10 +67,10 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %dopar% {
       )
       id_trial_vec_1_P = which(dat_P$scenario=="passiveVisual")
       id_trial_vec_1_P = id_trial_vec_1_P[which(dat_P$contrast_left<dat_P$contrast_right)]
-      id_node_vec_1 = seq(length(dat$brain_region))
-      if(length(id_node_vec_1)>0){
-        spks_time_mlist_1 = dat$spks_pp[id_node_vec_1, id_trial_vec_1]
-        spks_time_mlist_1_P = dat_P$spks_pp[id_node_vec_1, id_trial_vec_1_P]
+      id_subj_vec_1 = seq(length(dat$brain_region))
+      if(length(id_subj_vec_1)>0){
+        spks_time_mlist_1 = dat$spks_pp[id_subj_vec_1, id_trial_vec_1]
+        spks_time_mlist_1_P = dat_P$spks_pp[id_subj_vec_1, id_trial_vec_1_P]
         spks_time_mlist_1 = cbind(spks_time_mlist_1, spks_time_mlist_1_P)
         
         stim_onset_vec_1 = dat$stim_onset[id_trial_vec_1, 1]
@@ -95,11 +95,11 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %dopar% {
         
         id_trial_vec_1 = c(id_trial_vec_1, id_trial_vec_1_P+length(dat$scenario_num))
         
-        brain_area_1 = dat$brain_area[id_node_vec_1]
+        brain_area_1 = dat$brain_area[id_subj_vec_1]
         
         
         ### Reshape: N_subj x N_trial -> (N_subj*N_trial) x 1
-        N_subj = length(id_node_vec_1)
+        N_subj = length(id_subj_vec_1)
         N_trial = length(id_trial_vec_1)
         spks_time_mlist_2 = matrix(t(spks_time_mlist_1),
                                    nrow=length(spks_time_mlist_1),
@@ -109,13 +109,13 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %dopar% {
         pre_feedback_type_vec_2 = rep(pre_feedback_type_vec_1, N_subj)
         response_type_vec_2 = rep(response_type_vec_1, N_subj)
         is_passive_vec_2 = rep(is_passive_vec_1, N_subj)
-        id_node_vec_2 = rep(id_node_vec_1, each=N_trial)
+        id_subj_vec_2 = rep(id_subj_vec_1, each=N_trial)
         brain_area_2 = rep(brain_area_1, each=N_trial)
         
         ### Align (N_subj*N_trial) spike trains by their stimuli onset time
         spks_time_mlist_3 = spks_time_mlist_2
-        for (id_nodetrial in 1:nrow(spks_time_mlist_2)) {
-          spks_time_mlist_3[id_nodetrial,1] = list(spks_time_mlist_2[id_nodetrial,1][[1]] - stim_onset_vec_2[id_nodetrial])
+        for (id_subjtrial in 1:nrow(spks_time_mlist_2)) {
+          spks_time_mlist_3[id_subjtrial,1] = list(spks_time_mlist_2[id_subjtrial,1][[1]] - stim_onset_vec_2[id_subjtrial])
         }
         stim_onset_vec_3 = stim_onset_vec_2*0
         
@@ -123,7 +123,7 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %dopar% {
         spks_time_mlist = rbind(spks_time_mlist, spks_time_mlist_3)
         stim_onset_vec = c(stim_onset_vec, stim_onset_vec_3)
         id_session_vec = c(id_session_vec, rep(id_session, length(stim_onset_vec_3)))
-        id_node_vec = c(id_node_vec, id_node_vec_2)
+        id_subj_vec = c(id_subj_vec, id_subj_vec_2)
         id_trial_vec = c(id_trial_vec, id_trial_vec_2)
         pre_feedback_type_vec = c(pre_feedback_type_vec, pre_feedback_type_vec_2)
         response_type_vec = c(response_type_vec, response_type_vec_2)
@@ -137,7 +137,7 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %dopar% {
     spks_time_mlist_full = spks_time_mlist
     stim_onset_vec_full = stim_onset_vec
     id_session_vec_full = id_session_vec
-    id_node_vec_full = id_node_vec
+    id_subj_vec_full = id_subj_vec
     id_trial_vec_full = id_trial_vec
     pre_feedback_type_vec_full = pre_feedback_type_vec
     response_type_vec_full = response_type_vec
@@ -152,13 +152,13 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %dopar% {
     N_subj = nrow(spks_time_mlist_full)
     N_trial = ncol(spks_time_mlist_full)
     N_spks_vec = rep(0, N_subj)
-    for (id_node in 1:N_subj){
+    for (id_subj in 1:N_subj){
       for (id_trial in 1:N_trial){
-        spks_time_tmp = unlist(spks_time_mlist_full[id_node,id_trial]) - stim_onset_vec_full[id_trial]
+        spks_time_tmp = unlist(spks_time_mlist_full[id_subj,id_trial]) - stim_onset_vec_full[id_trial]
         spks_time_tmp = spks_time_tmp[which(spks_time_tmp<=max(t_vec) & 
                                               spks_time_tmp>=min(t_vec))]
         N_spks_tmp = length(spks_time_tmp)
-        N_spks_vec[id_node] = N_spks_vec[id_node] + N_spks_tmp
+        N_spks_vec[id_subj] = N_spks_vec[id_subj] + N_spks_tmp
       }
     }
     
@@ -284,7 +284,7 @@ foreach (id_mouse = 1:length(mouse_name_set_vec)) %dopar% {
                         spks_time_mlist = spks_time_mlist_full,
                         stim_onset_vec = stim_onset_vec_full,
                         id_trial_vec = id_trial_vec_full,
-                        id_node_vec = id_node_vec_full,
+                        id_subj_vec = id_subj_vec_full,
                         id_session_vec = id_session_vec_full,
                         pre_feedback_type_vec = pre_feedback_type_vec_full,
                         response_type_vec = response_type_vec_full,

@@ -43,11 +43,11 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
   } else{
     ### Use earliest spike times as subject-wise time shifts
     v_subjwise_vec_list = rep(list(rep(0, N_subj)), N_component)
-    for (id_node in 1:N_subj) {
+    for (id_subj in 1:N_subj) {
       for (id_component in 1:N_component){
         spks_time_shifted_vec = c()
         for (id_replicate in 1:N_replicate) {
-          spks_time_tmp = spks_time_mlist[id_node, id_replicate][[1]]-stim_onset_vec[id_replicate]
+          spks_time_tmp = spks_time_mlist[id_subj, id_replicate][[1]]-stim_onset_vec[id_replicate]
           time_start_curr_comp = key_times_vec[id_component] 
           time_end_curr_comp = key_times_vec[id_component + 1]
           spks_time_curr_comp_vec = spks_time_tmp[which(spks_time_tmp >= time_start_curr_comp &
@@ -59,10 +59,10 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
         }
         
         if (FALSE) {
-          v_subjwise_vec_list[[id_component]][id_node] = runif(n = 1, min = min(t_vec), 
+          v_subjwise_vec_list[[id_component]][id_subj] = runif(n = 1, min = min(t_vec), 
                                                                     max = quantile(spks_time_shifted_vec, 0.05) )
         } else {
-          v_subjwise_vec_list[[id_component]][id_node] = quantile(spks_time_shifted_vec, 0.05) 
+          v_subjwise_vec_list[[id_component]][id_subj] = quantile(spks_time_shifted_vec, 0.05) 
         }
       }
     }
@@ -88,8 +88,8 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
   node_intensity_array = array(dim=c(N_subj, 1, length(t_vec)))
   node_density_array = array(dim=c(N_subj, 1, length(t_vec)))
   node_Nspks_mat = matrix(nrow=N_subj, ncol=1)
-  for (id_node in 1:N_subj) {
-    spks_time_vec_tmp = unlist(spks_time_mlist[id_node, ])
+  for (id_subj in 1:N_subj) {
+    spks_time_vec_tmp = unlist(spks_time_mlist[id_subj, ])
     tmp = get_smoothed_pp(event_time_vec = spks_time_vec_tmp, 
                           freq_trun = freq_trun, 
                           t_vec = t_vec, 
@@ -101,13 +101,13 @@ get_init_random = function(spks_time_mlist, stim_onset_vec,
     } else{
       density_tmp = intensity_tmp*0
     }
-    N_spks_nodetrial_vec_tmp = sapply(spks_time_mlist[id_node, , drop=FALSE], length)
+    N_spks_nodetrial_vec_tmp = sapply(spks_time_mlist[id_subj, , drop=FALSE], length)
     F_hat_tmp = sqrt( mean(N_spks_nodetrial_vec_tmp^2) )
     intensity_tmp = density_tmp*F_hat_tmp
     
-    node_intensity_array[id_node,1,] = intensity_tmp
-    node_density_array[id_node,1,] = density_tmp
-    node_Nspks_mat[id_node,1] = F_hat_tmp
+    node_intensity_array[id_subj,1,] = intensity_tmp
+    node_density_array[id_subj,1,] = density_tmp
+    node_Nspks_mat[id_subj,1] = F_hat_tmp
   }
   
   ### Apply k-means algorithm

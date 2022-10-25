@@ -107,16 +107,16 @@ generate_data_Ncomp_1 = function(SEED=NULL,
   stim_onset_vec = rep(0, N_replicate)
   spks_time_mlist = matrix(list(), nrow = N_subj, ncol = N_replicate)
   for (id_clus in 1:N_clus) {
-    for (id_node in clus_true_list[[id_clus]]) {
+    for (id_subj in clus_true_list[[id_clus]]) {
       for (id_replicate in 1:N_replicate) {
-        v_tmp_1 = v_mat_list[[1]][id_node, id_replicate]
-        spks_time_mlist[id_node, id_replicate] = list(c( rejection_sampling(density_vec = center_density_array_true[id_clus,1,], 
+        v_tmp_1 = v_mat_list[[1]][id_subj, id_replicate]
+        spks_time_mlist[id_subj, id_replicate] = list(c( rejection_sampling(density_vec = center_density_array_true[id_clus,1,], 
                                                                             t_vec = t_vec_extend, 
                                                                             N_sample = rpois(n=1, lambda=center_N_spks_mat[id_clus,1]) )+
                                                            stim_onset_vec[id_replicate]+v_tmp_1 ))
         ### Only keep spike times during [-u_0, u_1] 
-        spks_time_vec = spks_time_mlist[id_node,id_replicate][[1]]
-        spks_time_mlist[id_node,id_replicate][[1]] = spks_time_vec[which(spks_time_vec >= -u_0 & 
+        spks_time_vec = spks_time_mlist[id_subj,id_replicate][[1]]
+        spks_time_mlist[id_subj,id_replicate][[1]] = spks_time_vec[which(spks_time_vec >= -u_0 & 
                                                                            spks_time_vec <= u_1)]
       }
     }

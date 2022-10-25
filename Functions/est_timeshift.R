@@ -40,12 +40,12 @@ est_timeshift = function(spks_time_mlist,
     f_origin_mat = matrix(nrow = N_component, ncol = length(t_vec))
     f_origin_mat[1:N_component, ] = center_density_smooth_array[id_clus, 1:N_component, ]
     
-    for (id_node in 1:N_subj) {
+    for (id_subj in 1:N_subj) {
       # Smooth point process -------
       f_target_mat = matrix(nrow = N_replicate, ncol = length(t_vec))
       N_spks_trialwise_vec = rep(0, N_replicate)
       for (id_replicate in 1:N_replicate) {
-        spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_replicate]) - stim_onset_vec[id_replicate]
+        spks_time_nodetrial = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
         spks_time_vec = spks_time_nodetrial[which(spks_time_nodetrial >= min(t_vec) & spks_time_nodetrial <= max(t_vec))]
         tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
                               freq_trun = freq_trun, 
@@ -61,14 +61,14 @@ est_timeshift = function(spks_time_mlist,
       n0_vec_current = rep(0, N_component)
       for (id_component in 1:N_component) {
         id_replicate = 1
-        v_subj_comp = v_mat_list[[id_component]][id_node, id_replicate] - v_trialwise_vec_list[[id_component]][id_replicate]
+        v_subj_comp = v_mat_list[[id_component]][id_subj, id_replicate] - v_trialwise_vec_list[[id_component]][id_replicate]
         n0_subj_comp = round(v_subj_comp / t_unit)
         n0_vec_current[id_component] = n0_subj_comp
       }
       if (fix_timeshift) {
         n0_vec_update = n0_vec_current
         for (id_component in 1:N_component) {
-          v_array_list[[id_component]][id_node, 1:N_replicate, id_clus] = v_mat_list[[id_component]][id_node, 1:N_replicate]
+          v_array_list[[id_component]][id_subj, 1:N_replicate, id_clus] = v_mat_list[[id_component]][id_subj, 1:N_replicate]
         }
       } else{
         # u_0 = v1, u_1 = v0
@@ -94,10 +94,10 @@ est_timeshift = function(spks_time_mlist,
                                                # pad = 0,
                                                periodic = TRUE)$n0_vec
         for (id_component in 1:N_component) {
-          v_array_list[[id_component]][id_node,1:N_replicate,id_clus] = n0_vec_update[id_component]*t_unit + v_trialwise_vec_list[[id_component]]
+          v_array_list[[id_component]][id_subj,1:N_replicate,id_clus] = n0_vec_update[id_component]*t_unit + v_trialwise_vec_list[[id_component]]
         }
         if (fix_comp1_timeshift_only) {
-          v_array_list[[1]][id_node,1:N_replicate,id_clus] = v_mat_list[[1]][id_node,1:N_replicate]
+          v_array_list[[1]][id_subj,1:N_replicate,id_clus] = v_mat_list[[1]][id_subj,1:N_replicate]
         }
       }
       
@@ -112,7 +112,7 @@ est_timeshift = function(spks_time_mlist,
       dist_tmp_vec = rep(0, N_replicate)
       for (id_replicate in 1:N_replicate) {
         # Get un-smoothed node density ----
-        spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_replicate]) - stim_onset_vec[id_replicate]
+        spks_time_nodetrial = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
         spks_time_vec = spks_time_nodetrial[which(spks_time_nodetrial >= min(t_vec) & spks_time_nodetrial <= max(t_vec))]
         tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
                               freq_trun = Inf, 
@@ -121,7 +121,7 @@ est_timeshift = function(spks_time_mlist,
         node_intensity_unsmooth = tmp$intens_vec
         node_density_unsmooth = node_intensity_unsmooth / length(spks_time_vec)
         
-        # Calculate distance between (id_node, id_replicate) and id_clus ----
+        # Calculate distance between (id_subj, id_replicate) and id_clus ----
         fft_node_density = fft(node_density_unsmooth) / length(node_density_unsmooth)
         N = length(node_density_unsmooth)
         l_vec = 0:(N-1)
@@ -135,7 +135,7 @@ est_timeshift = function(spks_time_mlist,
         }
         dist_tmp_vec[id_replicate] = sum(abs( fft_center_density_shifted - fft_node_density )^2) * length(spks_time_vec)
       }
-      dist_mat[id_node,id_clus] = sum(dist_tmp_vec)
+      dist_mat[id_subj,id_clus] = sum(dist_tmp_vec)
     }
     
   }

@@ -45,22 +45,22 @@ get_init = function(spks_time_mlist, stim_onset_vec,
   } else{
     ### Use earliest spike times as subject-wise time shifts
     v_subjwise_vec_list = rep(list(rep(0, N_subj)), N_component)
-    for (id_node in 1:N_subj) {
+    for (id_subj in 1:N_subj) {
       for (id_component in 1:N_component){
         spks_time_shifted_vec = c()
         for (id_replicate in 1:N_replicate) {
-          spks_time_tmp = spks_time_mlist[id_node, id_replicate][[1]]-stim_onset_vec[id_replicate]
+          spks_time_tmp = spks_time_mlist[id_subj, id_replicate][[1]]-stim_onset_vec[id_replicate]
           time_start_curr_comp = key_times_vec[id_component] 
           time_end_curr_comp = key_times_vec[id_component + 1]
           spks_time_curr_comp_vec = spks_time_tmp[which(spks_time_tmp >= time_start_curr_comp &
                                                           spks_time_tmp <= time_end_curr_comp)]
           if (length(spks_time_curr_comp_vec) > 0) {
             spks_time_curr_comp_vec = spks_time_curr_comp_vec - v_trialwise_vec_list[[id_component]][id_replicate]
-            # v_mat_list[[id_component]][id_node, id_replicate] = quantile(spks_time_curr_comp_vec, 0.05) 
+            # v_mat_list[[id_component]][id_subj, id_replicate] = quantile(spks_time_curr_comp_vec, 0.05) 
           }
           spks_time_shifted_vec = c(spks_time_shifted_vec, spks_time_curr_comp_vec)
         }
-        v_subjwise_vec_list[[id_component]][id_node] = quantile(spks_time_shifted_vec, 0.05) 
+        v_subjwise_vec_list[[id_component]][id_subj] = quantile(spks_time_shifted_vec, 0.05) 
       }
     }
     
@@ -83,7 +83,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
   node_intensity_array = array(dim=c(N_subj, 1, length(t_vec)))
   node_density_array = array(dim=c(N_subj, 1, length(t_vec)))
   node_Nspks_mat = matrix(nrow=N_subj, ncol=1)
-  for (id_node in 1:N_subj) {
+  for (id_subj in 1:N_subj) {
     intensity_tmp = rep(0, length(t_vec))
     density_tmp = rep(0, length(t_vec))
     F_hat_tmp = 0
@@ -92,17 +92,17 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     N_spks_nodetrial_vec_tmp = c()
     for (id_replicate in 1:N_replicate) {
       spks_time_shifted_tmp = c()
-      spks_time_tmp = unlist(spks_time_mlist[id_node,id_replicate]) - stim_onset_vec[id_replicate]
+      spks_time_tmp = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
       for (id_component in 1:N_component) {
-        time_start_tmp = key_times_vec[id_component] + v_mat_list[[id_component]][id_node,id_replicate]
+        time_start_tmp = key_times_vec[id_component] + v_mat_list[[id_component]][id_subj,id_replicate]
         if (id_component < N_component) {
-          time_end_tmp = key_times_vec[id_component+1] + v_mat_list[[id_component+1]][id_node,id_replicate]
+          time_end_tmp = key_times_vec[id_component+1] + v_mat_list[[id_component+1]][id_subj,id_replicate]
         } else {
           time_end_tmp = key_times_vec[id_component+1] 
         }
         spks_time_tmp_curr_comp = spks_time_tmp[which(spks_time_tmp >= time_start_tmp & 
                                                         spks_time_tmp <= time_end_tmp)]
-        spks_time_tmp_curr_comp_shifted = spks_time_tmp_curr_comp - v_mat_list[[id_component]][id_node,id_replicate]
+        spks_time_tmp_curr_comp_shifted = spks_time_tmp_curr_comp - v_mat_list[[id_component]][id_subj,id_replicate]
         spks_time_shifted_tmp = c(spks_time_shifted_tmp, spks_time_tmp_curr_comp_shifted)
       }
       
@@ -131,9 +131,9 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     
     
     
-    node_intensity_array[id_node,1,] = intensity_tmp
-    node_density_array[id_node,1,] = density_tmp
-    node_Nspks_mat[id_node,1] = F_hat_tmp
+    node_intensity_array[id_subj,1,] = intensity_tmp
+    node_density_array[id_subj,1,] = density_tmp
+    node_Nspks_mat[id_subj,1] = F_hat_tmp
   }
   
   if (rmv_conn_prob){

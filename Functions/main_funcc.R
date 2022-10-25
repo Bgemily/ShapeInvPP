@@ -69,13 +69,13 @@ main_funcc = function(### Parameters for generative model
   
   # Prepare data for FunCC ######
   density_array = array(dim = c(N_subj, N_component, length(t_vec)))
-  for (id_node in 1:N_subj){
-    res_smooth = density(spks_time_mlist[[id_node]], bw = bw, 
+  for (id_subj in 1:N_subj){
+    res_smooth = density(spks_time_mlist[[id_subj]], bw = bw, 
                          from = min(t_vec), to = max(t_vec),
                          n = length(t_vec))
     for (id_component in 1:N_component) {
       y_curr_comp = res_smooth$y * I((t_vec >= key_times_vec[id_component]) & (t_vec <= key_times_vec[id_component+1]))
-      density_array[id_node, id_component, ] = y_curr_comp
+      density_array[id_subj, id_component, ] = y_curr_comp
     }
   }
   

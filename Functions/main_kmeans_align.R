@@ -68,8 +68,8 @@ main_kmeans_align = function(### Parameters for generative model
   # Prepare data for kmeans_align() ######
   f_mat = c()
   time_vec = c()
-  for (id_node in 1:N_subj){
-    res_smooth = density(spks_time_mlist[[id_node]], bw = bw, n = length(t_vec), from = min(t_vec), to = max(t_vec))
+  for (id_subj in 1:N_subj){
+    res_smooth = density(spks_time_mlist[[id_subj]], bw = bw, n = length(t_vec), from = min(t_vec), to = max(t_vec))
     f_mat = cbind(f_mat, res_smooth$y)
     time_vec = res_smooth$x
   }

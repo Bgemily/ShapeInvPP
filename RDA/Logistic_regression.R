@@ -44,13 +44,13 @@ for (method in method_vec){
     mem = clus2mem(clusters_list)
     
     df_tmp3 = tibble(mem=mem, 
-                     id_node = data_res$id_node_vec, 
+                     id_subj = data_res$id_subj_vec, 
                      id_trial = data_res$id_trial_vec,
                      id_session = data_res$id_session_vec,
                      N_spks = data_res$N_spks_vec,
                      response_type = data_res$response_type_vec,
                      brain_area = data_res$brain_area_vec) %>%
-      mutate(id_node = as_factor(id_node))
+      mutate(id_subj = as_factor(id_subj))
     df_tmp3$response_type[is.na(df_tmp3$response_type)] = 'passive'
     
     df_tmp3.1 = df_tmp3
@@ -160,13 +160,13 @@ for (method in method_vec){
     mem = clus2mem(clusters_list)
     
     df_tmp3 = tibble(mem=mem, 
-                     id_node = data_res$id_node_vec, 
+                     id_subj = data_res$id_subj_vec, 
                      id_trial = data_res$id_trial_vec,
                      id_session = data_res$id_session_vec,
                      N_spks = data_res$N_spks_vec,
                      pre_feedback_type = data_res$pre_feedback_type_vec,
                      brain_area = data_res$brain_area_vec) %>%
-      mutate(id_node = as_factor(id_node))
+      mutate(id_subj = as_factor(id_subj))
     
     df_tmp3.1 = df_tmp3
     
@@ -302,13 +302,13 @@ for (method in method_vec){
 #     mem = clus2mem(clusters_list)
 #     
 #     df_tmp3 = tibble(mem=mem, 
-#                      id_node = data_res$id_node_vec, 
+#                      id_subj = data_res$id_subj_vec, 
 #                      id_trial = data_res$id_trial_vec,
 #                      id_session = data_res$id_session_vec,
 #                      N_spks = data_res$N_spks_vec,
 #                      response_type = data_res$response_type_vec,
 #                      brain_area = data_res$brain_area_vec) %>%
-#       mutate(id_node = as_factor(id_node))
+#       mutate(id_subj = as_factor(id_subj))
 #     df_tmp3$response_type[is.na(df_tmp3$response_type)] = 'passive'
 #     
 #     df_tmp3.1 = df_tmp3
@@ -418,13 +418,13 @@ for (method in method_vec){
 #     mem = clus2mem(clusters_list)
 #     
 #     df_tmp3 = tibble(mem=mem, 
-#                      id_node = data_res$id_node_vec, 
+#                      id_subj = data_res$id_subj_vec, 
 #                      id_trial = data_res$id_trial_vec,
 #                      id_session = data_res$id_session_vec,
 #                      N_spks = data_res$N_spks_vec,
 #                      pre_feedback_type = data_res$pre_feedback_type_vec,
 #                      brain_area = data_res$brain_area_vec) %>%
-#       mutate(id_node = as_factor(id_node))
+#       mutate(id_subj = as_factor(id_subj))
 #     
 #     df_tmp3.1 = df_tmp3
 #     

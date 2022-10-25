@@ -67,10 +67,10 @@ main_kcfc = function(### Parameters for generative model
   # Prepare data for FPCA ######
   yList = list()
   tList = list()
-  for (id_node in 1:N_subj){
-    res_smooth = density(spks_time_mlist[[id_node]], bw = bw, n = 256, from = min(t_vec), to = max(t_vec))
-    yList[[id_node]] = res_smooth$y
-    tList[[id_node]] = res_smooth$x
+  for (id_subj in 1:N_subj){
+    res_smooth = density(spks_time_mlist[[id_subj]], bw = bw, n = 256, from = min(t_vec), to = max(t_vec))
+    yList[[id_subj]] = res_smooth$y
+    tList[[id_subj]] = res_smooth$x
   }
   
   

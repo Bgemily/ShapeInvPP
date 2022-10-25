@@ -52,13 +52,13 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   dist_mat = matrix(0, nrow=N_subj, ncol=N_clus)
   for (id_clus in 1:N_clus) {
     N_spks_mat = matrix(nrow=N_subj, ncol=N_replicate)
-    for (id_node in 1:N_subj) {
+    for (id_subj in 1:N_subj) {
       for (id_replicate in 1:N_replicate) {
-        spks_time_mi_vec = spks_time_mlist[id_node, id_replicate][[1]] - stim_onset_vec[id_replicate] 
+        spks_time_mi_vec = spks_time_mlist[id_subj, id_replicate][[1]] - stim_onset_vec[id_replicate] 
         spks_time_mi_vec = spks_time_mi_vec[which(spks_time_mi_vec<=max(t_vec) &
                                                     spks_time_mi_vec>=min(t_vec))]
         N_spks_mi = length(spks_time_mi_vec)
-        N_spks_mat[id_node, id_replicate] = N_spks_mi
+        N_spks_mat[id_subj, id_replicate] = N_spks_mi
       }
     }
     dist_1_vec = dist_mat_tmp[, id_clus]

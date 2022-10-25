@@ -54,15 +54,15 @@ get_center_intensity_array = function(spks_time_mlist,
       N_spks_nodetrial_vec_q = c()
       mid = length(t_vec) %/% 2
       l_vec = c( 0:mid, (mid+1-length(t_vec)):(-1))
-      for(id_node_tmp in 1:length(clusters_list[[q]])){
-        id_node = clusters_list[[q]][id_node_tmp]    
+      for(id_subj_tmp in 1:length(clusters_list[[q]])){
+        id_subj = clusters_list[[q]][id_subj_tmp]    
         for (id_replicate in 1:N_replicate) {
-          spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_replicate]) - stim_onset_vec[id_replicate]
+          spks_time_nodetrial = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
           spks_time_vec = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
                                                       spks_time_nodetrial<=max(t_vec))]
           N_spks_nodetrial_vec_q = c(N_spks_nodetrial_vec_q, length(spks_time_vec))
           
-          ### Smooth point process of id_node in id_replicate
+          ### Smooth point process of id_subj in id_replicate
           tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
                                 freq_trun = freq_trun, 
                                 t_vec = t_vec, 
@@ -71,9 +71,9 @@ get_center_intensity_array = function(spks_time_mlist,
           density = intensity/length(spks_time_vec)
           
           ### Save terms in the analytical solution of least-squares-estimator 
-          Y_mat_q[ , (id_node_tmp-1)*N_replicate+id_replicate] = fft(density) / length(t_vec)
+          Y_mat_q[ , (id_subj_tmp-1)*N_replicate+id_replicate] = fft(density) / length(t_vec)
           for (id_component in 1:N_component) {
-            X_array_q[ , (id_node_tmp-1)*N_replicate+id_replicate, id_component] = exp(-1i*2*pi*l_vec*v_mat_list[[id_component]][id_node, id_replicate]/(max(t_vec)-min(t_vec)))
+            X_array_q[ , (id_subj_tmp-1)*N_replicate+id_replicate, id_component] = exp(-1i*2*pi*l_vec*v_mat_list[[id_component]][id_subj, id_replicate]/(max(t_vec)-min(t_vec)))
           }
         }
       }
@@ -152,12 +152,12 @@ get_center_intensity_array = function(spks_time_mlist,
       }
       
     } else if (length(clusters_list[[q]])*N_replicate==1){
-      id_node_tmp = 1
-      id_node = clusters_list[[q]][id_node_tmp]    
+      id_subj_tmp = 1
+      id_subj = clusters_list[[q]][id_subj_tmp]    
       id_replicate = 1
       
       ### The the only one point process
-      spks_time_nodetrial = unlist(spks_time_mlist[id_node,id_replicate]) - stim_onset_vec[id_replicate]
+      spks_time_nodetrial = unlist(spks_time_mlist[id_subj,id_replicate]) - stim_onset_vec[id_replicate]
       spks_time_vec = spks_time_nodetrial[which(spks_time_nodetrial>=min(t_vec) & 
                                                   spks_time_nodetrial<=max(t_vec))]
       N_spks_nodetrial_vec_q = length(spks_time_nodetrial)

@@ -62,13 +62,13 @@ if (select_tuning_parameter) {
     key_times_vec = c(-1, 0, 1)
     spks_time_mlist = data_generated$spks_time_mlist
     density_array = array(dim = c(data_param$N_subj, N_component_true, length(data_param$t_vec)))
-    for (id_node in 1:data_param$N_subj){
-      res_smooth = density(spks_time_mlist[[id_node]], bw = 'SJ', 
+    for (id_subj in 1:data_param$N_subj){
+      res_smooth = density(spks_time_mlist[[id_subj]], bw = 'SJ', 
                            from = min(data_param$t_vec), to = max(data_param$t_vec),
                            n = length(data_param$t_vec))
       for (id_component in 1:N_component_true) {
         y_curr_comp = res_smooth$y * I((data_param$t_vec >= key_times_vec[id_component]) & (data_param$t_vec <= key_times_vec[id_component+1]))
-        density_array[id_node, id_component, ] = y_curr_comp
+        density_array[id_subj, id_component, ] = y_curr_comp
       }
     }
     
