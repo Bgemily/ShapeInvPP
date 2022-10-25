@@ -53,8 +53,8 @@ if (test_random_restart) {
       }
       for (id_N_replicate in 1:length(N_replicate_list)) {
         N_replicate = N_replicate_list[[id_N_replicate]]
-        results <- foreach(id_trial = 1:N_simtrial) %dopar% {
-          SEED = id_split * 1000 + id_N_replicate * 100 + id_trial + 10
+        results <- foreach(id_simtrial = 1:N_simtrial) %dopar% {
+          SEED = id_split * 1000 + id_N_replicate * 100 + id_simtrial + 10
           print(paste0("SEED: ", SEED))
           tryCatch(main_v5_pdf(SEED = SEED,
                                N_subj = 100,
@@ -102,8 +102,8 @@ if (test_random_restart) {
     }
     for (id_N_replicate in 1:length(N_replicate_list)) {
       N_replicate = N_replicate_list[[id_N_replicate]]
-      results <- foreach(id_trial = 1:N_simtrial) %dopar% {
-        SEED = id_split * 1000 + id_N_replicate * 100 + id_trial + 10
+      results <- foreach(id_simtrial = 1:N_simtrial) %dopar% {
+        SEED = id_split * 1000 + id_N_replicate * 100 + id_simtrial + 10
         print(paste0("SEED: ", SEED))
         tryCatch(main_v5_pdf(SEED = SEED,
                              N_subj = 100,
