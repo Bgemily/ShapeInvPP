@@ -95,7 +95,6 @@ get_init = function(spks_time_mlist, stim_onset_vec,
       spks_time_tmp = unlist(spks_time_mlist[id_node,id_replicate]) - stim_onset_vec[id_replicate]
       for (id_component in 1:N_component) {
         time_start_tmp = key_times_vec[id_component] + v_mat_list[[id_component]][id_node,id_replicate]
-        ### TODO: Make time_end_tmp more reasonable
         if (id_component < N_component) {
           time_end_tmp = key_times_vec[id_component+1] + v_mat_list[[id_component+1]][id_node,id_replicate]
         } else {

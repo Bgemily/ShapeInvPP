@@ -84,7 +84,6 @@ select_model = function(spks_time_mlist,
     u_0 = -min(res_tmp$t_vec); u_1 = max(res_tmp$t_vec)
     degr_free_vec = c()
     for (id_component in 1:N_component) {
-      ### TODO: Check whether degr_free_curr_comp is reasonable
       degr_free_curr_comp = length(which( (key_times_vec[id_component]<=t_vec) & (t_vec<=u_1-max(v_mat_list_tmp[[id_component]])) ))
       degr_free_vec[id_component] = degr_free_curr_comp
     }
