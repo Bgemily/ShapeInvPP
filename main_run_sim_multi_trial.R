@@ -38,10 +38,10 @@ top_level_folder = "../Results/Rdata"
 setup = 'Multi_trial_v2'
 
 ### Parameters' possible values:
-timeshift_subj_max_vec_list = list(c(1/4, 1/16), 
-                              c(1/4, 1/16)*0.25, c(1/4, 1/16)*0.125,
-                              c(1/4, 1/16)*1.25, c(1/4, 1/16)*1.5 )
-timeshift_trial_max_list = list(0, 1/16, 1/8, 3/16, 1/4)
+timeshift_subj_max_vec_list = list( c(1/4, 1/16)*0.1, c(1/4, 1/16)*0.3,
+                                    c(1/4, 1/16)*0.5,
+                                    c(1/4, 1/16)*0.75, c(1/4, 1/16)*1 )
+timeshift_trial_max_list = list(0, 1/16, 1/8, 3/16, 1/4, 5/16, 3/8, 7/16, 1/2)
 
 for (id_timeshift_subj_max_vec in 1:length(timeshift_subj_max_vec_list)) {
   timeshift_subj_max_vec = timeshift_subj_max_vec_list[[id_timeshift_subj_max_vec]]
