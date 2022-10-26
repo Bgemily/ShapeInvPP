@@ -38,33 +38,34 @@ top_level_folder = "../Results/Rdata"
 setup = 'Multi_trial_v2'
 
 ### Parameters' possible values:
-                              c(1/4, 1/16)*0.5, c(1/4, 1/16)*0.75, 
 timeshift_subj_max_vec_list = list(c(1/4, 1/16), 
                               c(1/4, 1/16)*0.25, c(1/4, 1/16)*0.125,
                               c(1/4, 1/16)*1.25, c(1/4, 1/16)*1.5 )
-N_trial_list = list(1,2,4,8)
+timeshift_trial_max_list = list(0, 1/16, 1/8, 3/16, 1/4)
 
-for (id_N_trial in 1:length(N_trial_list)) {
-  N_trial = N_trial_list[[id_N_trial]]
-  method = paste0('shape_inv_pp_v2','_N_trial',N_trial)
-  default_setting = 'N_spks_total=100,N_subj=100,N_clus=4,clus_sep=1.3,N_comp=2'
+for (id_timeshift_subj_max_vec in 1:length(timeshift_subj_max_vec_list)) {
+  timeshift_subj_max_vec = timeshift_subj_max_vec_list[[id_timeshift_subj_max_vec]]
+  method = paste0('shape_inv_pp','_timeshift_subj_max_vec_',
+                  paste0(timeshift_subj_max_vec, collapse = '_'))
+  default_setting = 'N_spks_total=100,N_subj=100,N_trial=10,N_clus=4,clus_sep=1.3,N_comp=2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
     } else {
       save_center_pdf_array = FALSE
     }
-    for (id_timeshift_subj_max_vec in 1:length(timeshift_subj_max_vec_list)) {
-      timeshift_subj_max_vec = timeshift_subj_max_vec_list[[id_timeshift_subj_max_vec]]
+    for (id_timeshift_trial_max in 1:length(timeshift_trial_max_list)) {
+      timeshift_trial_max = timeshift_trial_max_list[[id_timeshift_trial_max]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_shapeinvpp(SEED = SEED, 
-                             N_trial = N_trial,
+                             N_trial = 10,
                              N_subj = 100,
                              N_clus = 4, 
                              N_component_true = 2,
                              N_spks_total = 100,
                              timeshift_subj_max_vec = timeshift_subj_max_vec,
+                             timeshift_trial_max = timeshift_trial_max,
                              t_vec = seq(-1,1,0.01),
                              clus_sep = 1.3,
                              ### Parameters for algorithms
@@ -76,8 +77,8 @@ for (id_N_trial in 1:length(N_trial_list)) {
                              save_center_pdf_array = save_center_pdf_array),
                  error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
-      param_name = "timeshift_subj_max_vec"
-      param_value = paste0(timeshift_subj_max_vec, collapse = '_')
+      param_name = "timeshift_trial_max"
+      param_value = timeshift_trial_max
       folder_path = paste0(top_level_folder,
                            '/', setup,
                            '/', method, 
