@@ -10,7 +10,8 @@ main_shapeinvpp = function(### Parameters for generative model
                         t_vec = seq(-u_0,u_1,by=0.01),
                         t_vec_extend = t_vec,
                         N_spks_total = 1000,
-                        timeshift_max_vec = c(1/8, 1/32),
+                        timeshift_subj_max_vec = c(1/8, 1/32),
+                        timeshift_trial_max = 1/8,
                         ### params when N_clus==4:
                         clus_sep = 2,
                         ### params when N_clus==1:
@@ -56,7 +57,8 @@ main_shapeinvpp = function(### Parameters for generative model
                     t_vec=t_vec,
                     t_vec_extend=t_vec_extend,
                     N_spks_total = N_spks_total,
-                    timeshift_max_vec = timeshift_max_vec,
+                    timeshift_subj_max_vec = timeshift_subj_max_vec,
+                    timeshift_trial_max = timeshift_trial_max,
                     clus_sep = clus_sep,
                     N_spks_ratio = N_spks_ratio,
                     sd_shrinkage = sd_shrinkage,

@@ -41,7 +41,7 @@ setup = 'Compare_methods_v2.8'
 method = 'fpca'
 
 ### Parameters' possible values:
-timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
+timeshift_subj_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
                               c(1/4, 1/16)*0.5, c(1/4, 1/16)*0.75, 
                               c(1/4, 1/16)*0.25, c(1/4, 1/16)*0.125,
                               c(1/4, 1/16)*1.25, c(1/4, 1/16)*1.75)
@@ -54,9 +54,9 @@ if (test_N_component_2){
     } else {
       save_center_pdf_array = FALSE
     }
-    ### timeshift_max_vec
-    for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
-      timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
+    ### timeshift_subj_max_vec
+    for (id_timeshift_subj_max_vec in 1:length(timeshift_subj_max_vec_list)) {
+      timeshift_subj_max_vec = timeshift_subj_max_vec_list[[id_timeshift_subj_max_vec]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_fpca(SEED = SEED,
@@ -64,7 +64,7 @@ if (test_N_component_2){
                            N_clus = 1,
                            N_component_true = 2,
                            N_spks_total = 100,
-                           timeshift_max_vec = timeshift_max_vec,
+                           timeshift_subj_max_vec = timeshift_subj_max_vec,
                            t_vec = seq(-1,1,0.01),
                            ### Parameters for algorithms
                            bw = 'SJ',
@@ -72,8 +72,8 @@ if (test_N_component_2){
                            save_center_pdf_array = save_center_pdf_array),
                  error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
-      param_name = "timeshift_max_vec"
-      param_value = paste0(timeshift_max_vec, collapse = '_')
+      param_name = "timeshift_subj_max_vec"
+      param_value = paste0(timeshift_subj_max_vec, collapse = '_')
       folder_path = paste0(top_level_folder,
                            '/', setup,
                            '/', method,
@@ -98,9 +98,9 @@ if (test_N_component_1) {
     } else {
       save_center_pdf_array = FALSE
     }
-    ### timeshift_max_vec
-    for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
-      timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
+    ### timeshift_subj_max_vec
+    for (id_timeshift_subj_max_vec in 1:length(timeshift_subj_max_vec_list)) {
+      timeshift_subj_max_vec = timeshift_subj_max_vec_list[[id_timeshift_subj_max_vec]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_fpca(SEED = SEED,
@@ -108,7 +108,7 @@ if (test_N_component_1) {
                            N_clus = 1,
                            N_component_true = 1,
                            N_spks_total = 100,
-                           timeshift_max_vec = timeshift_max_vec,
+                           timeshift_subj_max_vec = timeshift_subj_max_vec,
                            t_vec = seq(-1,1,0.01),
                            ### Parameters for algorithms
                            bw = 'SJ',
@@ -116,8 +116,8 @@ if (test_N_component_1) {
                            save_center_pdf_array = save_center_pdf_array),
                  error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
-      param_name = "timeshift_max_vec"
-      param_value = paste0(timeshift_max_vec, collapse = '_')
+      param_name = "timeshift_subj_max_vec"
+      param_value = paste0(timeshift_subj_max_vec, collapse = '_')
       folder_path = paste0(top_level_folder,
                            '/', setup,
                            '/', method,

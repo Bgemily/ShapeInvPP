@@ -61,7 +61,7 @@ for (id_N_split in 1:N_split) {
                              N_clus = 4,
                              N_component_true = 2,
                              t_vec = seq(-1, 1, by=0.01),
-                             timeshift_max_vec = c(1/4, 1/16),
+                             timeshift_subj_max_vec = c(1/4, 1/16),
                              ### params when N_clus==4:
                              N_spks_total = N_spks_total,
                              clus_sep = clus_sep,
@@ -106,7 +106,7 @@ for (id_N_split in 1:N_split) {
                              N_clus = 4,
                              N_component_true = 2,
                              t_vec = seq(-1, 1, by=0.01),
-                             timeshift_max_vec = c(1/4, 1/16),
+                             timeshift_subj_max_vec = c(1/4, 1/16),
                              ### params when N_clus==4:
                              N_spks_total = 50,
                              clus_sep = clus_sep,
@@ -150,7 +150,7 @@ for (id_N_split in 1:N_split) {
                              N_clus = 4,
                              N_component_true = 2,
                              t_vec = seq(-1, 1, by=0.01),
-                             timeshift_max_vec = c(1/4, 1/16),
+                             timeshift_subj_max_vec = c(1/4, 1/16),
                              ### params when N_clus==4:
                              N_spks_total = 50,
                              clus_sep = clus_sep,

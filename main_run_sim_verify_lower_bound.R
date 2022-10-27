@@ -40,7 +40,7 @@ top_level_folder = "../Results/Rdata"
 setup = 'Verify_lower_bound'
 
 ### Parameters' possible values:
-timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
+timeshift_subj_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
                               c(1/4, 1/16)*2.25, c(1/4, 1/16)*2.5, c(1/4, 1/16)*2.75, c(1/4, 1/16)*3,
                               c(1/4, 1/16)*3.25, c(1/4, 1/16)*3.5, c(1/4, 1/16)*3.75,
                               c(1/4, 1/16)*0.5, c(1/4, 1/16)*0.75, 
@@ -58,8 +58,8 @@ if (test_var_timeshift) {
       } else {
         save_center_pdf_array = FALSE
       }
-      for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
-        timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
+      for (id_timeshift_subj_max_vec in 1:length(timeshift_subj_max_vec_list)) {
+        timeshift_subj_max_vec = timeshift_subj_max_vec_list[[id_timeshift_subj_max_vec]]
         results <- foreach(j = 1:N_replicate) %dopar% {
           SEED = sample(1:1e7,1)
           tryCatch(main_shapeinvpp(SEED = SEED, 
@@ -67,7 +67,7 @@ if (test_var_timeshift) {
                                N_clus = 1, 
                                N_component_true = 1,
                                N_spks_total = 30,
-                               timeshift_max_vec = timeshift_max_vec,
+                               timeshift_subj_max_vec = timeshift_subj_max_vec,
                                t_vec = seq(-1,1,0.01),
                                ### Parameters for algorithms
                                freq_trun = 10,
@@ -78,8 +78,8 @@ if (test_var_timeshift) {
                                save_center_pdf_array = save_center_pdf_array),
                    error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
         }
-        param_name = "timeshift_max_vec"
-        param_value = paste0(timeshift_max_vec, collapse = '_')
+        param_name = "timeshift_subj_max_vec"
+        param_value = paste0(timeshift_subj_max_vec, collapse = '_')
         folder_path = paste0(top_level_folder,
                              '/', setup,
                              '/', method, 
@@ -116,7 +116,7 @@ if (test_N_spks) {
                              N_clus = 1, 
                              N_component_true = 1,
                              N_spks_total = N_spks_total,
-                             timeshift_max_vec = c(1/4, 1/16),
+                             timeshift_subj_max_vec = c(1/4, 1/16),
                              t_vec = seq(-1,1,0.01),
                              ### Parameters for algorithms
                              freq_trun = 10,

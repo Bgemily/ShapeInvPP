@@ -39,7 +39,7 @@ setup = 'Non_identifiability_v2.2'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
-timeshift_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*0.75,
+timeshift_subj_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*0.75,
                               c(1/4, 1/16)*0.5, c(1/4, 1/16)*0.45,
                               c(1/4, 1/16)*0.4, c(1/4, 1/16)*0.35, 
                               c(1/4, 1/16)*0.325, c(1/4, 1/16)*0.3, 
@@ -54,8 +54,8 @@ for (id_N_split in 1:N_split) {
   } else {
     save_center_pdf_array = FALSE
   }
-  for (id_timeshift_max_vec in 1:length(timeshift_max_vec_list)) {
-    timeshift_max_vec = timeshift_max_vec_list[[id_timeshift_max_vec]]
+  for (id_timeshift_subj_max_vec in 1:length(timeshift_subj_max_vec_list)) {
+    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[id_timeshift_subj_max_vec]]
     results <- foreach(j = 1:N_xxxxxxxx) %dopar% {
       SEED = sample(1:1e7,1)
       tryCatch(main_shapeinvpp(SEED = SEED, 
@@ -63,7 +63,7 @@ for (id_N_split in 1:N_split) {
                            N_clus = 1, 
                            N_component_true = 2,
                            N_spks_total = 100,
-                           timeshift_max_vec = timeshift_max_vec,
+                           timeshift_subj_max_vec = timeshift_subj_max_vec,
                            t_vec = seq(-1,1,0.01),
                            ### Parameters for algorithms
                            freq_trun = 10,
@@ -74,8 +74,8 @@ for (id_N_split in 1:N_split) {
                            save_center_pdf_array = save_center_pdf_array),
                error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
     }
-    param_name = "timeshift_max_vec"
-    param_value = paste0(timeshift_max_vec, collapse = '_')
+    param_name = "timeshift_subj_max_vec"
+    param_value = paste0(timeshift_subj_max_vec, collapse = '_')
     folder_path = paste0(top_level_folder,
                          '/', setup,
                          '/', method, 
