@@ -22,7 +22,7 @@ id_neuron_vis = which(dat$brain_region == 'vis ctx')
 N_neuron = length(id_neuron_vis)
 N_trial = length(id_trial_success_vec)
 
-t_vec = seq(0, 2,length.out=200)
+t_vec = seq(-2, 2,length.out=200)
 
 ### Get the number of spikes for selected neurons and trials
 N_spks_df = c()
@@ -32,10 +32,11 @@ for (i in 1:N_neuron){
     id_trial = id_trial_success_vec[j]
     
     spks_vec = dat$spks_pp[id_neuron, id_trial][[1]]
-    spks_shifted_vec = spks_vec - dat$stim_onset[id_trial]
-    response_time_shifted = dat$response_time[id_trial] - dat$stim_onset[id_trial]
+    spks_shifted_vec = spks_vec - dat$gocue[id_trial]
+    response_time_shifted = dat$response_time[id_trial] - dat$gocue[id_trial]
+    stim_onset_time_shifted = dat$stim_onset[id_trial] - dat$gocue[id_trial]
     spks_shifted_vec = spks_shifted_vec[which((spks_shifted_vec <= min(max(t_vec), response_time_shifted)) &  
-                                                (spks_shifted_vec >= 0) )]
+                                                (spks_shifted_vec >= max(min(t_vec), stim_onset_time_shifted)) )]
     
     N_spks_df = rbind(N_spks_df, c(id_neuron, id_trial, length(spks_shifted_vec)))
   }
@@ -46,18 +47,19 @@ colnames(N_spks_df) = c("id_neuron", "id_trial", "N_spks")
 ### Select neuron-trial pairs with N_spks >= 10
 id_neuron_id_trial_selected = N_spks_df[N_spks_df$N_spks >= 10, c('id_neuron', 'id_trial')]
 spks_time_mlist = matrix(list(), nrow = nrow(id_neuron_id_trial_selected), ncol = 1)
-go_cue_time_matrix = matrix(nrow = nrow(id_neuron_id_trial_selected), ncol = 1)
+stim_onset_time_mat = matrix(nrow = nrow(id_neuron_id_trial_selected), ncol = 1)
 for (id_subj in 1:nrow(id_neuron_id_trial_selected)) {
   id_neuron = id_neuron_id_trial_selected[id_subj, 'id_neuron']
   id_trial = id_neuron_id_trial_selected[id_subj, 'id_trial']
   
   spks_vec = dat$spks_pp[id_neuron, id_trial][[1]]
-  spks_shifted_vec = spks_vec - dat$stim_onset[id_trial]
-  response_time_shifted = dat$response_time[id_trial] - dat$stim_onset[id_trial]
+  spks_shifted_vec = spks_vec - dat$gocue[id_trial]
+  response_time_shifted = dat$response_time[id_trial] - dat$gocue[id_trial]
+  stim_onset_time_shifted = dat$stim_onset[id_trial] - dat$gocue[id_trial]
   spks_shifted_vec = spks_shifted_vec[which((spks_shifted_vec <= min(max(t_vec), response_time_shifted)) &  
-                                              (spks_shifted_vec >= min(t_vec)) )]
+                                              (spks_shifted_vec >= max(min(t_vec), stim_onset_time_shifted)) )]
   spks_time_mlist[id_subj, 1] = list(spks_shifted_vec)
-  go_cue_time_matrix[id_subj, 1] = dat$gocue[id_trial] - dat$stim_onset[id_trial]
+  stim_onset_time_mat[id_subj, 1] = stim_onset_time_shifted
 }
 stim_onset_vec = 0
 
@@ -66,10 +68,9 @@ stim_onset_vec = 0
 N_clus_min = 3
 N_clus_max = 3
 N_component = 2
-key_times_vec = c(0, 0.5, 2)
+key_times_vec = c(min(t_vec), 0, max(t_vec))
 N_start_kmean = 5
 freq_trun = 10
-bw = 'SJ'
 fix_timeshift = FALSE
 fix_comp1_timeshift_only = FALSE
 use_true_timeshift = FALSE
@@ -94,11 +95,7 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
                    key_times_vec = key_times_vec,
                    N_start_kmean = N_start_kmean,
                    freq_trun = freq_trun,
-                   bw = bw,
-                   fix_timeshift = TRUE, 
-                   use_true_timeshift = TRUE,
-                   v_true_mat_list = list(0*go_cue_time_matrix, 
-                                          go_cue_time_matrix-key_times_vec[2]),
+                   fix_timeshift = fix_timeshift, 
                    v_trialwise_vec_list = v_trialwise_vec_list,
                    rmv_conn_prob = TRUE)
     center_density_array_init = res$center_density_array
@@ -119,7 +116,6 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
                              v_mat_list_init = v_mat_list_init,
                              N_component = N_component, 
                              freq_trun = freq_trun,
-                             bw = bw,
                              gamma=0,
                              t_vec=t_vec, 
                              key_times_vec = key_times_vec,
@@ -168,7 +164,8 @@ penalty_vec = res_select_model$penalty_vec
 results = list(res_list = res_list, 
                cand_N_clus_vec = cand_N_clus_vec, 
                res_select_model = res_select_model,
-               spks_time_mlist = spks_time_mlist)
+               spks_time_mlist = spks_time_mlist,
+               stim_onset_time_mat = stim_onset_time_mat)
 
 
 # Save results ------------------------------------------------------------
