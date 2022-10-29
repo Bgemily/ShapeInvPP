@@ -18,7 +18,8 @@ id_session = 8
 dat = readRDS(paste(new.path,"session",id_session,".rds",sep=''))
 
 id_trial_success_vec = which((dat$scenario_num == -1) & (dat$feedback_type == 1))
-id_neuron_vis = which(dat$brain_region == 'vis ctx')
+brain_region = 'vis ctx'
+id_neuron_vis = which(dat$brain_region == brain_region)
 N_neuron = length(id_neuron_vis)
 N_trial = length(id_trial_success_vec)
 
@@ -173,7 +174,7 @@ results = list(res_list = res_list,
 top_level_folder = "../Results/Rdata"
 setup = 'RDA_v2'
 method = 'shape_inv_pp'
-default_setting = paste0('Session ', id_session, ', vis ctx')
+default_setting = paste0('Session ', id_session, ', ', brain_region)
 folder_path = paste0(top_level_folder,
                      '/', setup,
                      '/', method, 
