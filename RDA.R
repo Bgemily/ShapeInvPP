@@ -14,7 +14,7 @@ library(fdapace)
 
 # Prepare data ------------------------------------------------------------
 new.path = '../Data/Main/'
-id_session = 2
+id_session = 8
 dat = readRDS(paste(new.path,"session",id_session,".rds",sep=''))
 
 id_trial_success_vec = which((dat$scenario_num == -1) & (dat$feedback_type == 1))
@@ -33,19 +33,19 @@ for (i in 1:N_neuron){
     
     spks_vec = dat$spks_pp[id_neuron, id_trial][[1]]
     spks_shifted_vec = spks_vec - dat$gocue[id_trial]
-    response_time_shifted = dat$response_time[id_trial] - dat$gocue[id_trial]
+    feedback_time_shifted = dat$feedback_time[id_trial] - dat$gocue[id_trial]
     stim_onset_time_shifted = dat$stim_onset[id_trial] - dat$gocue[id_trial]
-    spks_shifted_vec = spks_shifted_vec[which((spks_shifted_vec <= min(max(t_vec), response_time_shifted)) &  
+    spks_shifted_vec = spks_shifted_vec[which((spks_shifted_vec <= min(max(t_vec), feedback_time_shifted)) &  
                                                 (spks_shifted_vec >= max(min(t_vec), stim_onset_time_shifted)) )]
     
-    N_spks_df = rbind(N_spks_df, c(id_neuron, id_trial, length(spks_shifted_vec)))
+    N_spks_df = rbind(N_spks_df, c(id_neuron, id_trial, length(spks_shifted_vec), feedback_time_shifted))
   }
 }
 N_spks_df = as.data.frame(N_spks_df)
-colnames(N_spks_df) = c("id_neuron", "id_trial", "N_spks")
+colnames(N_spks_df) = c("id_neuron", "id_trial", "N_spks", "feedback_time")
 
-### Select neuron-trial pairs with N_spks >= 10
-id_neuron_id_trial_selected = N_spks_df[N_spks_df$N_spks >= 10, c('id_neuron', 'id_trial')]
+### Select neuron-trial pairs 
+id_neuron_id_trial_selected = N_spks_df[(N_spks_df$N_spks >= 10) & (N_spks_df$feedback_time >= 0.2), c('id_neuron', 'id_trial')]
 spks_time_mlist = matrix(list(), nrow = nrow(id_neuron_id_trial_selected), ncol = 1)
 stim_onset_time_mat = matrix(nrow = nrow(id_neuron_id_trial_selected), ncol = 1)
 for (id_subj in 1:nrow(id_neuron_id_trial_selected)) {
@@ -54,9 +54,9 @@ for (id_subj in 1:nrow(id_neuron_id_trial_selected)) {
   
   spks_vec = dat$spks_pp[id_neuron, id_trial][[1]]
   spks_shifted_vec = spks_vec - dat$gocue[id_trial]
-  response_time_shifted = dat$response_time[id_trial] - dat$gocue[id_trial]
+  feedback_time_shifted = dat$feedback_time[id_trial] - dat$gocue[id_trial]
   stim_onset_time_shifted = dat$stim_onset[id_trial] - dat$gocue[id_trial]
-  spks_shifted_vec = spks_shifted_vec[which((spks_shifted_vec <= min(max(t_vec), response_time_shifted)) &  
+  spks_shifted_vec = spks_shifted_vec[which((spks_shifted_vec <= min(max(t_vec), feedback_time_shifted)) &  
                                               (spks_shifted_vec >= max(min(t_vec), stim_onset_time_shifted)) )]
   spks_time_mlist[id_subj, 1] = list(spks_shifted_vec)
   stim_onset_time_mat[id_subj, 1] = stim_onset_time_shifted
@@ -165,14 +165,15 @@ results = list(res_list = res_list,
                cand_N_clus_vec = cand_N_clus_vec, 
                res_select_model = res_select_model,
                spks_time_mlist = spks_time_mlist,
-               stim_onset_time_mat = stim_onset_time_mat)
+               stim_onset_time_mat = stim_onset_time_mat,
+               id_neuron_id_trial_selected = id_neuron_id_trial_selected)
 
 
 # Save results ------------------------------------------------------------
 top_level_folder = "../Results/Rdata"
 setup = 'RDA_v2'
 method = 'shape_inv_pp'
-default_setting = 'Session 8, vis ctx'
+default_setting = paste0('Session ', id_session, ', vis ctx')
 folder_path = paste0(top_level_folder,
                      '/', setup,
                      '/', method, 
