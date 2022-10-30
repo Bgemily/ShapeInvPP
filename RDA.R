@@ -80,7 +80,7 @@ use_true_timeshift = FALSE
 v_trialwise_vec_list = rep(list(0), 2)
 N_restart = 1
 
-
+set.seed(1)
 res_list = list()
 for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
   res_list[[ind_N_clus]] = list()
