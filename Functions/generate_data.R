@@ -67,7 +67,7 @@ generate_data = function(SEED=NULL,
     center_N_spks_mat[2,2] = N_spks_total*0.7
   } else if (N_clus==1){
     center_N_spks_mat[1,1] = N_spks_total*(1/(N_spks_ratio+1))
-    center_N_spks_mat[1,2] = N_spks_total*(N_spks_ratio/(N_spks_ratio+1))
+    center_N_spks_mat[1,2] = 0 * N_spks_total*(N_spks_ratio/(N_spks_ratio+1))
   } else if (N_clus==4){
     center_N_spks_mat[1,1] = N_spks_total*0.5
     center_N_spks_mat[1,2] = N_spks_total*0.5
@@ -110,6 +110,7 @@ generate_data = function(SEED=NULL,
     
     s_tmp = 1/5; mu_tmp = s_tmp; 
     center_density_array_true[1,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
+    center_density_array_true[1,2, ] = 0 * center_density_array_true[1,2, ]
     
     ### Add weights for two components
     center_density_array_true[1,1,] = center_density_array_true[1,1,]*center_N_spks_mat[1,1]/sum(center_N_spks_mat[1,1:2])
