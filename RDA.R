@@ -15,7 +15,7 @@ library(fdapace)
 # Prepare data ------------------------------------------------------------
 new.path = '../Data/Main/'
 id_session = 8
-scenario_num = c(-1,1)
+scenario_num = c(-1)
 feedback_type = 1
 dat = readRDS(paste(new.path, "session",id_session,".rds",sep=''))
 
@@ -68,8 +68,8 @@ stim_onset_vec = 0
 
 
 # Fit model for various cluster number ------------------------------------
-N_clus_min = 4
-N_clus_max = 5
+N_clus_min = 3
+N_clus_max = 3
 N_component = 2
 key_times_vec = c(min(t_vec), 0, max(t_vec))
 N_start_kmean = 5
