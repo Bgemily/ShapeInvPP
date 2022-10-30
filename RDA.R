@@ -15,9 +15,11 @@ library(fdapace)
 # Prepare data ------------------------------------------------------------
 new.path = '../Data/Main/'
 id_session = 8
-dat = readRDS(paste(new.path,"session",id_session,".rds",sep=''))
+scenario_num = c(-1,1)
+feedback_type = 1
+dat = readRDS(paste(new.path, "session",id_session,".rds",sep=''))
 
-id_trial_success_vec = which((dat$scenario_num == -1) & (dat$feedback_type == 1))
+id_trial_success_vec = which((dat$scenario_num %in% scenario_num) & (dat$feedback_type == feedback_type))
 brain_region = 'vis ctx'
 id_neuron_vis = which(dat$brain_region == brain_region)
 N_neuron = length(id_neuron_vis)
@@ -66,8 +68,8 @@ stim_onset_vec = 0
 
 
 # Fit model for various cluster number ------------------------------------
-N_clus_min = 3
-N_clus_max = 3
+N_clus_min = 4
+N_clus_max = 5
 N_component = 2
 key_times_vec = c(min(t_vec), 0, max(t_vec))
 N_start_kmean = 5
@@ -174,7 +176,10 @@ results = list(res_list = res_list,
 top_level_folder = "../Results/Rdata"
 setup = 'RDA_v2'
 method = 'shape_inv_pp'
-default_setting = paste0('Session ', id_session, ', ', brain_region)
+default_setting = paste0('Session ', id_session, 
+                         ', ', brain_region, 
+                         ', scenario_num = ', paste0(scenario_num, collapse = '_'),
+                         ', feedback_type = ', feedback_type)
 folder_path = paste0(top_level_folder,
                      '/', setup,
                      '/', method, 
