@@ -113,7 +113,8 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   
   return(list(clusters_list = clusters_list, 
               v_mat_list = v_mat_list,
-              l2_loss = l2_loss  ))
+              l2_loss = l2_loss,
+              dist_to_centr_vec = dist_to_centr_vec))
 }
 
 

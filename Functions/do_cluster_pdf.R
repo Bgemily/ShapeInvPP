@@ -107,6 +107,7 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
     clusters_list_update = tmp$clusters_list
     v_mat_list_update = tmp$v_mat_list
     l2_loss = tmp$l2_loss
+    dist_to_centr_vec = tmp$dist_to_centr_vec
     loss_history = c(loss_history, l2_loss)
     
     ### Evaluate stopping criterion
@@ -168,11 +169,12 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
   }
   
   
-  return(list(clusters_list=clusters_list, 
-              loss_history=loss_history,
-              clusters_history=clusters_history, 
-              center_density_array=center_density_array,
-              center_Nspks_mat=center_Nspks_mat,
+  return(list(clusters_list = clusters_list, 
+              loss_history = loss_history,
+              dist_to_centr_vec = dist_to_centr_vec,
+              clusters_history = clusters_history, 
+              center_density_array = center_density_array,
+              center_Nspks_mat = center_Nspks_mat,
               center_intensity_array = center_intensity_array,
               v_mat_list = v_mat_list,
               t_vec = t_vec,
