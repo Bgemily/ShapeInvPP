@@ -140,9 +140,8 @@ get_center_intensity_array = function(spks_time_mlist,
       
       
       ### Force the tails of densities to be zero
-      u_1 = v0; u_0 = v1
       for (id_component in 1:N_component) {
-        density_q_mat[id_component, ] = density_q_mat[id_component, ] * I(t_vec <= u_1 - max(v_mat_list[[id_component]]))
+        density_q_mat[id_component, ] = density_q_mat[id_component, ] * I(t_vec <= max(t_vec) - max(v_mat_list[[id_component]]))
       }
       
       ### Calculate intensity components
@@ -179,9 +178,8 @@ get_center_intensity_array = function(spks_time_mlist,
       }
       
       ### Force the tails of densities to be zero
-      u_1 = v0; u_0 = v1
       for (id_component in 1:N_component) {
-        density_q_mat[id_component, ] = density_q_mat[id_component, ] * I(t_vec <= u_1 - max(v_mat_list[[id_component]]))
+        density_q_mat[id_component, ] = density_q_mat[id_component, ] * I(t_vec <= max(t_vec) - max(v_mat_list[[id_component]]))
       }
       
       ### Calculate intensity components

@@ -60,7 +60,12 @@ get_init = function(spks_time_mlist, stim_onset_vec,
           }
           spks_time_shifted_vec = c(spks_time_shifted_vec, spks_time_curr_comp_vec)
         }
-        v_subjwise_vec_list[[id_component]][id_subj] = quantile(spks_time_shifted_vec, 0.05) 
+        if (length(spks_time_shifted_vec) > 0) {
+          v_subjwise_vec_list[[id_component]][id_subj] = quantile(spks_time_shifted_vec, 0.05) 
+        } else {
+          v_subjwise_vec_list[[id_component]][id_subj] = key_times_vec[id_component] 
+        }
+        
       }
     }
     

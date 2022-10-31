@@ -328,6 +328,7 @@ main_shapeinvpp = function(### Parameters for generative model
       
     } else {
       v_mean_sq_err = v_mean_sq_err_vec = NA
+      v_align_mean_sq_err_vec = v_align_mean_sq_err = NA
     }
     
     
