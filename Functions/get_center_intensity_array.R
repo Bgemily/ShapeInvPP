@@ -33,6 +33,7 @@ get_center_intensity_array = function(spks_time_mlist,
     intensity_q_mat = matrix(0, nrow = N_component, ncol = length(t_vec))
     density_q_mat = matrix(0, nrow = N_component, ncol = length(t_vec))
     F_hat_q = 0
+    
     if (length(clusters_list[[q]])*N_trial>=2) {
       ### Temporarily force the minimum time shift of second component to be zero
       if (!fix_timeshift) {
@@ -68,7 +69,7 @@ get_center_intensity_array = function(spks_time_mlist,
                                 t_vec = t_vec, 
                                 bw=bw)
           intensity = tmp$intens_vec
-          density = intensity/length(spks_time_vec)
+          density = intensity/(length(spks_time_vec)+.Machine$double.eps)
           
           ### Save terms in the analytical solution of least-squares-estimator 
           Y_mat_q[ , (id_subj_tmp-1)*N_trial+id_trial] = fft(density) / length(t_vec)
@@ -81,19 +82,23 @@ get_center_intensity_array = function(spks_time_mlist,
       ### Get the least-squares estimator
       if(length(N_spks_subjtrial_vec_q)>1){
         W_mat_q = diag(N_spks_subjtrial_vec_q)
-        theta_list = lapply( 2:length(l_vec), function(l){
-          Xt_W_X = t(Conj(X_array_q[l, , ])) %*% W_mat_q %*% X_array_q[l, , ]
+        theta_list = list()
+        for (l in 2:length(l_vec)) {
+          W_X = matrix(diag(W_mat_q), nrow = nrow(W_mat_q), ncol = ncol(X_array_q[l, , ])) * X_array_q[l, , ]
+          Xt_W_X = t(Conj(X_array_q[l, , ])) %*% W_X
           inv_Xt_W_X = tryCatch(solve(Xt_W_X), error=function(Xt_W_X){return(NULL)})
+          W_Y = as.matrix(diag(W_mat_q) * Y_mat_q[l, ])
           if(is.null(inv_Xt_W_X)){
             tmp_2 = 0
-            tmp_1 = (t(Conj(X_array_q[l, , ])) %*% W_mat_q %*% X_array_q[l, , ])[1,1]^(-1) *
-              (t(Conj(X_array_q[l, , ])) %*% W_mat_q %*% Y_mat_q[l, ])[1]
-            return(c(tmp_1, rep(0,N_component-1)))
+            tmp_1 = (t(Conj(X_array_q[l, , ])) %*% W_X)[1,1]^(-1) *
+              (t(Conj(X_array_q[l, , ])) %*% W_Y)[1]
+            res = c(tmp_1, rep(0,N_component-1))
+            theta_list = c(theta_list, list(res))
           } else {
-            return( inv_Xt_W_X %*% 
-                      (t(Conj(X_array_q[l, , ])) %*% W_mat_q %*% Y_mat_q[l, ]) )
+            res =  inv_Xt_W_X %*% (t(Conj(X_array_q[l, , ])) %*% W_Y) 
+            theta_list = c(theta_list, list(res))
           }
-        } )
+        }
       } else{
         W_mat_q = N_spks_subjtrial_vec_q
         theta_list = lapply( 2:length(l_vec), function(l){ c((X_array_q[l, , 1])^(-1)*Y_mat_q[l, ], rep(0, N_component-1)) } )
