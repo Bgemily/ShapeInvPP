@@ -1,7 +1,6 @@
 ### Estimate time shifts between each subject and each cluster
 
 est_timeshift = function(spks_time_mlist, 
-                         stim_onset_vec, 
                          v_trialwise_vec_list = NULL,
                          center_density_array,
                          v_vec=NULL,
@@ -45,7 +44,7 @@ est_timeshift = function(spks_time_mlist,
       f_target_mat = matrix(nrow = N_trial, ncol = length(t_vec))
       N_spks_trialwise_vec = rep(0, N_trial)
       for (id_trial in 1:N_trial) {
-        spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial]) - stim_onset_vec[id_trial]
+        spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial]) 
         spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial >= min(t_vec) & spks_time_subjtrial <= max(t_vec))]
         tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
                               freq_trun = freq_trun, 
@@ -112,7 +111,7 @@ est_timeshift = function(spks_time_mlist,
       dist_tmp_vec = rep(0, N_trial)
       for (id_trial in 1:N_trial) {
         # Get un-smoothed subj density ----
-        spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial]) - stim_onset_vec[id_trial]
+        spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial])
         spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial >= min(t_vec) & spks_time_subjtrial <= max(t_vec))]
         tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
                               freq_trun = Inf, 

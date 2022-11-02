@@ -1,6 +1,6 @@
 ### Input: spks_time_mlist: N_subj * N_trial with each element being a list of spike times
 ### Perform algorithm based on intensities 
-do_cluster_pdf = function(spks_time_mlist, stim_onset_vec, 
+do_cluster_pdf = function(spks_time_mlist, 
                           reaction_time_vec=NULL,
                           v_trialwise_vec_list = NULL,
                           # Initial values
@@ -26,9 +26,6 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
                           opt_radius=max(t_vec)/2,
                           ...)
 {
-  if(is.matrix(stim_onset_vec)){
-    stim_onset_vec = stim_onset_vec[,1]
-  }
   
   t_unit = t_vec[2] - t_vec[1]
   N_subj = nrow(spks_time_mlist)
@@ -42,7 +39,6 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
   
   ### Estimate parameters 
   res = get_center_intensity_array(spks_time_mlist = spks_time_mlist, 
-                                   stim_onset_vec = stim_onset_vec, 
                                    v_trialwise_vec_list = v_trialwise_vec_list,
                                    clusters_list = clusters_list_init, 
                                    v_mat_list = v_mat_list_init,
@@ -70,7 +66,6 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
   while (!stopping & n_iter<=MaxIter){
     ### Update intensities 
     tmp = get_center_intensity_array(spks_time_mlist = spks_time_mlist, 
-                                     stim_onset_vec = stim_onset_vec, 
                                      reaction_time_vec = reaction_time_vec, 
                                      v_trialwise_vec_list = v_trialwise_vec_list,
                                      clusters_list = clusters_list_current, 
@@ -91,7 +86,6 @@ do_cluster_pdf = function(spks_time_mlist, stim_onset_vec,
     
     ### Update time shifts and clusters 
     tmp = get_timeshift_and_clusters(spks_time_mlist = spks_time_mlist,
-                                     stim_onset_vec = stim_onset_vec,
                                      v_trialwise_vec_list = v_trialwise_vec_list,
                                      center_density_array = center_density_array_update,
                                      center_Nspks_mat = center_Nspks_mat_update,

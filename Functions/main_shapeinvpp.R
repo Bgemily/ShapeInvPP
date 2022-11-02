@@ -76,8 +76,7 @@ main_shapeinvpp = function(### Parameters for generative model
   
   
   spks_time_mlist = data_generated$spks_time_mlist
-  stim_onset_vec = data_generated$stim_onset_vec
-  
+
   center_density_array_true = data_generated$center_density_array_true
   center_intensity_array_true = data_generated$center_intensity_array_true
   mem_true_vec = data_generated$mem_true_vec
@@ -110,7 +109,6 @@ main_shapeinvpp = function(### Parameters for generative model
       ### Get initialization -----------
       if (rand_init) {
         res = get_init_random(spks_time_mlist = spks_time_mlist, 
-                              stim_onset_vec = stim_onset_vec,
                               N_clus = N_clus_tmp,
                               N_component = N_component,
                               v0 = u_1, v1 = u_0,
@@ -132,7 +130,6 @@ main_shapeinvpp = function(### Parameters for generative model
         v_mat_list_init = res$v_mat_list
       } else {
         res = get_init(spks_time_mlist = spks_time_mlist, 
-                       stim_onset_vec = stim_onset_vec,
                        N_clus = N_clus_tmp,
                        N_component = N_component,
                        v0 = u_1, v1 = u_0,
@@ -159,7 +156,6 @@ main_shapeinvpp = function(### Parameters for generative model
       time_start = Sys.time()
       ### Estimation z,v,f based on pdf
       res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
-                               stim_onset_vec = stim_onset_vec,
                                v_trialwise_vec_list = v_trialwise_vec_list,
                                center_density_array_init = center_density_array_init,
                                center_Nspks_mat_init = center_Nspks_mat_init, 
@@ -185,7 +181,6 @@ main_shapeinvpp = function(### Parameters for generative model
       
       ### Calculate log likelihood
       res = select_model(spks_time_mlist, 
-                         stim_onset_vec, 
                          N_component = N_component,
                          key_times_vec = key_times_vec,
                          result_list = list(res_new))
@@ -207,7 +202,6 @@ main_shapeinvpp = function(### Parameters for generative model
 
   # Select best cluster number using ICL ------------------------------------
   res_select_model = select_model(spks_time_mlist = spks_time_mlist, 
-                                  stim_onset_vec = stim_onset_vec, 
                                   N_component = N_component,
                                   key_times_vec = key_times_vec,
                                   result_list = res_list)

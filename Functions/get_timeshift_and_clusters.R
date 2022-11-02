@@ -1,7 +1,6 @@
 
 # Estimate time shifts and cluster memberships, conditioning on densities
 get_timeshift_and_clusters = function(spks_time_mlist,
-                                      stim_onset_vec,
                                       v_trialwise_vec_list = NULL,
                                       center_density_array,
                                       center_Nspks_mat,
@@ -32,7 +31,6 @@ get_timeshift_and_clusters = function(spks_time_mlist,
     }
   }
   tmp = est_timeshift(spks_time_mlist = spks_time_mlist, 
-                      stim_onset_vec = stim_onset_vec, 
                       v_trialwise_vec_list = v_trialwise_vec_list,
                       center_density_array = center_density_array,
                       v_mat_list = v_mat_list,
@@ -54,7 +52,7 @@ get_timeshift_and_clusters = function(spks_time_mlist,
     N_spks_mat = matrix(nrow=N_subj, ncol=N_trial)
     for (id_subj in 1:N_subj) {
       for (id_trial in 1:N_trial) {
-        spks_time_mi_vec = spks_time_mlist[id_subj, id_trial][[1]] - stim_onset_vec[id_trial] 
+        spks_time_mi_vec = spks_time_mlist[id_subj, id_trial][[1]] 
         spks_time_mi_vec = spks_time_mi_vec[which(spks_time_mi_vec<=max(t_vec) &
                                                     spks_time_mi_vec>=min(t_vec))]
         N_spks_mi = length(spks_time_mi_vec)

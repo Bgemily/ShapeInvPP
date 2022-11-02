@@ -1,7 +1,6 @@
 
 ### Obtain truncated fourier series (smoothed point process) for each cluster and intensity component
 get_center_intensity_array = function(spks_time_mlist, 
-                                      stim_onset_vec, 
                                       v_trialwise_vec_list = NULL,
                                       clusters_list, 
                                       v_vec=NULL,
@@ -58,7 +57,7 @@ get_center_intensity_array = function(spks_time_mlist,
       for(id_subj_tmp in 1:length(clusters_list[[q]])){
         id_subj = clusters_list[[q]][id_subj_tmp]    
         for (id_trial in 1:N_trial) {
-          spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial]) - stim_onset_vec[id_trial]
+          spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial]) 
           spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial>=min(t_vec) & 
                                                       spks_time_subjtrial<=max(t_vec))]
           N_spks_subjtrial_vec_q = c(N_spks_subjtrial_vec_q, length(spks_time_vec))
@@ -161,7 +160,7 @@ get_center_intensity_array = function(spks_time_mlist,
       id_trial = 1
       
       ### The the only one point process
-      spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial]) - stim_onset_vec[id_trial]
+      spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial]) 
       spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial>=min(t_vec) & 
                                                   spks_time_subjtrial<=max(t_vec))]
       N_spks_subjtrial_vec_q = length(spks_time_subjtrial)

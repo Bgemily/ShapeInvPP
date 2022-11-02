@@ -1,6 +1,5 @@
 
 select_model = function(spks_time_mlist, 
-                        stim_onset_vec, 
                         N_component,
                         key_times_vec,
                         result_list)

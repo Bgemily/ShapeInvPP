@@ -1,6 +1,6 @@
 ### Initialize of cluster memberships and time shifts
 ### Initialize time shifts by earliest edge time.
-get_init = function(spks_time_mlist, stim_onset_vec, 
+get_init = function(spks_time_mlist, 
                     reaction_time_vec=NULL, 
                     N_clus,
                     N_component=1,
@@ -49,7 +49,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
       for (id_component in 1:N_component){
         spks_time_shifted_vec = c()
         for (id_trial in 1:N_trial) {
-          spks_time_tmp = spks_time_mlist[id_subj, id_trial][[1]]-stim_onset_vec[id_trial]
+          spks_time_tmp = spks_time_mlist[id_subj, id_trial][[1]]
           time_start_curr_comp = key_times_vec[id_component] 
           time_end_curr_comp = key_times_vec[id_component + 1]
           spks_time_curr_comp_vec = spks_time_tmp[which(spks_time_tmp >= time_start_curr_comp &
@@ -97,7 +97,7 @@ get_init = function(spks_time_mlist, stim_onset_vec,
     N_spks_subjtrial_vec_tmp = c()
     for (id_trial in 1:N_trial) {
       spks_time_shifted_tmp = c()
-      spks_time_tmp = unlist(spks_time_mlist[id_subj,id_trial]) - stim_onset_vec[id_trial]
+      spks_time_tmp = unlist(spks_time_mlist[id_subj,id_trial])
       for (id_component in 1:N_component) {
         time_start_tmp = key_times_vec[id_component] + v_mat_list[[id_component]][id_subj,id_trial]
         if (id_component < N_component) {
