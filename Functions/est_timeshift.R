@@ -76,7 +76,7 @@ est_timeshift = function(spks_time_mlist,
         if (FALSE) {
           n0_max_vec = c(round((v1/2)/t_unit), round((v0-v1/2)/t_unit) )
         } else {
-          n0_max_vec = round( (1/2)*(key_times_vec[2:(N_component+1)] - key_times_vec[1:N_component]) / t_unit)
+          n0_max_vec = round( (key_times_vec[2:(N_component+1)] - key_times_vec[1:N_component]) / t_unit)
         }
         n0_min_vec = rep(0, N_component)
         if (rand_init) {
