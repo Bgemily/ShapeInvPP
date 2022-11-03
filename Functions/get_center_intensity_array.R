@@ -23,11 +23,9 @@ get_center_intensity_array = function(spks_time_mlist,
   N_subj = nrow(spks_time_mlist)
   N_trial = ncol(spks_time_mlist)
   
-  
   center_intensity_array = array(0, dim=c(N_clus, N_component, length(t_vec)))
   center_density_array = array(0, dim=c(N_clus, N_component, length(t_vec)))
   center_Nspks_mat = matrix(0, nrow=N_clus, ncol=N_component)
-  
   for (q in 1:N_clus) {
     intensity_q_mat = matrix(0, nrow = N_component, ncol = length(t_vec))
     density_q_mat = matrix(0, nrow = N_component, ncol = length(t_vec))
@@ -51,16 +49,16 @@ get_center_intensity_array = function(spks_time_mlist,
       ### Calculate terms in the analytical solution of least-squares-estimator 
       Y_mat_q = matrix(nrow = length(t_vec), ncol = length(clusters_list[[q]])*N_trial )
       X_array_q = array(dim = c(length(t_vec), length(clusters_list[[q]])*N_trial, N_component))
-      N_spks_subjtrial_vec_q = c()
+      N_spks_subjtrial_vec_q = rep(0, length(clusters_list[[q]])*N_trial)
       mid = length(t_vec) %/% 2
       l_vec = c( 0:mid, (mid+1-length(t_vec)):(-1))
+      count = 0
       for(id_subj_tmp in 1:length(clusters_list[[q]])){
         id_subj = clusters_list[[q]][id_subj_tmp]    
         for (id_trial in 1:N_trial) {
-          spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial]) 
-          spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial>=min(t_vec) & 
-                                                      spks_time_subjtrial<=max(t_vec))]
-          N_spks_subjtrial_vec_q = c(N_spks_subjtrial_vec_q, length(spks_time_vec))
+          count = count + 1
+          spks_time_vec = unlist(spks_time_mlist[id_subj,id_trial]) 
+          N_spks_subjtrial_vec_q[count] = length(spks_time_vec)
           
           ### Smooth point process of id_subj in id_trial
           tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
@@ -71,9 +69,9 @@ get_center_intensity_array = function(spks_time_mlist,
           density = intensity/(length(spks_time_vec)+.Machine$double.eps)
           
           ### Save terms in the analytical solution of least-squares-estimator 
-          Y_mat_q[ , (id_subj_tmp-1)*N_trial+id_trial] = fft(density) / length(t_vec)
+          Y_mat_q[ , count] = fft(density) / length(t_vec)
           for (id_component in 1:N_component) {
-            X_array_q[ , (id_subj_tmp-1)*N_trial+id_trial, id_component] = exp(-1i*2*pi*l_vec*v_mat_list[[id_component]][id_subj, id_trial]/(max(t_vec)-min(t_vec)))
+            X_array_q[ , count, id_component] = exp(-1i*2*pi*l_vec*v_mat_list[[id_component]][id_subj, id_trial]/(max(t_vec)-min(t_vec)))
           }
         }
       }
@@ -112,7 +110,6 @@ get_center_intensity_array = function(spks_time_mlist,
         }
         density_q_mat[id_component, ] = Re(fft(fft_vec_tmp, inverse = TRUE))
       }
-      
       
       ### Force second density to be zero when t<=0
       if (N_component >= 2) {
