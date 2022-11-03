@@ -1,6 +1,8 @@
 
 # Estimate time shifts and cluster memberships, conditioning on densities
-get_timeshift_and_clusters = function(spks_time_mlist,
+get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
+                                      fft_subjtrial_density_unsmooth_array,
+                                      N_spks_mat,
                                       v_trialwise_vec_list = NULL,
                                       center_density_array,
                                       center_Nspks_mat,
@@ -16,8 +18,8 @@ get_timeshift_and_clusters = function(spks_time_mlist,
                                       gamma)
 {
   t_unit = t_vec[2]-t_vec[1]
-  N_subj = nrow(spks_time_mlist)
-  N_trial = ncol(spks_time_mlist)
+  N_subj = dim(subjtrial_density_smooth_array)[1]
+  N_trial = dim(subjtrial_density_smooth_array)[2]
   N_clus = dim(center_density_array)[1]
   N_component = dim(center_density_array)[2]
   
@@ -31,7 +33,9 @@ get_timeshift_and_clusters = function(spks_time_mlist,
       }
     }
   }
-  tmp = est_timeshift(spks_time_mlist = spks_time_mlist, 
+  tmp = est_timeshift(subjtrial_density_smooth_array = subjtrial_density_smooth_array,
+                      fft_subjtrial_density_unsmooth_array = fft_subjtrial_density_unsmooth_array,
+                      N_spks_mat = N_spks_mat,
                       v_trialwise_vec_list = v_trialwise_vec_list,
                       center_density_array = center_density_array,
                       v_mat_list = v_mat_list,
@@ -51,16 +55,6 @@ get_timeshift_and_clusters = function(spks_time_mlist,
   ### Get distance between each subj and each cluster -----
   dist_mat = matrix(0, nrow=N_subj, ncol=N_clus)
   for (id_clus in 1:N_clus) {
-    N_spks_mat = matrix(nrow=N_subj, ncol=N_trial)
-    for (id_subj in 1:N_subj) {
-      for (id_trial in 1:N_trial) {
-        spks_time_mi_vec = spks_time_mlist[id_subj, id_trial][[1]] 
-        spks_time_mi_vec = spks_time_mi_vec[which(spks_time_mi_vec<=max(t_vec) &
-                                                    spks_time_mi_vec>=min(t_vec))]
-        N_spks_mi = length(spks_time_mi_vec)
-        N_spks_mat[id_subj, id_trial] = N_spks_mi
-      }
-    }
     dist_1_vec = dist_mat_tmp[, id_clus]
     center_Nspks_q_scalar = sum(center_Nspks_mat[id_clus,1:N_component])
     dist_2_vec = gamma * rowSums( (center_Nspks_q_scalar+.Machine$double.eps)^(-1) * 

@@ -1,6 +1,8 @@
 ### Estimate time shifts between each subject and each cluster
 
-est_timeshift = function(spks_time_mlist, 
+est_timeshift = function(subjtrial_density_smooth_array,
+                         fft_subjtrial_density_unsmooth_array,
+                         N_spks_mat,
                          v_trialwise_vec_list = NULL,
                          center_density_array,
                          v_vec=NULL,
@@ -17,10 +19,9 @@ est_timeshift = function(spks_time_mlist,
                          bw=0)
 {
   t_unit = t_vec[2]-t_vec[1]
-  N_subj = nrow(spks_time_mlist)
-  N_trial = ncol(spks_time_mlist)
+  N_subj = dim(subjtrial_density_smooth_array)[1]
+  N_trial = dim(subjtrial_density_smooth_array)[2]
   N_clus = dim(center_density_array)[1]
-  
   
   v_mat = matrix(nrow = N_subj, ncol = N_clus)
   v_array_list = rep(list(array(dim = c(N_subj, N_trial, N_clus))), N_component)
@@ -41,22 +42,7 @@ est_timeshift = function(spks_time_mlist,
     f_origin_mat[1:N_component, ] = center_density_smooth_array[id_clus, 1:N_component, ]
     
     # Smooth observed point process -------
-    f_target_array = array(dim = c(N_subj, N_trial, length(t_vec)))
-    N_spks_mat = matrix(0, nrow = N_subj, ncol = N_trial)
-    for (id_subj in 1:N_subj) {
-      for (id_trial in 1:N_trial) {
-        spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial]) 
-        spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial >= min(t_vec) & spks_time_subjtrial <= max(t_vec))]
-        tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
-                              freq_trun = freq_trun, 
-                              t_vec = t_vec, 
-                              bw = bw)
-        subj_intensity_smooth = tmp$intens_vec
-        subj_density_smooth = subj_intensity_smooth / (length(spks_time_vec)+.Machine$double.eps)
-        f_target_array[id_subj, id_trial, ] = subj_density_smooth
-        N_spks_mat[id_subj, id_trial] = length(spks_time_vec)
-      }
-    }
+    f_target_array = subjtrial_density_smooth_array
     
     # Align smoothed point process and smoothed cluster-wise density components ----
     n0_mat_current = matrix(0, nrow = N_subj, ncol = N_component)
@@ -112,21 +98,7 @@ est_timeshift = function(spks_time_mlist,
     }
     
     # Get un-smoothed subj density ----
-    fft_subj_density_array = array(dim = c(N_subj, N_trial, length(t_vec)))
-    for (id_subj in 1:N_subj) {
-      for (id_trial in 1:N_trial) {
-        spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial]) 
-        spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial >= min(t_vec) & spks_time_subjtrial <= max(t_vec))]
-        tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
-                              freq_trun = Inf, 
-                              t_vec = t_vec, 
-                              bw = 0)
-        subj_intensity_unsmooth = tmp$intens_vec
-        subj_density_unsmooth = subj_intensity_unsmooth / (length(spks_time_vec)+.Machine$double.eps)
-        fft_subj_density_tmp = fft(subj_density_unsmooth) / length(subj_density_unsmooth)
-        fft_subj_density_array[id_subj, id_trial, ] = fft_subj_density_tmp
-      }
-    }
+    fft_subj_density_array = fft_subjtrial_density_unsmooth_array
     
     # Calculate distance between (id_subj, id_trial) and id_clus ----
     N_timetick = length(t_vec)

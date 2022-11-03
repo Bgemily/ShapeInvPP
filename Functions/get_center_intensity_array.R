@@ -1,6 +1,8 @@
 
 ### Obtain truncated fourier series (smoothed point process) for each cluster and intensity component
-get_center_intensity_array = function(spks_time_mlist, 
+get_center_intensity_array = function(subjtrial_density_unsmooth_array,
+                                      fft_subjtrial_density_unsmooth_array,
+                                      N_spks_mat,
                                       v_trialwise_vec_list = NULL,
                                       clusters_list, 
                                       v_vec=NULL,
@@ -20,8 +22,8 @@ get_center_intensity_array = function(spks_time_mlist,
 {  
   t_unit = t_vec[2]-t_vec[1]
   N_clus = length(clusters_list)
-  N_subj = nrow(spks_time_mlist)
-  N_trial = ncol(spks_time_mlist)
+  N_subj = dim(subjtrial_density_unsmooth_array)[1]
+  N_trial = dim(subjtrial_density_unsmooth_array)[2]
   
   center_intensity_array = array(0, dim=c(N_clus, N_component, length(t_vec)))
   center_density_array = array(0, dim=c(N_clus, N_component, length(t_vec)))
@@ -48,32 +50,20 @@ get_center_intensity_array = function(spks_time_mlist,
       
       ### Calculate terms in the analytical solution of least-squares-estimator 
       Y_mat_q = matrix(nrow = length(t_vec), ncol = length(clusters_list[[q]])*N_trial )
-      X_array_q = array(dim = c(length(t_vec), length(clusters_list[[q]])*N_trial, N_component))
+      fft_curr_clus_density_unsmooth_array = fft_subjtrial_density_unsmooth_array[clusters_list[[q]], 1:N_trial, , drop = FALSE]
+      Y_mat_q = t(apply(fft_curr_clus_density_unsmooth_array, MARGIN = 3, FUN = c))
+      
       N_spks_subjtrial_vec_q = rep(0, length(clusters_list[[q]])*N_trial)
+      N_spks_subjtrial_vec_q = c(N_spks_mat[clusters_list[[q]], ])
+      
+      X_array_q = array(dim = c(length(t_vec), length(clusters_list[[q]])*N_trial, N_component))
       mid = length(t_vec) %/% 2
       l_vec = c( 0:mid, (mid+1-length(t_vec)):(-1))
-      count = 0
-      for(id_subj_tmp in 1:length(clusters_list[[q]])){
-        id_subj = clusters_list[[q]][id_subj_tmp]    
-        for (id_trial in 1:N_trial) {
-          count = count + 1
-          spks_time_vec = unlist(spks_time_mlist[id_subj,id_trial]) 
-          N_spks_subjtrial_vec_q[count] = length(spks_time_vec)
-          
-          ### Smooth point process of id_subj in id_trial
-          tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
-                                freq_trun = freq_trun, 
-                                t_vec = t_vec, 
-                                bw=bw)
-          intensity = tmp$intens_vec
-          density = intensity/(length(spks_time_vec)+.Machine$double.eps)
-          
-          ### Save terms in the analytical solution of least-squares-estimator 
-          Y_mat_q[ , count] = fft(density) / length(t_vec)
-          for (id_component in 1:N_component) {
-            X_array_q[ , count, id_component] = exp(-1i*2*pi*l_vec*v_mat_list[[id_component]][id_subj, id_trial]/(max(t_vec)-min(t_vec)))
-          }
-        }
+      for (id_component in 1:N_component) {
+        v_curr_clus_mat = v_mat_list[[id_component]][clusters_list[[q]], , drop = FALSE]
+        exp_timeshift_array = exp(-1i*2*pi*outer(v_curr_clus_mat, l_vec)/(max(t_vec)-min(t_vec)))
+        exp_timeshift_mat = t(apply(exp_timeshift_array, MARGIN = 3, FUN = c))
+        X_array_q[ , , id_component] = exp_timeshift_mat
       }
       
       ### Get the least-squares estimator
@@ -155,24 +145,11 @@ get_center_intensity_array = function(spks_time_mlist,
       id_subj_tmp = 1
       id_subj = clusters_list[[q]][id_subj_tmp]    
       id_trial = 1
-      
-      ### The the only one point process
-      spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial]) 
-      spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial>=min(t_vec) & 
-                                                  spks_time_subjtrial<=max(t_vec))]
-      N_spks_subjtrial_vec_q = length(spks_time_subjtrial)
-      
-      
-      ### Smooth the point process 
-      tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
-                            freq_trun = freq_trun, 
-                            t_vec = t_vec, 
-                            bw=bw)
-      intensity = tmp$intens_vec
-      density = intensity/length(spks_time_vec)
-      
-      
+       
       ### Let the first density to be the smoothed point process, the second density to be zero
+      N_spks_subjtrial_vec_q = N_spks_mat[id_subj,id_trial]
+      density = subjtrial_density_unsmooth_array[id_subj, id_trial, ]
+      
       density_q_mat[1, ] = density
       if (N_component >= 2) {
         density_q_mat[2:N_component, ] = 0

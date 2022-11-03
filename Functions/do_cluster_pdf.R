@@ -37,8 +37,27 @@ do_cluster_pdf = function(spks_time_mlist,
   ### Save init estimation
   clusters_history = c(clusters_history, list(clusters_list_init))
   
+  ### Calculate subj-trial-wise densities
+  res = get_indiv_intensity_array(spks_time_mlist = spks_time_mlist, 
+                                  freq_trun = freq_trun,
+                                  bw = bw,
+                                  t_vec = t_vec )
+  subjtrial_density_smooth_array = res$subjtrial_density_array
+  fft_subjtrial_density_smooth_array = res$fft_subjtrial_density_array
+  
+  res = get_indiv_intensity_array(spks_time_mlist = spks_time_mlist, 
+                                  freq_trun = Inf,
+                                  bw = 0,
+                                  t_vec = t_vec )
+  subjtrial_density_unsmooth_array = res$subjtrial_density_array
+  fft_subjtrial_density_unsmooth_array = res$fft_subjtrial_density_array
+  N_spks_mat = res$N_spks_mat 
+  
+  
   ### Estimate parameters 
-  res = get_center_intensity_array(spks_time_mlist = spks_time_mlist, 
+  res = get_center_intensity_array(subjtrial_density_unsmooth_array = subjtrial_density_unsmooth_array,
+                                   fft_subjtrial_density_unsmooth_array = fft_subjtrial_density_unsmooth_array,
+                                   N_spks_mat = N_spks_mat,
                                    v_trialwise_vec_list = v_trialwise_vec_list,
                                    clusters_list = clusters_list_init, 
                                    v_mat_list = v_mat_list_init,
@@ -65,7 +84,9 @@ do_cluster_pdf = function(spks_time_mlist,
   stopping = FALSE
   while (!stopping & n_iter<=MaxIter){
     ### Update intensities 
-    tmp = get_center_intensity_array(spks_time_mlist = spks_time_mlist, 
+    tmp = get_center_intensity_array(subjtrial_density_unsmooth_array = subjtrial_density_unsmooth_array,
+                                     fft_subjtrial_density_unsmooth_array = fft_subjtrial_density_unsmooth_array,
+                                     N_spks_mat = N_spks_mat,
                                      reaction_time_vec = reaction_time_vec, 
                                      v_trialwise_vec_list = v_trialwise_vec_list,
                                      clusters_list = clusters_list_current, 
@@ -83,9 +104,10 @@ do_cluster_pdf = function(spks_time_mlist,
     center_intensity_array = tmp$center_intensity_array
     v_mat_list_tmp = tmp$v_mat_list
     
-    
     ### Update time shifts and clusters 
-    tmp = get_timeshift_and_clusters(spks_time_mlist = spks_time_mlist,
+    tmp = get_timeshift_and_clusters(subjtrial_density_smooth_array = subjtrial_density_smooth_array,
+                                     fft_subjtrial_density_unsmooth_array = fft_subjtrial_density_unsmooth_array,
+                                     N_spks_mat = N_spks_mat,
                                      v_trialwise_vec_list = v_trialwise_vec_list,
                                      center_density_array = center_density_array_update,
                                      center_Nspks_mat = center_Nspks_mat_update,
