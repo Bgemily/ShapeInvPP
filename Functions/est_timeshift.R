@@ -132,7 +132,7 @@ est_timeshift = function(spks_time_mlist,
         fft_center_density_shifted = 0
         for (id_component in 1:N_component) {
           n0_trialwise = round(v_trialwise_vec_list[[id_component]][id_trial] / t_unit)
-          fft_curr_comp_shifted = exp(-1i*2*pi*l_vec*(n0_mat_update[id_component]+n0_trialwise)/N) * fft_center_density_mat[id_component, ]
+          fft_curr_comp_shifted = exp(-1i*2*pi*l_vec*(n0_mat_update[id_subj, id_component]+n0_trialwise)/N) * fft_center_density_mat[id_component, ]
           fft_center_density_shifted = fft_center_density_shifted + fft_curr_comp_shifted
         }
         dist_tmp_vec[id_trial] = sum(abs( fft_center_density_shifted - fft_subj_density )^2) * length(spks_time_vec)
