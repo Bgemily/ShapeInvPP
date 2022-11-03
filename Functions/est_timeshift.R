@@ -102,44 +102,51 @@ est_timeshift = function(spks_time_mlist,
       }
     }
     
+    # Get un-smoothed center densities ----
+    center_density_unsmooth_array = center_density_array
+    fft_center_density_mat = matrix(nrow = N_component, ncol = dim(center_density_unsmooth_array)[3])
+    for (id_component in 1:N_component) {
+      center_density_vec_tmp = center_density_unsmooth_array[id_clus, id_component, ]   
+      fft_center_density_mat[id_component, ] = fft(center_density_vec_tmp) / length(center_density_vec_tmp)
+    }
+    
+    # Get un-smoothed subj density ----
+    fft_subj_density_array = array(dim = c(N_subj, N_trial, length(t_vec)))
     for (id_subj in 1:N_subj) {
-      # Get un-smoothed center densities ----
-      center_density_unsmooth_array = center_density_array
-      fft_center_density_mat = matrix(nrow = N_component, ncol = dim(center_density_unsmooth_array)[3])
-      for (id_component in 1:N_component) {
-        center_density_vec_tmp = center_density_unsmooth_array[id_clus, id_component, ]   
-        fft_center_density_mat[id_component, ] = fft(center_density_vec_tmp) / length(center_density_vec_tmp)
-      }
-      
-      dist_tmp_vec = rep(0, N_trial)
       for (id_trial in 1:N_trial) {
-        # Get un-smoothed subj density ----
-        spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial])
+        spks_time_subjtrial = unlist(spks_time_mlist[id_subj,id_trial]) 
         spks_time_vec = spks_time_subjtrial[which(spks_time_subjtrial >= min(t_vec) & spks_time_subjtrial <= max(t_vec))]
         tmp = get_smoothed_pp(event_time_vec = spks_time_vec, 
                               freq_trun = Inf, 
                               t_vec = t_vec, 
                               bw = 0)
         subj_intensity_unsmooth = tmp$intens_vec
-        subj_density_unsmooth = subj_intensity_unsmooth / length(spks_time_vec)
-        
-        # Calculate distance between (id_subj, id_trial) and id_clus ----
-        fft_subj_density = fft(subj_density_unsmooth) / length(subj_density_unsmooth)
-        N = length(subj_density_unsmooth)
-        l_vec = 0:(N-1)
-        l_vec = c( head(l_vec, N-(N-1)%/%2),
-                   tail(l_vec, (N-1)%/%2) - N )
-        fft_center_density_shifted = 0
-        for (id_component in 1:N_component) {
-          n0_trialwise = round(v_trialwise_vec_list[[id_component]][id_trial] / t_unit)
-          fft_curr_comp_shifted = exp(-1i*2*pi*l_vec*(n0_mat_update[id_subj, id_component]+n0_trialwise)/N) * fft_center_density_mat[id_component, ]
-          fft_center_density_shifted = fft_center_density_shifted + fft_curr_comp_shifted
-        }
-        dist_tmp_vec[id_trial] = sum(abs( fft_center_density_shifted - fft_subj_density )^2) * length(spks_time_vec)
+        subj_density_unsmooth = subj_intensity_unsmooth / (length(spks_time_vec)+.Machine$double.eps)
+        fft_subj_density_tmp = fft(subj_density_unsmooth) / length(subj_density_unsmooth)
+        fft_subj_density_array[id_subj, id_trial, ] = fft_subj_density_tmp
       }
-      dist_mat[id_subj,id_clus] = sum(dist_tmp_vec)
     }
     
+    # Calculate distance between (id_subj, id_trial) and id_clus ----
+    N_timetick = length(t_vec)
+    l_vec = 0:(N_timetick-1)
+    l_vec = c( head(l_vec, N_timetick-(N_timetick-1)%/%2),
+               tail(l_vec, (N_timetick-1)%/%2) - N_timetick )
+    fft_center_density_shifted_array = array(data = 0, dim = c(N_subj, N_trial, N_timetick))
+    for (id_component in 1:N_component) {
+      n0_subjwise_tmp_vec = n0_mat_update[1:N_subj, id_component]
+      n0_trialwise_tmp_vec = round(v_trialwise_vec_list[[id_component]] / t_unit)
+      n0_subj_trial_tmp_mat = outer(n0_subjwise_tmp_vec, n0_trialwise_tmp_vec, FUN = "+")
+      fft_center_density_tmp = fft_center_density_mat[id_component, ]
+      fft_center_density_tmp_array = outer(matrix(data = 1, nrow = N_subj, ncol = N_trial), fft_center_density_tmp)
+      
+      fft_curr_comp_shifted_array = exp(-1i*2*pi*outer(n0_subj_trial_tmp_mat, l_vec)/N_timetick) * fft_center_density_tmp_array
+      fft_center_density_shifted_array = fft_center_density_shifted_array + fft_curr_comp_shifted_array
+    }
+    dist_tmp_mat = matrix(nrow = N_subj, ncol = N_trial)
+    dist_tmp_mat = N_spks_mat * apply(abs(fft_center_density_shifted_array - fft_subj_density_array)^2, MARGIN = c(1,2), FUN = sum)
+      
+    dist_mat[1:N_subj, id_clus] = rowSums(dist_tmp_mat)
   }
   
 
