@@ -141,10 +141,12 @@ get_init = function(spks_time_mlist,
     subj_Nspks_mat[id_subj,1] = F_hat_tmp
   }
   
-  if (rmv_conn_prob){
-    membership = kmeans(x=subj_density_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
+  if (N_subj == 1) {
+    membership = 1
+  } else if (rmv_conn_prob){
+      membership = kmeans(x=subj_density_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
   } else{
-    membership = kmeans(x=subj_intensity_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
+      membership = kmeans(x=subj_intensity_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
   }
   
   clusters = mem2clus(membership = membership, N_clus_min = N_clus)
