@@ -129,7 +129,7 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       
       ### Force the tails of densities to be zero
       for (id_component in 1:N_component) {
-        density_q_mat[id_component, ] = density_q_mat[id_component, ] * I(t_vec <= max(t_vec) - max(v_mat_list[[id_component]]))
+        density_q_mat[id_component, ] = density_q_mat[id_component, ] * I(t_vec <= max(key_times_vec) )
       }
       
       ### Calculate intensity components
