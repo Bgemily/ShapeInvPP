@@ -1,126 +1,135 @@
-align_multi_components = function(f_target_mat,
+align_multi_components = function(f_target_array,
                                   f_origin_mat,
-                                  v_trialwise_vec_list = NULL,
-                                  N_spks_trialwise_vec = NULL,
-                                  step_size = 0.02,
+                                  v_trialwise_vec_list,
+                                  N_spks_mat,
+                                  n0_init_mat,
                                   t_unit = 0.05, 
-                                  n0_vec = c(0,0),
                                   n0_min_vec = 0,
-                                  n0_max_vec = ncol(f_target_mat), 
+                                  n0_max_vec = ncol(f_target_array), 
                                   pad = NULL,
-                                  periodic = FALSE,
                                   MaxIter=1000, 
-                                  stopping_redu=0.01, 
-                                  weights=NULL)
+                                  stopping_redu=0.01)
 {
   
-  ### Extend f_target_mat and f_origin from [0,T] to [-T,2T]
-  if(!is.null(pad)){
-    extend = function(f) {return(c( rep(pad,length(f)-1), f, rep(pad,2*round(length(f)/2)) ))} # make N:=length_of_func odd
-  } else{
-    extend = function(f) {return(c( rep(head(f,1),length(f)-1), f, rep(tail(f,1),2*round(length(f)/2)) ))} # make N:=length_of_func odd
-  }
-  N_trial = nrow(f_target_mat)
-  f_target_mat_extend = c()
-  for (id_trial in 1:N_trial) {
-    f_target_extend_tmp = extend(f_target_mat[id_trial, ])
-    f_target_mat_extend = rbind(f_target_mat_extend, f_target_extend_tmp)
-  }
-  f_target_mat = f_target_mat_extend
-  
+  N_subj = dim(f_target_array)[1]
+  N_trial = dim(f_target_array)[2]
   N_component = nrow(f_origin_mat)
-  f_origin_mat_extend = matrix(nrow = N_component, ncol = ncol(f_target_mat))
-  for (id_component in 1:N_component) {
-    f_origin_mat_extend[id_component, ] = extend(f_origin_mat[id_component, ])
+  n0_min_mat = matrix(n0_min_vec, byrow = TRUE, nrow = N_subj, ncol = N_component)
+  n0_max_mat = matrix(n0_max_vec, byrow = TRUE, nrow = N_subj, ncol = N_component)
+  
+  ### Extend f_target_array and f_origin from [0,T] to [-T,2T] ----
+  N_timetick = dim(f_target_array)[3]
+  N_timetick_extend = (N_timetick-1) + N_timetick + 2*round(N_timetick/2)
+  f_target_array_extend = array(dim = c(N_subj, N_trial, N_timetick_extend))
+  if(!is.null(pad)){
+    f_target_array_extend[ , , 1:(N_timetick-1)] = pad
+    f_target_array_extend[ , , N_timetick:(2*N_timetick-1)] = f_target_array
+    f_target_array_extend[ , , (2*N_timetick):(2*N_timetick+2*round(N_timetick/2)-1)] = pad
+  } else{
+    f_target_array_extend[ , , 1:(N_timetick-1)] = f_target_array[ , , 1]
+    f_target_array_extend[ , , N_timetick:(2*N_timetick-1)] = f_target_array
+    f_target_array_extend[ , , (2*N_timetick):(2*N_timetick+2*round(N_timetick/2)-1)] = f_target_array[ , , N_timetick]
+  }
+  f_target_array = f_target_array_extend
+  
+  f_origin_mat_extend = matrix(nrow = N_component, ncol = N_timetick_extend)
+  if(!is.null(pad)){
+    f_origin_mat_extend[ , 1:(N_timetick-1)] = pad
+    f_origin_mat_extend[ , N_timetick:(2*N_timetick-1)] = f_origin_mat
+    f_origin_mat_extend[ , (2*N_timetick):(2*N_timetick+2*round(N_timetick/2)-1)] = pad
+  } else{
+    f_origin_mat_extend[ , 1:(N_timetick-1)] = f_origin_mat[ , 1]
+    f_origin_mat_extend[ , N_timetick:(2*N_timetick-1)] = f_origin_mat
+    f_origin_mat_extend[ , (2*N_timetick):(2*N_timetick+2*round(N_timetick/2)-1)] = f_origin_mat[ , N_timetick]
   }
   f_origin_mat = f_origin_mat_extend
-  
-  ### Compute terms needed in gradients
-  fft_f_target_mat = 0 * f_target_mat
-  for (id_trial in 1:N_trial) {
-    fft_f_target_mat[id_trial, ] = fft(f_target_mat[id_trial, ]) #/ length(f_target_mat[id_trial, ])
+
+  ### Compute terms needed in gradients ----
+  fft_f_target_array = 0 * f_target_array
+  for (id_subj in 1:N_subj) {
+    for (id_trial in 1:N_trial) {
+      fft_f_target_array[id_subj, id_trial, ] = fft(f_target_array[id_subj, id_trial, ]) #/ length(f_target_array[id_trial, ])
+    }
   }
+  
   fft_f_origin_mat = 0 * f_origin_mat
   for (id_component in 1:N_component) {
     fft_f_origin_mat[id_component, ] = fft(f_origin_mat[id_component, ]) #/ length(f_origin_mat[id_component, ])
   }
   
-  ### Gradient descent
-  iter_count = 0
-  dist_redu = Inf
-  dist_curr = Inf
-  converge = FALSE
-  while (!converge && iter_count<MaxIter) {
-    iter_count = iter_count + 1
-    gd_vec = gradient_multi_component(fft_f_target_mat = fft_f_target_mat, 
-                                      fft_f_origin_mat = fft_f_origin_mat,
-                                      v_trialwise_vec_list = v_trialwise_vec_list,
-                                      N_spks_trialwise_vec = N_spks_trialwise_vec,
-                                      t_unit = t_unit,
-                                      n0_vec = n0_vec)
-    hessian_mat = hessian_multi_component(fft_f_target_mat = fft_f_target_mat, 
-                                          fft_f_origin_mat = fft_f_origin_mat,
-                                          v_trialwise_vec_list = v_trialwise_vec_list,
-                                          N_spks_trialwise_vec = N_spks_trialwise_vec,
-                                          t_unit = t_unit,
-                                          n0_vec = n0_vec)
-    inv_hessian_mat = try(solve(hessian_mat), silent = TRUE)
-    if (identical(class(inv_hessian_mat), "try-error")) {
-      n0_vec = n0_vec - (diag(hessian_mat) + .Machine$double.eps)^(-1) * gd_vec
-    } else {
-      n0_vec = n0_vec - inv_hessian_mat %*% gd_vec
-    }
-    
-    if (FALSE) {
-      print((step_size)*gd_vec)
-    }
-    
-    n0_vec[which(n0_vec<n0_min_vec)] = n0_min_vec[which(n0_vec<n0_min_vec)]
-    n0_vec[which(n0_vec>n0_max_vec)] = n0_max_vec[which(n0_vec>n0_max_vec)]
-
-    N = ncol(fft_f_target_mat)
-    l_vec = 0:(N-1)
-    l_vec = c( head(l_vec, N-(N-1)%/%2),
-               tail(l_vec, (N-1)%/%2) - N )
-    fft_f_origin_shifted_mat = matrix(nrow = N_trial, ncol = ncol(fft_f_target_mat))
-    for (id_trial in 1:N_trial) {
-      fft_f_origin_shifted = 0
-      for (id_component in 1:N_component) {
-        n0_trialwise = round(v_trialwise_vec_list[[id_component]][id_trial] / t_unit)
-        fft_curr_comp_shifted = exp(1i*2*pi*l_vec*(-(n0_vec[id_component]+n0_trialwise))/N) * fft_f_origin_mat[id_component, ]
-        fft_f_origin_shifted = fft_f_origin_shifted + fft_curr_comp_shifted
-      }
-      if (length(fft_f_origin_shifted)==0) {
-        browser()
-      }
-      fft_f_origin_shifted_mat[id_trial, ] = fft_f_origin_shifted
-    }
-    
-    dist_upd = 0
-    for (id_trial in 1:N_trial) {
-      d = sum(abs( fft_f_origin_shifted_mat[id_trial, ] - fft_f_target_mat[id_trial, ] )^2)  
-      d = sqrt(t_unit / N * d)
-      d = d * N_spks_trialwise_vec[id_trial]
-      dist_upd = dist_upd + d
-    }
-    dist_redu = (dist_curr - dist_upd) / dist_upd
-    if (is.na(dist_redu)) dist_redu = 0
-    
-    ### DEBUG
-    # if(dist_redu<0){
-      # print(step_size*gd_vec)
-    # }
-    
-    dist_curr = dist_upd
-    converge = dist_redu < stopping_redu
   
+  ### Gradient descent ----
+  n0_mat = n0_init_mat
+  iter_count = 0
+  dist_redu_vec = rep(Inf, N_subj)
+  dist_curr_vec = rep(Inf, N_subj)
+  converge_vec = rep(FALSE, N_subj)
+  while (!all(converge_vec) && iter_count<MaxIter) {
+    iter_count = iter_count + 1
+    ##### Update time shifts -----
+    gd_mat = gradient_multi_component(fft_f_target_array = fft_f_target_array[!converge_vec, , , drop = FALSE], 
+                                      fft_f_origin_mat = fft_f_origin_mat,
+                                      n0_mat = n0_mat[!converge_vec, , drop = FALSE],
+                                      v_trialwise_vec_list = v_trialwise_vec_list,
+                                      N_spks_mat = N_spks_mat[!converge_vec, , drop = FALSE],
+                                      t_unit = t_unit )
+    hessian_array = hessian_multi_component(fft_f_target_array = fft_f_target_array[!converge_vec, , , drop = FALSE], 
+                                          fft_f_origin_mat = fft_f_origin_mat,
+                                          n0_mat = n0_mat[!converge_vec, , drop = FALSE],
+                                          v_trialwise_vec_list = v_trialwise_vec_list,
+                                          N_spks_mat = N_spks_mat[!converge_vec, , drop = FALSE],
+                                          t_unit = t_unit )
+    for (i in 1:sum(!converge_vec)) {
+      id_subj = which(!converge_vec)[i]
+      inv_hessian_mat_tmp = try(solve(hessian_array[i, , ]), silent = TRUE)
+      if (identical(class(inv_hessian_mat_tmp), "try-error")) {
+        n0_mat[id_subj, ] = n0_mat[id_subj, ] - (diag(as.matrix(hessian_array[i, , ])) + .Machine$double.eps)^(-1) * gd_mat[i, ]
+      } else {
+        n0_mat[id_subj, ] = n0_mat[id_subj, ] - inv_hessian_mat_tmp %*% gd_mat[i, ]
+      }
+    }
+    n0_mat[which(n0_mat<n0_min_mat)] = n0_min_mat[which(n0_mat<n0_min_mat)]
+    n0_mat[which(n0_mat>n0_max_mat)] = n0_max_mat[which(n0_mat>n0_max_mat)]
+
+    ### Calculate shifted center densities ----
+    l_vec = 0:(N_timetick_extend-1)
+    l_vec = c( head(l_vec, N_timetick_extend-(N_timetick_extend-1)%/%2),
+               tail(l_vec, (N_timetick_extend-1)%/%2) - N_timetick_extend )
+    
+    fft_f_origin_shifted_array = array(data = 0, dim = c(sum(!converge_vec), N_trial, N_timetick_extend))
+    for (id_component in 1:N_component) {
+      n0_subjwise_tmp_vec = n0_mat[!converge_vec, id_component]
+      n0_trialwise_tmp_vec = round(v_trialwise_vec_list[[id_component]] / t_unit)
+      n0_subj_trial_tmp_mat = outer(n0_subjwise_tmp_vec, n0_trialwise_tmp_vec, FUN = "+")
+
+      fft_f_origin_tmp = fft_f_origin_mat[id_component, ]
+      fft_f_origin_tmp_array = outer(matrix(data = 1, nrow = sum(!converge_vec), ncol = N_trial), fft_f_origin_tmp)
+
+      fft_curr_comp_shifted_array = exp(1i*2*pi*outer(-n0_subj_trial_tmp_mat, l_vec)/N_timetick_extend) * fft_f_origin_tmp_array
+      fft_f_origin_shifted_array = fft_f_origin_shifted_array + fft_curr_comp_shifted_array
+    }
+    
+    
+    ### Calculate distance between observed point processes and shifted center densities ----
+    diff_fft_squared_array = abs( fft_f_origin_shifted_array - fft_f_target_array[!converge_vec, , , drop = FALSE] )^2
+    d_mat = apply(diff_fft_squared_array, MARGIN = c(1,2), FUN = sum)
+    d_mat = sqrt(t_unit / N_timetick_extend * d_mat)
+    dist_upd_vec = rowSums(d_mat * N_spks_mat[!converge_vec, , drop = FALSE])
+    
+    ### Evaluate convergence criterion ----
+    dist_redu_vec = rep(0, N_subj)
+    dist_redu_vec[!converge_vec] = (dist_curr_vec - dist_upd_vec) / (dist_upd_vec+.Machine$double.eps)
+    dist_redu_vec[which(is.na(dist_redu_vec))] = 0
+    converge_vec = I(dist_redu_vec < stopping_redu)
+    
+    dist_curr_vec = dist_upd_vec[!converge_vec]
   }
 
   if (iter_count == MaxIter) {
     warning("Reached max iteration number when estimating a time shift. Consider adjusting the step size.")
   }
   
-  return(list(n0_vec = n0_vec))
+  return(list(n0_mat = n0_mat))
   
   
 }

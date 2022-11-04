@@ -1,52 +1,53 @@
-gradient_multi_component = function(fft_f_target_mat, 
+gradient_multi_component = function(fft_f_target_array, 
                                     fft_f_origin_mat,
-                                    n0_vec,
+                                    n0_mat,
                                     v_trialwise_vec_list,
-                                    N_spks_trialwise_vec,
+                                    N_spks_mat,
                                     t_unit)
 {
-  N_trial = nrow(fft_f_target_mat)
-  N_timegrid = ncol(fft_f_target_mat)
+  N_subj = dim(fft_f_target_array)[1]
+  N_trial = dim(fft_f_target_array)[2]
+  N_timetick = dim(fft_f_target_array)[3]
   N_component = nrow(fft_f_origin_mat)
-  if(N_timegrid != ncol(fft_f_origin_mat)) 
-    stop("Length of fft_f_target_mat and fft_f_origin's do not match.")
+  if(N_timetick != ncol(fft_f_origin_mat)) 
+    stop("Length of fft_f_target_array and fft_f_origin's do not match.")
+
+  idx_timetick = 1:N_timetick
+  idx_timetick_swap = c(tail(idx_timetick, (N_timetick-1)%/%2), 
+                        head(idx_timetick, N_timetick-(N_timetick-1)%/%2) )
+  fft_f_target_array = fft_f_target_array[ , , idx_timetick_swap, drop = FALSE]
+  fft_f_origin_mat = fft_f_origin_mat[ , idx_timetick_swap, drop = FALSE]
   
-  for (id_trial in 1:N_trial) {
-    fft_curr_comp = fft_f_target_mat[id_trial, ]
-    fft_f_target_mat[id_trial, ] = c(tail(fft_curr_comp, (N_timegrid-1)%/%2), 
-                                         head(fft_curr_comp, N_timegrid-(N_timegrid-1)%/%2) )
-  }
+  l_vec = 0:(N_timetick-1)
+  l_vec = c(tail(l_vec, (N_timetick-1)%/%2) - N_timetick,
+            head(l_vec, N_timetick-(N_timetick-1)%/%2) )
+  l_array = outer(matrix(data = 1, nrow = N_subj, ncol = N_trial), l_vec)
+  
+  gd_mat = matrix(nrow = N_subj, ncol = N_component)
   for (id_component in 1:N_component) {
-    fft_curr_comp = fft_f_origin_mat[id_component, ]
-    fft_f_origin_mat[id_component, ] = c(tail(fft_curr_comp, (N_timegrid-1)%/%2), 
-                                         head(fft_curr_comp, N_timegrid-(N_timegrid-1)%/%2) )
-  }
-  
-  l_vec = 0:(N_timegrid-1)
-  l_vec = c(tail(l_vec, (N_timegrid-1)%/%2)-N_timegrid,
-            head(l_vec, N_timegrid-(N_timegrid-1)%/%2) )
-  
-  gd_vec = c()
-  for (id_component in 1:N_component) {
-    gd_curr_comp_vec = c()
-    for (id_trial in 1:N_trial) {
-      fft_f_target = fft_f_target_mat[id_trial, ]
-      fft_f_origin_no_curr_comp = 0
-      for (id_component_2 in 1:N_component) {
-        if (id_component_2 != id_component) {
-          n0_trialwise = round(v_trialwise_vec_list[[id_component_2]][id_trial] / t_unit)
-          fft_tmp = exp(1i*2*pi*(-(n0_vec[[id_component_2]]+n0_trialwise))*l_vec/N_timegrid) * fft_f_origin_mat[id_component_2, ]
-          fft_f_origin_no_curr_comp = fft_f_origin_no_curr_comp + fft_tmp
-        }
-      }
-      n0_trialwise = round(v_trialwise_vec_list[[id_component]][id_trial] / t_unit)
-      gd_curr_comp = 2 * sum( Re(1i*2*pi*(l_vec/N_timegrid) * 
-                                   exp(1i*2*pi*(-(n0_vec[[id_component]]+n0_trialwise))*l_vec/N_timegrid)*fft_f_origin_mat[id_component, ] * 
-                                   Conj(fft_f_target - fft_f_origin_no_curr_comp) ) ) 
-      gd_curr_comp_vec[id_trial] = gd_curr_comp
+    fft_f_origin_no_curr_comp_array = array(data = 0, dim = c(N_subj, N_trial, N_timetick))
+    for (id_component_2 in setdiff(1:N_component, id_component)) {
+      n0_subjwise_tmp_vec = n0_mat[, id_component_2]
+      n0_trialwise_tmp_vec = round(v_trialwise_vec_list[[id_component_2]] / t_unit)
+      n0_subj_trial_tmp_mat = outer(n0_subjwise_tmp_vec, n0_trialwise_tmp_vec, FUN = "+")
+      fft_f_origin_tmp = fft_f_origin_mat[id_component_2, ]
+      fft_f_origin_tmp_array = outer(matrix(data = 1, nrow = N_subj, ncol = N_trial), fft_f_origin_tmp)
+      fft_shifted_tmp_array = exp(1i*2*pi*outer(-n0_subj_trial_tmp_mat, l_vec)/N_timetick) * fft_f_origin_tmp_array
+      fft_f_origin_no_curr_comp_array = fft_f_origin_no_curr_comp_array + fft_shifted_tmp_array
     }
-    gd_vec[id_component] = sum(gd_curr_comp_vec * N_spks_trialwise_vec)
+    n0_subjwise_tmp_vec = n0_mat[, id_component]
+    n0_trialwise_tmp_vec = round(v_trialwise_vec_list[[id_component]] / t_unit)
+    n0_subj_trial_tmp_mat = outer(n0_subjwise_tmp_vec, n0_trialwise_tmp_vec, FUN = "+")
+    fft_f_origin_tmp = fft_f_origin_mat[id_component, ]
+    fft_f_origin_tmp_array = outer(matrix(data = 1, nrow = N_subj, ncol = N_trial), fft_f_origin_tmp)
+    
+    gd_curr_comp_tmp_mat = matrix(nrow = N_subj, ncol = N_trial)
+    gd_curr_comp_tmp_mat = 2 * apply( Re(1i*2*pi*l_array/N_timetick * 
+                                           exp(1i*2*pi*outer(-n0_subj_trial_tmp_mat, l_vec)/N_timetick)*fft_f_origin_tmp_array * 
+                                           Conj(fft_f_target_array - fft_f_origin_no_curr_comp_array) ), 
+                                      MARGIN = c(1,2), FUN = sum ) 
+    gd_mat[ , id_component] = rowSums(gd_curr_comp_tmp_mat * N_spks_mat)
   }
   
-  return(gd_vec)
+  return(gd_mat)
 }

@@ -56,8 +56,7 @@ main_fpca = function(### Parameters for generative model
   
   
   spks_time_mlist = data_generated$spks_time_mlist
-  stim_onset_vec = data_generated$stim_onset_vec
-  
+
   center_density_array_true = data_generated$center_density_array_true
   center_intensity_array_true = data_generated$center_intensity_array_true
   mem_true_vec = data_generated$mem_true_vec
