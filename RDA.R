@@ -25,7 +25,12 @@ id_neuron_selected = which(dat$brain_region == brain_region)
 N_neuron = length(id_neuron_selected)
 N_trial = length(id_trial_selected)
 
-t_vec = seq(-2, 2,length.out=200)
+if (identical(feedback_type, 1)) {
+  t_vec = seq(-2, 2,length.out=200)
+} else {
+  t_vec = seq(-2, 3,length.out=200)
+}
+
 
 
 ### Select neuron-trial pairs 
@@ -40,7 +45,7 @@ for (i in 1:N_neuron) {
     spks_shifted_vec = spks_vec - dat$gocue[id_trial]
     stim_onset_time_shifted = dat$stim_onset[id_trial] - dat$gocue[id_trial]
     spks_shifted_vec = spks_shifted_vec[which( (spks_shifted_vec <= max(t_vec)) &  
-                                                (spks_shifted_vec >= max(min(t_vec), stim_onset_time_shifted)) )]
+                                                (spks_shifted_vec >= max(min(t_vec), stim_onset_time_shifted-0.5)) )]
     spks_time_mlist[i, j] = list(spks_shifted_vec)
   }
 }
@@ -50,7 +55,12 @@ for (i in 1:N_neuron) {
 N_clus_min = 3
 N_clus_max = 5
 N_component = 2
-key_times_vec = c(-1.2, 0, 1.5)
+if (identical(feedback_type, 1)) {
+  key_times_vec = c(-1.2, 0, 1.5)
+} else {
+  key_times_vec = c(-1.2, 0, 2.5)
+}
+
 N_start_kmean = 5
 freq_trun = 10
 fix_timeshift = FALSE
