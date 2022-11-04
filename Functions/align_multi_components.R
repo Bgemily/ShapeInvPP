@@ -3,15 +3,12 @@ align_multi_components = function(f_target_array,
                                   v_trialwise_vec_list,
                                   N_spks_mat,
                                   n0_init_mat,
-                                  step_size = 0.02,
                                   t_unit = 0.05, 
                                   n0_min_vec = 0,
                                   n0_max_vec = ncol(f_target_array), 
                                   pad = NULL,
-                                  periodic = FALSE,
                                   MaxIter=1000, 
-                                  stopping_redu=0.01, 
-                                  weights=NULL)
+                                  stopping_redu=0.01)
 {
   
   N_subj = dim(f_target_array)[1]

@@ -3,16 +3,13 @@
 est_timeshift = function(subjtrial_density_smooth_array,
                          fft_subjtrial_density_unsmooth_array,
                          N_spks_mat,
-                         v_trialwise_vec_list = NULL,
+                         v_trialwise_vec_list,
                          center_density_array,
-                         v_vec=NULL,
                          v_mat_list=NULL,
                          N_component=1,
                          freq_trun=5, 
-                         v0 = 0.15, v1 = 0.1,
-                         t_vec=seq(0, v0, by=0.01),
+                         t_vec=seq(0, 1, by=0.01),
                          key_times_vec = c(min(t_vec), 0, max(t_vec)),
-                         step_size = 1e-4,
                          fix_timeshift=FALSE,
                          rand_init = FALSE,
                          fix_comp1_timeshift_only=FALSE,
@@ -59,11 +56,7 @@ est_timeshift = function(subjtrial_density_smooth_array,
       }
     } else {
       ### TODO: Set n0_max_vec according to identifiability assumptions
-      if (FALSE) {
-        n0_max_vec = c(round((v1/2)/t_unit), round((v0-v1/2)/t_unit) )
-      } else {
-        n0_max_vec = round( (key_times_vec[2:(N_component+1)] - key_times_vec[1:N_component]) / t_unit)
-      }
+      n0_max_vec = round( (key_times_vec[2:(N_component+1)] - key_times_vec[1:N_component]) / t_unit)
       n0_min_vec = rep(0, N_component)
       if (rand_init) {
         n0_min_vec = -1 * n0_max_vec
@@ -73,12 +66,10 @@ est_timeshift = function(subjtrial_density_smooth_array,
                                              v_trialwise_vec_list = v_trialwise_vec_list,
                                              N_spks_mat = N_spks_mat,
                                              n0_init_mat = n0_mat_current,
-                                             step_size = step_size,
-                                             t_unit = t_unit, 
                                              n0_min_vec = n0_min_vec,
                                              n0_max_vec = n0_max_vec, 
                                              # pad = 0,
-                                             periodic = TRUE)$n0_mat
+                                             t_unit = t_unit)$n0_mat
       for (id_component in 1:N_component) {
         v_subjwise_vec = n0_mat_update[1:N_subj, id_component]*t_unit
         v_trialwise_vec = v_trialwise_vec_list[[id_component]]

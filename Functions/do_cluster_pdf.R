@@ -1,7 +1,6 @@
 ### Input: spks_time_mlist: N_subj * N_trial with each element being a list of spike times
 ### Perform algorithm based on intensities 
 do_cluster_pdf = function(spks_time_mlist, 
-                          reaction_time_vec=NULL,
                           v_trialwise_vec_list = NULL,
                           # Initial values
                           clusters_list_init,
@@ -12,8 +11,7 @@ do_cluster_pdf = function(spks_time_mlist,
                           N_component=1,
                           freq_trun=5, 
                           bw = 0,
-                          v0 = 0.15, v1 = 0.1,
-                          t_vec=seq(0, v0, length.out=200),
+                          t_vec=seq(0, 1, length.out=200),
                           t_vec_extend=t_vec,
                           key_times_vec = c(min(t_vec), 0, max(t_vec)),
                           MaxIter=10, conv_thres=5e-3, 
@@ -21,9 +19,6 @@ do_cluster_pdf = function(spks_time_mlist,
                           rand_init = FALSE,
                           fix_comp1_timeshift_only=FALSE,
                           gamma=0.06,
-                          # Unused arguments
-                          n0_vec_list_init=NULL,
-                          opt_radius=max(t_vec)/2,
                           ...)
 {
   
@@ -66,9 +61,7 @@ do_cluster_pdf = function(spks_time_mlist,
                                    fix_timeshift = fix_timeshift,
                                    freq_trun = Inf,
                                    bw = bw,
-                                   v0 = v0, v1 = v1,
-                                   t_vec = t_vec,
-                                   rmv_conn_prob = TRUE)
+                                   t_vec = t_vec)
   center_density_array = res$center_density_array
   center_Nspks_mat = res$center_Nspks_mat
   center_intensity_array = res$center_intensity_array
@@ -87,18 +80,15 @@ do_cluster_pdf = function(spks_time_mlist,
     tmp = get_center_intensity_array(subjtrial_density_unsmooth_array = subjtrial_density_unsmooth_array,
                                      fft_subjtrial_density_unsmooth_array = fft_subjtrial_density_unsmooth_array,
                                      N_spks_mat = N_spks_mat,
-                                     reaction_time_vec = reaction_time_vec, 
                                      v_trialwise_vec_list = v_trialwise_vec_list,
                                      clusters_list = clusters_list_current, 
                                      v_mat_list = v_mat_list_current,
                                      N_component = N_component,
                                      freq_trun = Inf, 
                                      bw = bw,
-                                     v0 = v0, v1 = v1,
                                      t_vec = t_vec,
                                      key_times_vec = key_times_vec,
-                                     fix_timeshift = fix_timeshift,
-                                     align_density = FALSE)
+                                     fix_timeshift = fix_timeshift )
     center_density_array_update = tmp$center_density_array
     center_Nspks_mat_update = tmp$center_Nspks_mat
     center_intensity_array = tmp$center_intensity_array
@@ -114,7 +104,6 @@ do_cluster_pdf = function(spks_time_mlist,
                                      v_mat_list = v_mat_list_tmp,
                                      freq_trun = freq_trun,
                                      bw = bw,
-                                     v0 = v0, v1 = v1,
                                      t_vec = t_vec,
                                      key_times_vec = key_times_vec,
                                      fix_timeshift = fix_timeshift,

@@ -5,20 +5,13 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
                                       N_spks_mat,
                                       v_trialwise_vec_list = NULL,
                                       clusters_list, 
-                                      v_vec=NULL,
                                       v_mat_list=NULL,
                                       N_component=1,
                                       freq_trun=5,
-                                      v0 = 0.15, v1 = 0.1,
-                                      t_vec=seq(0, v0, by=0.01),
+                                      t_vec=seq(0, 1, by=0.01),
                                       key_times_vec = c(min(t_vec), 0, max(t_vec)),
-                                      n0_mat_list=NULL,
                                       bw=0,
-                                      align_density=FALSE,
-                                      fix_timeshift=FALSE,
-                                      # Unused arguments
-                                      reaction_time_vec=NULL,
-                                      rmv_conn_prob=FALSE)
+                                      fix_timeshift=FALSE)
 {  
   t_unit = t_vec[2]-t_vec[1]
   N_clus = length(clusters_list)
@@ -177,7 +170,6 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
   return(list(center_intensity_array=center_intensity_array,
               center_density_array=center_density_array,
               center_Nspks_mat=center_Nspks_mat,
-              v_vec=v_vec,
               v_mat_list=v_mat_list))
 }
 
