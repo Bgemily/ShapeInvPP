@@ -98,6 +98,16 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
         density_q_mat[id_component, ] = Re(fft(fft_vec_tmp, inverse = TRUE))
       }
       
+      ### Add constants to densities to force the tails to be zero
+      if (N_component >= 2) {
+        for (id_component in 2:N_component) {
+          index_tail = which(t_vec >= max(key_times_vec))
+          density_q_tail = density_q_mat[id_component, index_tail]
+          density_q_mat[1, ] = density_q_mat[1, ] + mean(density_q_tail)
+          density_q_mat[id_component, ] = density_q_mat[id_component, ] - mean(density_q_tail)
+        }
+      }
+      
       ### Force second density to be zero when t<=0
       if (N_component >= 2) {
         for (id_component in 2:N_component) {
