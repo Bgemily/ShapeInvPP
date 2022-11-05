@@ -16,11 +16,11 @@ library(fdapace)
 new.path = '../Data/Main/'
 id_session = 8
 scenario_num = c(1)
-feedback_type = 1
+feedback_type = c(1, -1)
 brain_region = 'thal'
 
 dat = readRDS(paste(new.path, "session",id_session,".rds",sep=''))
-id_trial_selected = which((dat$scenario_num %in% scenario_num) & (dat$feedback_type == feedback_type))
+id_trial_selected = which((dat$scenario_num %in% scenario_num) & (dat$feedback_type %in% feedback_type))
 id_neuron_selected = which(dat$brain_region == brain_region)
 N_neuron = length(id_neuron_selected)
 N_trial = length(id_trial_selected)
@@ -30,8 +30,6 @@ if (identical(feedback_type, 1)) {
 } else {
   t_vec = seq(-2, 3,length.out=200)
 }
-
-
 
 ### Select neuron-trial pairs 
 stim_onset_time_vec = (dat$stim_onset - dat$gocue)[id_trial_selected]
@@ -49,6 +47,11 @@ for (i in 1:N_neuron) {
     spks_time_mlist[i, j] = list(spks_shifted_vec)
   }
 }
+N_spks_subjwise = rowSums(apply(spks_time_mlist, c(1,2), function(ls)length(unlist(ls))))
+id_neuron_active = which(N_spks_subjwise/N_trial >= 1)
+id_neuron_selected = id_neuron_selected[id_neuron_active]
+N_neuron = length(id_neuron_selected)
+spks_time_mlist = spks_time_mlist[id_neuron_active, ]
 
 
 # Fit model for various cluster number ------------------------------------
@@ -213,7 +216,7 @@ method = 'shape_inv_pp'
 default_setting = paste0('Session ', id_session, 
                          ', ', brain_region, 
                          ', scenario_num = ', paste0(scenario_num, collapse = '_'),
-                         ', feedback_type = ', feedback_type)
+                         ', feedback_type = ', paste0(feedback_type, collapse = '_'))
 folder_path = paste0(top_level_folder,
                      '/', setup,
                      '/', method, 
