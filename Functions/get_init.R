@@ -50,13 +50,17 @@ get_init = function(spks_time_mlist,
         spks_time_shifted_vec = c()
         for (id_trial in 1:N_trial) {
           spks_time_tmp = spks_time_mlist[id_subj, id_trial][[1]]
-          time_start_curr_comp = key_times_vec[id_component] 
-          time_end_curr_comp = key_times_vec[id_component + 1]
+          time_start_curr_comp = key_times_vec[id_component] + v_trialwise_vec_list[[id_component]][id_trial]
+          if ((id_component + 1) <= N_component) {
+            time_end_curr_comp = key_times_vec[id_component + 1] + v_trialwise_vec_list[[id_component + 1]][id_trial]
+          } else {
+            time_end_curr_comp = max(t_vec)
+          }
+          
           spks_time_curr_comp_vec = spks_time_tmp[which(spks_time_tmp >= time_start_curr_comp &
                                                           spks_time_tmp <= time_end_curr_comp)]
           if (length(spks_time_curr_comp_vec) > 0) {
             spks_time_curr_comp_vec = spks_time_curr_comp_vec - v_trialwise_vec_list[[id_component]][id_trial]
-            # v_mat_list[[id_component]][id_subj, id_trial] = quantile(spks_time_curr_comp_vec, 0.05) 
           }
           spks_time_shifted_vec = c(spks_time_shifted_vec, spks_time_curr_comp_vec)
         }
@@ -141,10 +145,12 @@ get_init = function(spks_time_mlist,
     subj_Nspks_mat[id_subj,1] = F_hat_tmp
   }
   
-  if (rmv_conn_prob){
-    membership = kmeans(x=subj_density_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
+  if (N_subj == 1) {
+    membership = 1
+  } else if (rmv_conn_prob){
+      membership = kmeans(x=subj_density_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
   } else{
-    membership = kmeans(x=subj_intensity_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
+      membership = kmeans(x=subj_intensity_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
   }
   
   clusters = mem2clus(membership = membership, N_clus_min = N_clus)
