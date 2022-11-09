@@ -148,9 +148,15 @@ get_init = function(spks_time_mlist,
   if (N_subj == 1) {
     membership = 1
   } else if (rmv_conn_prob){
-      membership = kmeans(x=subj_density_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
+    tmp = stats::kmeans(x=subj_density_array[,1,], centers = N_clus, nstart = N_start_kmean)
+    membership = tmp$cluster
+    center_density_mat = tmp$centers
+    center_intensity_mat = NA
   } else{
-      membership = kmeans(x=subj_intensity_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
+    tmp = stats::kmeans(x=subj_intensity_array[,1,], centers = N_clus, nstart = N_start_kmean)
+    membership = tmp$cluster
+    center_intensity_mat = tmp$centers
+    center_density_mat = NA
   }
   
   clusters = mem2clus(membership = membership, N_clus_min = N_clus)
@@ -180,6 +186,8 @@ get_init = function(spks_time_mlist,
   return(list(v_vec=v_vec,
               v_mat_list=v_mat_list,
               membership_vec=membership_vec, 
-              clusters_list=clusters_list))
+              clusters_list=clusters_list,
+              center_density_mat = center_density_mat,
+              center_intensity_mat = center_intensity_mat))
 }
 
