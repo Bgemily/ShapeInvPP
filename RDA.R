@@ -14,10 +14,10 @@ library(fdapace)
 
 # Prepare data ------------------------------------------------------------
 new.path = '../Data/Main/'
-id_session = 8
-scenario_num = c(1)
-feedback_type = c(1, -1)
-brain_region = 'thal'
+id_session = 13
+scenario_num = c(-1)
+feedback_type = c(1)
+brain_region = 'midbrain'
 
 dat = readRDS(paste(new.path, "session",id_session,".rds",sep=''))
 id_trial_selected = which((dat$scenario_num %in% scenario_num) & (dat$feedback_type %in% feedback_type))
@@ -33,6 +33,8 @@ if (identical(feedback_type, 1)) {
 
 ### Select neuron-trial pairs 
 stim_onset_time_vec = (dat$stim_onset - dat$gocue)[id_trial_selected]
+reaction_time_vec = (dat$reaction_time - dat$gocue)[id_trial_selected]
+feedback_time_vec = (dat$feedback_time - dat$gocue)[id_trial_selected]
 spks_time_mlist = matrix(list(), nrow = N_neuron, ncol = N_trial)
 for (i in 1:N_neuron) {
   for (j in 1:N_trial) {
@@ -55,13 +57,13 @@ spks_time_mlist = spks_time_mlist[id_neuron_active, ]
 
 
 # Fit model for various cluster number ------------------------------------
-N_clus_min = 3
-N_clus_max = 5
+N_clus_min = 4
+N_clus_max = 6
 N_component = 2
 if (identical(feedback_type, 1)) {
-  key_times_vec = c(-1.2, 0, 1.5)
+  key_times_vec = c(-1.7, 0, 1.5)
 } else {
-  key_times_vec = c(-1.2, 0, 2.5)
+  key_times_vec = c(-1.7, 0, 2.5)
 }
 
 N_start_kmean = 5
@@ -69,7 +71,8 @@ freq_trun = 10
 fix_timeshift = FALSE
 fix_comp1_timeshift_only = FALSE
 use_true_timeshift = FALSE
-v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), rep(0, N_trial))
+v_trialwise_vec_list = list(reaction_time_vec - min(reaction_time_vec), 
+                            feedback_time_vec - min(feedback_time_vec))
 N_restart = 1
 
 set.seed(1)
@@ -204,7 +207,7 @@ results = list(res_list = res_list,
 # Save results ------------------------------------------------------------
 top_level_folder = "../Results/Rdata"
 setup = 'RDA_v2'
-method = 'shape_inv_pp'
+method = 'shape_inv_pp_v2'
 default_setting = paste0('Session ', id_session, 
                          ', ', brain_region, 
                          ', scenario_num = ', paste0(scenario_num, collapse = '_'),
