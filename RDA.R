@@ -92,8 +92,6 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
                    fix_timeshift = fix_timeshift, 
                    v_trialwise_vec_list = v_trialwise_vec_list,
                    rmv_conn_prob = TRUE)
-    center_density_array_init = res$center_density_array
-    center_Nspks_mat_init = res$center_Nspks_mat
     clusters_list_init = res$clusters_list
     v_mat_list_init = res$v_mat_list
     
@@ -102,8 +100,6 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
     time_start = Sys.time()
     res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
                              v_trialwise_vec_list = v_trialwise_vec_list,
-                             center_density_array_init = center_density_array_init,
-                             center_Nspks_mat_init = center_Nspks_mat_init, 
                              clusters_list_init = clusters_list_init,
                              v_mat_list_init = v_mat_list_init,
                              N_component = N_component, 
@@ -137,23 +133,19 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
                      fix_timeshift = fix_timeshift, 
                      v_trialwise_vec_list = v_trialwise_vec_list[1:N_component],
                      rmv_conn_prob = TRUE)
-      center_density_array_init = res$center_density_array
-      center_Nspks_mat_init = res$center_Nspks_mat
       clusters_list_init = res$clusters_list
       v_mat_list_init = res$v_mat_list
       res_curr_clus = do_cluster_pdf(spks_time_mlist = spks_time_mlist_curr_clus,
-                               v_trialwise_vec_list = v_trialwise_vec_list[1:N_component],
-                               center_density_array_init = center_density_array_init,
-                               center_Nspks_mat_init = center_Nspks_mat_init, 
-                               clusters_list_init = clusters_list_init,
-                               v_mat_list_init = v_mat_list_init,
-                               N_component = N_component_tmp, 
-                               freq_trun = freq_trun,
-                               gamma=0,
-                               t_vec=t_vec, 
-                               key_times_vec = key_times_vec_tmp,
-                               fix_timeshift = fix_timeshift, 
-                               fix_comp1_timeshift_only = fix_comp1_timeshift_only )
+                                     v_trialwise_vec_list = v_trialwise_vec_list[1:N_component],
+                                     clusters_list_init = clusters_list_init,
+                                     v_mat_list_init = v_mat_list_init,
+                                     N_component = N_component_tmp, 
+                                     freq_trun = freq_trun,
+                                     gamma=0,
+                                     t_vec=t_vec, 
+                                     key_times_vec = key_times_vec_tmp,
+                                     fix_timeshift = fix_timeshift, 
+                                     fix_comp1_timeshift_only = fix_comp1_timeshift_only )
       l2_loss_tmp = sum(res_curr_clus$dist_to_centr_vec)
       if (l2_loss_tmp < l2_loss_curr_clus) {
         res_new_2$center_density_array[id_clus, 1:N_component_tmp, ] = res_curr_clus$center_density_array
