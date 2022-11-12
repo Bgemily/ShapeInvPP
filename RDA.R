@@ -15,26 +15,31 @@ library(fdapace)
 # Prepare data ------------------------------------------------------------
 new.path = '../Data/Main/'
 id_session = 13
-scenario_num = c(-1)
+scenario_num = c(1)
 feedback_type = c(1)
 brain_region = 'midbrain'
 
 dat = readRDS(paste(new.path, "session",id_session,".rds",sep=''))
 id_trial_selected = which((dat$scenario_num %in% scenario_num) & (dat$feedback_type %in% feedback_type))
 id_neuron_selected = which(dat$brain_region == brain_region)
+if (FALSE) {
+  id_trial_selected = sample(id_trial_selected, 3)
+  id_neuron_selected = sample(id_neuron_selected, 30)
+}
 N_neuron = length(id_neuron_selected)
 N_trial = length(id_trial_selected)
 
 if (identical(feedback_type, 1)) {
-  t_vec = seq(-2, 2,length.out=200)
+  t_vec = seq(0, 2, length.out=200)
 } else {
   t_vec = seq(-2, 3,length.out=200)
 }
 
 ### Select neuron-trial pairs 
-stim_onset_time_vec = (dat$stim_onset - dat$gocue)[id_trial_selected]
-reaction_time_vec = (dat$reaction_time - dat$gocue)[id_trial_selected]
-feedback_time_vec = (dat$feedback_time - dat$gocue)[id_trial_selected]
+stim_onset_time_vec = (dat$stim_onset - dat$stim_onset)[id_trial_selected]
+gocue_time_vec = (dat$gocue - dat$stim_onset)[id_trial_selected]
+reaction_time_vec = (dat$reaction_time - dat$stim_onset)[id_trial_selected]
+feedback_time_vec = (dat$feedback_time - dat$stim_onset)[id_trial_selected]
 spks_time_mlist = matrix(list(), nrow = N_neuron, ncol = N_trial)
 for (i in 1:N_neuron) {
   for (j in 1:N_trial) {
@@ -42,10 +47,11 @@ for (i in 1:N_neuron) {
     id_trial = id_trial_selected[j]
     
     spks_vec = dat$spks_pp[id_neuron, id_trial][[1]]
-    spks_shifted_vec = spks_vec - dat$gocue[id_trial]
-    stim_onset_time_shifted = dat$stim_onset[id_trial] - dat$gocue[id_trial]
-    spks_shifted_vec = spks_shifted_vec[which( (spks_shifted_vec <= max(t_vec)) &  
-                                                (spks_shifted_vec >= max(min(t_vec), stim_onset_time_shifted-0.5)) )]
+    spks_shifted_vec = spks_vec - dat$stim_onset[id_trial]
+    stim_onset_time_shifted = dat$stim_onset[id_trial] - dat$stim_onset[id_trial]
+    feedback_time_shifted = dat$feedback_time[id_trial] - dat$stim_onset[id_trial]
+    spks_shifted_vec = spks_shifted_vec[which( (spks_shifted_vec <= min(max(t_vec), feedback_time_shifted)) &  
+                                                (spks_shifted_vec >= max(min(t_vec), stim_onset_time_shifted-0)) )]
     spks_time_mlist[i, j] = list(spks_shifted_vec)
   }
 }
@@ -58,10 +64,10 @@ spks_time_mlist = spks_time_mlist[id_neuron_active, ]
 
 # Fit model for various cluster number ------------------------------------
 N_clus_min = 4
-N_clus_max = 6
+N_clus_max = 4
 N_component = 2
 if (identical(feedback_type, 1)) {
-  key_times_vec = c(-1.7, 0, 1.5)
+  key_times_vec = c(min(t_vec), min(gocue_time_vec), 1.5)
 } else {
   key_times_vec = c(-1.7, 0, 2.5)
 }
@@ -70,10 +76,12 @@ N_start_kmean = 5
 freq_trun = 10
 fix_timeshift = FALSE
 fix_comp1_timeshift_only = FALSE
-use_true_timeshift = FALSE
-v_trialwise_vec_list = list(reaction_time_vec - min(reaction_time_vec), 
-                            feedback_time_vec - min(feedback_time_vec))
+v_true_mat_list = NULL
+v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
+                            gocue_time_vec - min(gocue_time_vec))
 N_restart = 1
+MaxIter = 5 
+conv_thres = 5e-6 
 
 set.seed(1)
 res_list = list()
@@ -94,6 +102,8 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
                    freq_trun = freq_trun,
                    fix_timeshift = fix_timeshift, 
                    v_trialwise_vec_list = v_trialwise_vec_list,
+                   fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                   v_true_mat_list = v_true_mat_list,
                    rmv_conn_prob = TRUE)
     clusters_list_init = res$clusters_list
     v_mat_list_init = res$v_mat_list
@@ -111,6 +121,8 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
                              t_vec=t_vec, 
                              key_times_vec = key_times_vec,
                              fix_timeshift = fix_timeshift, 
+                             MaxIter = MaxIter, 
+                             conv_thres = conv_thres, 
                              fix_comp1_timeshift_only = fix_comp1_timeshift_only )
     time_end = Sys.time()
     time_estimation = time_end - time_start
@@ -118,48 +130,53 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
     
     # Apply algorithm with N_component = 1 to each cluster ----
     res_new_2 = res_new
-    for (id_clus in 1:N_clus_tmp) {
-      if (length(res_new$clusters_list[[id_clus]]) == 0) {
-        next
-      }
-      N_component_tmp = 1
-      key_times_vec_tmp = c(min(key_times_vec), max(key_times_vec))
-      spks_time_mlist_curr_clus = spks_time_mlist[res_new$clusters_list[[id_clus]], , drop = FALSE]
-      l2_loss_curr_clus = sum(res_new$dist_to_centr_vec[res_new$clusters_list[[id_clus]]])
-      res = get_init(spks_time_mlist = spks_time_mlist_curr_clus, 
-                     N_clus = 1,
-                     N_component = N_component_tmp,
-                     t_vec = t_vec, 
-                     key_times_vec = key_times_vec_tmp,
-                     N_start_kmean = N_start_kmean,
-                     freq_trun = freq_trun,
-                     fix_timeshift = fix_timeshift, 
-                     v_trialwise_vec_list = v_trialwise_vec_list[1:N_component],
-                     rmv_conn_prob = TRUE)
-      clusters_list_init = res$clusters_list
-      v_mat_list_init = res$v_mat_list
-      res_curr_clus = do_cluster_pdf(spks_time_mlist = spks_time_mlist_curr_clus,
-                                     v_trialwise_vec_list = v_trialwise_vec_list[1:N_component],
-                                     clusters_list_init = clusters_list_init,
-                                     v_mat_list_init = v_mat_list_init,
-                                     N_component = N_component_tmp, 
-                                     freq_trun = freq_trun,
-                                     gamma=0,
-                                     t_vec=t_vec, 
-                                     key_times_vec = key_times_vec_tmp,
-                                     fix_timeshift = fix_timeshift, 
-                                     fix_comp1_timeshift_only = fix_comp1_timeshift_only )
-      l2_loss_tmp = sum(res_curr_clus$dist_to_centr_vec)
-      if (l2_loss_tmp < l2_loss_curr_clus) {
-        res_new_2$center_density_array[id_clus, 1:N_component_tmp, ] = res_curr_clus$center_density_array
-        res_new_2$center_density_array[id_clus, (N_component_tmp+1):N_component, ] = 0
-        for (id_component in 1:N_component_tmp) {
-          res_new_2$v_mat_list[[id_component]][res_new$clusters_list[[id_clus]], ] = res_curr_clus$v_mat_list[[id_component]]
+    if (FALSE) {
+      for (id_clus in 1:N_clus_tmp) {
+        if (length(res_new$clusters_list[[id_clus]]) == 0) {
+          next
         }
-        for (id_component in (N_component_tmp+1):N_component) {
-          res_new_2$v_mat_list[[id_component]][res_new$clusters_list[[id_clus]], ] = 0
+        N_component_tmp = 1
+        key_times_vec_tmp = c(min(key_times_vec), max(key_times_vec))
+        spks_time_mlist_curr_clus = spks_time_mlist[res_new$clusters_list[[id_clus]], , drop = FALSE]
+        l2_loss_curr_clus = sum(res_new$dist_to_centr_vec[res_new$clusters_list[[id_clus]]])
+        res = get_init(spks_time_mlist = spks_time_mlist_curr_clus, 
+                       N_clus = 1,
+                       N_component = N_component_tmp,
+                       t_vec = t_vec, 
+                       key_times_vec = key_times_vec_tmp,
+                       N_start_kmean = N_start_kmean,
+                       freq_trun = freq_trun,
+                       fix_timeshift = fix_timeshift, 
+                       v_trialwise_vec_list = v_trialwise_vec_list[1:N_component],
+                       fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                       v_true_mat_list = v_true_mat_list,
+                       rmv_conn_prob = TRUE)
+        clusters_list_init = res$clusters_list
+        v_mat_list_init = res$v_mat_list
+        res_curr_clus = do_cluster_pdf(spks_time_mlist = spks_time_mlist_curr_clus,
+                                       v_trialwise_vec_list = v_trialwise_vec_list[1:N_component],
+                                       clusters_list_init = clusters_list_init,
+                                       v_mat_list_init = v_mat_list_init,
+                                       N_component = N_component_tmp, 
+                                       freq_trun = freq_trun,
+                                       gamma=0,
+                                       t_vec=t_vec, 
+                                       key_times_vec = key_times_vec_tmp,
+                                       fix_timeshift = fix_timeshift, 
+                                       fix_comp1_timeshift_only = fix_comp1_timeshift_only )
+        l2_loss_tmp = sum(res_curr_clus$dist_to_centr_vec)
+        if (l2_loss_tmp < l2_loss_curr_clus) {
+          res_new_2$center_density_array[id_clus, 1:N_component_tmp, ] = res_curr_clus$center_density_array
+          res_new_2$center_density_array[id_clus, (N_component_tmp+1):N_component, ] = 0
+          for (id_component in 1:N_component_tmp) {
+            res_new_2$v_mat_list[[id_component]][res_new$clusters_list[[id_clus]], ] = res_curr_clus$v_mat_list[[id_component]]
+          }
+          for (id_component in (N_component_tmp+1):N_component) {
+            res_new_2$v_mat_list[[id_component]][res_new$clusters_list[[id_clus]], ] = 0
+          }
         }
       }
+      
     }
     
     ### Calculate log likelihood
@@ -207,7 +224,7 @@ results = list(res_list = res_list,
 # Save results ------------------------------------------------------------
 top_level_folder = "../Results/Rdata"
 setup = 'RDA_v2'
-method = 'shape_inv_pp_v2'
+method = 'shape_inv_pp_v3'
 default_setting = paste0('Session ', id_session, 
                          ', ', brain_region, 
                          ', scenario_num = ', paste0(scenario_num, collapse = '_'),
