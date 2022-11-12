@@ -51,6 +51,9 @@ select_model = function(spks_time_mlist,
           for (id_component in 1:N_component) {
             time_shift_tmp = v_mat_list_tmp[[id_component]][id_subj, id_trial]
             n0_shift_tmp = round(time_shift_tmp / t_unit)
+            if (n0_shift_tmp > length(t_vec)) {
+              n0_shift_tmp = length(t_vec)
+            }
             intensity_tmp = center_intensity_array_tmp[id_clus, id_component, ]
             intensity_shifted_curr_comp = c(rep(0, max(0, n0_shift_tmp) ),
                                       head(intensity_tmp, length(t_vec) - max(0, n0_shift_tmp)) )
