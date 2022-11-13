@@ -83,6 +83,7 @@ v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec),
 N_restart = 1
 MaxIter = 5 
 conv_thres = 5e-6 
+gamma = 0
 
 set.seed(1)
 res_list = list()
@@ -118,7 +119,7 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
                              v_mat_list_init = v_mat_list_init,
                              N_component = N_component, 
                              freq_trun = freq_trun,
-                             gamma=0,
+                             gamma = gamma,
                              t_vec=t_vec, 
                              key_times_vec = key_times_vec,
                              fix_timeshift = fix_timeshift, 
@@ -160,7 +161,7 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
                                        v_mat_list_init = v_mat_list_init,
                                        N_component = N_component_tmp, 
                                        freq_trun = freq_trun,
-                                       gamma=0,
+                                       gamma = gamma,
                                        t_vec=t_vec, 
                                        key_times_vec = key_times_vec_tmp,
                                        fix_timeshift = fix_timeshift, 
@@ -225,7 +226,7 @@ results = list(res_list = res_list,
 # Save results ------------------------------------------------------------
 top_level_folder = "../Results/Rdata"
 setup = 'RDA_v2'
-method = 'shape_inv_pp_v3'
+method = paste0('shape_inv_pp_v4_gamma',gamma)
 default_setting = paste0('Session ', id_session, 
                          ', ', brain_region, 
                          ', scenario_num = ', paste0(scenario_num, collapse = '_'),
