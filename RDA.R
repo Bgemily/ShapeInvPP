@@ -65,9 +65,9 @@ spks_time_mlist = spks_time_mlist[id_neuron_active, ]
 # Fit model for various cluster number ------------------------------------
 N_clus_min = 5
 N_clus_max = 5
-N_component = 3
+N_component = 2
 if (identical(feedback_type, 1)) {
-  key_times_vec = c(min(t_vec), quantile(reaction_time_vec,0.1), min(gocue_time_vec), 1.5)
+  key_times_vec = c(min(t_vec), min(gocue_time_vec), 1.5)
 } else {
   key_times_vec = c(-1.7, 0, 2.5)
 }
@@ -78,7 +78,6 @@ fix_timeshift = FALSE
 fix_comp1_timeshift_only = FALSE
 v_true_mat_list = NULL
 v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
-                            reaction_time_vec - quantile(reaction_time_vec,0.1),
                             gocue_time_vec - min(gocue_time_vec))
 N_restart = 1
 MaxIter = 5 
