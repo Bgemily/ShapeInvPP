@@ -147,6 +147,8 @@ get_init = function(spks_time_mlist,
   
   if (N_subj == 1) {
     membership = 1
+    center_density_mat = NA
+    center_intensity_mat = NA
   } else if (rmv_conn_prob){
     tmp = stats::kmeans(x=subj_density_array[,1,], centers = N_clus, nstart = N_start_kmean)
     membership = tmp$cluster

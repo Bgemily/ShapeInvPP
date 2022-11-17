@@ -84,7 +84,7 @@ get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
       v_mat_list[[id_component]][clusters_list[[id_clus]], 1:N_trial] = v_array_list_tmp[[id_component]][clusters_list[[id_clus]], 1:N_trial, id_clus]
     }
   }
-  ### For each cluster, force the minimum time shifts to be trial-wise time shift
+  ### For Component 1, force the minimum subj-wise time shifts to be zero
   if ( (!fix_timeshift) & (!fix_comp1_timeshift_only) ) {
     id_component = 1
     for (id_clus in 1:N_clus) {
