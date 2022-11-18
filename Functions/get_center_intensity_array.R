@@ -11,7 +11,6 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
                                       t_vec=seq(0, 1, by=0.01),
                                       key_times_vec = c(min(t_vec), 0, max(t_vec)),
                                       bw=0,
-                                      eta = 0,
                                       fix_timeshift=FALSE)
 {  
   t_unit = t_vec[2]-t_vec[1]
@@ -90,7 +89,6 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       }
       for (id_component in 1:N_component) {
         fft_vec_tmp = sapply(theta_list, "[", id_component)
-        fft_vec_tmp[which(abs(fft_vec_tmp) < eta)] = 0
         if (id_component == 1) {
           fft_l_eq_0 = sum(N_spks_subjtrial_vec_q*Y_mat_q[1,]) / (sum(N_spks_subjtrial_vec_q) + .Machine$double.eps)
           fft_vec_tmp = c(fft_l_eq_0, fft_vec_tmp)
