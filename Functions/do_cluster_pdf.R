@@ -19,6 +19,7 @@ do_cluster_pdf = function(spks_time_mlist,
                           rand_init = FALSE,
                           fix_comp1_timeshift_only=FALSE,
                           gamma=0.06,
+                          eta = 0,
                           ...)
 {
   
@@ -61,6 +62,7 @@ do_cluster_pdf = function(spks_time_mlist,
                                    fix_timeshift = fix_timeshift,
                                    freq_trun = Inf,
                                    bw = bw,
+                                   eta = eta,
                                    t_vec = t_vec)
   center_density_array = res$center_density_array
   center_Nspks_mat = res$center_Nspks_mat
@@ -86,6 +88,7 @@ do_cluster_pdf = function(spks_time_mlist,
                                      N_component = N_component,
                                      freq_trun = Inf, 
                                      bw = bw,
+                                     eta = eta,
                                      t_vec = t_vec,
                                      key_times_vec = key_times_vec,
                                      fix_timeshift = fix_timeshift )

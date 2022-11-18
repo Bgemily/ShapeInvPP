@@ -11,6 +11,7 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
                                       t_vec=seq(0, 1, by=0.01),
                                       key_times_vec = c(min(t_vec), 0, max(t_vec)),
                                       bw=0,
+                                      eta = 0,
                                       fix_timeshift=FALSE)
 {  
   t_unit = t_vec[2]-t_vec[1]
@@ -63,10 +64,13 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       if(length(N_spks_subjtrial_vec_q)>1){
         W_mat_q = diag(N_spks_subjtrial_vec_q)
         theta_list = list()
-        for (l in 2:length(l_vec)) {
+        for (l in 1:length(l_vec)) {
+          if (eta == 0 & l == 1) {
+            next
+          }
           W_X = matrix(diag(W_mat_q), nrow = nrow(W_mat_q), ncol = N_component) * as.matrix(X_array_q[l, , ])
           Xt_W_X = t(Conj(as.matrix(X_array_q[l, , ]))) %*% W_X
-          inv_Xt_W_X = tryCatch(solve(Xt_W_X), error=function(Xt_W_X){return(NULL)})
+          inv_Xt_W_X = tryCatch(solve(Xt_W_X + eta^2 * diag(x = 1, nrow = nrow(Xt_W_X), ncol = ncol(Xt_W_X))), error=function(Xt_W_X){return(NULL)})
           W_Y = as.matrix(diag(W_mat_q) * Y_mat_q[l, ])
           if(is.null(inv_Xt_W_X)){
             tmp_2 = 0
@@ -85,15 +89,17 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
         }
       } else{
         W_mat_q = N_spks_subjtrial_vec_q
-        theta_list = lapply( 2:length(l_vec), function(l){ c((X_array_q[l, , 1])^(-1)*Y_mat_q[l, ], rep(0, N_component-1)) } )
+        theta_list = lapply( 2:length(l_vec), function(l){ c((X_array_q[l, , 1] + eta^2/(X_array_q[l, , 1]*W_mat_q))^(-1)*Y_mat_q[l, ], rep(0, N_component-1)) } )
       }
       for (id_component in 1:N_component) {
         fft_vec_tmp = sapply(theta_list, "[", id_component)
-        if (id_component == 1) {
-          fft_l_eq_0 = sum(N_spks_subjtrial_vec_q*Y_mat_q[1,]) / (sum(N_spks_subjtrial_vec_q) + .Machine$double.eps)
-          fft_vec_tmp = c(fft_l_eq_0, fft_vec_tmp)
-        } else {
-          fft_vec_tmp = c(0, fft_vec_tmp)
+        if (eta == 0) {
+          if (id_component == 1) {
+            fft_l_eq_0 = sum(N_spks_subjtrial_vec_q*Y_mat_q[1,]) / (sum(N_spks_subjtrial_vec_q) + .Machine$double.eps)
+            fft_vec_tmp = c(fft_l_eq_0, fft_vec_tmp)
+          } else {
+            fft_vec_tmp = c(0, fft_vec_tmp)
+          }
         }
         density_q_mat[id_component, ] = Re(fft(fft_vec_tmp, inverse = TRUE))
       }
