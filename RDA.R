@@ -63,7 +63,7 @@ spks_time_mlist = spks_time_mlist[id_neuron_active, ]
 
 
 # Fit model for various cluster number ------------------------------------
-N_clus_min = 5
+N_clus_min = 3
 N_clus_max = 5
 N_component = 2
 if (identical(feedback_type, 1)) {
@@ -74,6 +74,7 @@ if (identical(feedback_type, 1)) {
 
 N_start_kmean = 5
 freq_trun = 10
+init_timeshift_zero = TRUE
 fix_timeshift = FALSE
 fix_comp1_timeshift_only = FALSE
 v_true_mat_list = NULL
@@ -101,6 +102,7 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
                    key_times_vec = key_times_vec,
                    N_start_kmean = N_start_kmean,
                    freq_trun = freq_trun,
+                   init_timeshift_zero = init_timeshift_zero,
                    fix_timeshift = fix_timeshift, 
                    v_trialwise_vec_list = v_trialwise_vec_list,
                    fix_comp1_timeshift_only = fix_comp1_timeshift_only,
@@ -121,6 +123,7 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
                              gamma = gamma,
                              t_vec=t_vec, 
                              key_times_vec = key_times_vec,
+                             init_timeshift_zero = init_timeshift_zero,
                              fix_timeshift = fix_timeshift, 
                              MaxIter = MaxIter, 
                              conv_thres = conv_thres, 
@@ -131,54 +134,6 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
     
     # Apply algorithm with N_component = 1 to each cluster ----
     res_new_2 = res_new
-    if (FALSE) {
-      for (id_clus in 1:N_clus_tmp) {
-        if (length(res_new$clusters_list[[id_clus]]) == 0) {
-          next
-        }
-        N_component_tmp = 1
-        key_times_vec_tmp = c(min(key_times_vec), max(key_times_vec))
-        spks_time_mlist_curr_clus = spks_time_mlist[res_new$clusters_list[[id_clus]], , drop = FALSE]
-        l2_loss_curr_clus = sum(res_new$dist_to_centr_vec[res_new$clusters_list[[id_clus]]])
-        res = get_init(spks_time_mlist = spks_time_mlist_curr_clus, 
-                       N_clus = 1,
-                       N_component = N_component_tmp,
-                       t_vec = t_vec, 
-                       key_times_vec = key_times_vec_tmp,
-                       N_start_kmean = N_start_kmean,
-                       freq_trun = freq_trun,
-                       fix_timeshift = fix_timeshift, 
-                       v_trialwise_vec_list = v_trialwise_vec_list[1:N_component],
-                       fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                       v_true_mat_list = v_true_mat_list,
-                       rmv_conn_prob = TRUE)
-        clusters_list_init = res$clusters_list
-        v_mat_list_init = res$v_mat_list
-        res_curr_clus = do_cluster_pdf(spks_time_mlist = spks_time_mlist_curr_clus,
-                                       v_trialwise_vec_list = v_trialwise_vec_list[1:N_component],
-                                       clusters_list_init = clusters_list_init,
-                                       v_mat_list_init = v_mat_list_init,
-                                       N_component = N_component_tmp, 
-                                       freq_trun = freq_trun,
-                                       gamma = gamma,
-                                       t_vec=t_vec, 
-                                       key_times_vec = key_times_vec_tmp,
-                                       fix_timeshift = fix_timeshift, 
-                                       fix_comp1_timeshift_only = fix_comp1_timeshift_only )
-        l2_loss_tmp = sum(res_curr_clus$dist_to_centr_vec)
-        if (l2_loss_tmp < l2_loss_curr_clus) {
-          res_new_2$center_density_array[id_clus, 1:N_component_tmp, ] = res_curr_clus$center_density_array
-          res_new_2$center_density_array[id_clus, (N_component_tmp+1):N_component, ] = 0
-          for (id_component in 1:N_component_tmp) {
-            res_new_2$v_mat_list[[id_component]][res_new$clusters_list[[id_clus]], ] = res_curr_clus$v_mat_list[[id_component]]
-          }
-          for (id_component in (N_component_tmp+1):N_component) {
-            res_new_2$v_mat_list[[id_component]][res_new$clusters_list[[id_clus]], ] = 0
-          }
-        }
-      }
-      
-    }
     
     ### Calculate log likelihood
     res = select_model(spks_time_mlist = spks_time_mlist, 
@@ -225,7 +180,7 @@ results = list(res_list = res_list,
 # Save results ------------------------------------------------------------
 top_level_folder = "../Results/Rdata"
 setup = 'RDA_v2'
-method = paste0('shape_inv_pp_v4_gamma',gamma)
+method = paste0('shape_inv_pp_v5_gamma',gamma)
 default_setting = paste0('Session ', id_session, 
                          ', ', brain_region, 
                          ', scenario_num = ', paste0(scenario_num, collapse = '_'),

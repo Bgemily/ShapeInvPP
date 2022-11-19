@@ -10,6 +10,7 @@ get_init = function(spks_time_mlist,
                     t_vec=seq(0, v0, by=0.01),
                     key_times_vec = c(min(t_vec),0,max(t_vec)),
                     N_start_kmean = 5,
+                    init_timeshift_zero = FALSE,
                     fix_timeshift=FALSE,
                     fix_comp1_timeshift_only=FALSE,
                     use_true_timeshift=FALSE, 
@@ -64,12 +65,16 @@ get_init = function(spks_time_mlist,
           }
           spks_time_shifted_vec = c(spks_time_shifted_vec, spks_time_curr_comp_vec)
         }
-        if (length(spks_time_shifted_vec) > 0) {
-          v_subjwise_vec_list[[id_component]][id_subj] = quantile(spks_time_shifted_vec, 0.05) 
+        if (!init_timeshift_zero) {
+          if (length(spks_time_shifted_vec) > 0) {
+            v_subjwise_vec_list[[id_component]][id_subj] = quantile(spks_time_shifted_vec, 0.05) 
+          } else {
+            v_subjwise_vec_list[[id_component]][id_subj] = key_times_vec[id_component] 
+          }
         } else {
-          v_subjwise_vec_list[[id_component]][id_subj] = key_times_vec[id_component] 
+          v_subjwise_vec_list[[id_component]][id_subj] = 0 
         }
-        
+
       }
     }
     
