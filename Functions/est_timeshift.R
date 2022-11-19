@@ -10,7 +10,6 @@ est_timeshift = function(subjtrial_density_smooth_array,
                          freq_trun=5, 
                          t_vec=seq(0, 1, by=0.01),
                          key_times_vec = c(min(t_vec), 0, max(t_vec)),
-                         init_timeshift_zero = FALSE,
                          fix_timeshift=FALSE,
                          rand_init = FALSE,
                          fix_comp1_timeshift_only=FALSE,
@@ -58,13 +57,7 @@ est_timeshift = function(subjtrial_density_smooth_array,
     } else {
       ### TODO: Set n0_max_vec according to identifiability assumptions
       n0_max_vec = round( (key_times_vec[2:(N_component+1)] - key_times_vec[1:N_component]) / t_unit)
-      if (!init_timeshift_zero) {
-        n0_min_vec = rep(0, N_component)
-      } else {
-        n0_max_vec = n0_max_vec / 2
-        n0_min_vec = -1 * n0_max_vec
-      }
-      
+      n0_min_vec = rep(0, N_component)
       if (rand_init) {
         n0_min_vec = -1 * n0_max_vec
       }
