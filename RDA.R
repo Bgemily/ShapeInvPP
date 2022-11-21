@@ -50,7 +50,8 @@ for (i in 1:N_neuron) {
     spks_shifted_vec = spks_vec - dat$stim_onset[id_trial]
     stim_onset_time_shifted = dat$stim_onset[id_trial] - dat$stim_onset[id_trial]
     feedback_time_shifted = dat$feedback_time[id_trial] - dat$stim_onset[id_trial]
-    spks_shifted_vec = spks_shifted_vec[which( (spks_shifted_vec <= min(max(t_vec), feedback_time_shifted)) &  
+    trial_end_time_min = min(dat$trial_intervals[,2] - dat$stim_onset)
+    spks_shifted_vec = spks_shifted_vec[which( (spks_shifted_vec <= min(max(t_vec), trial_end_time_min)) &  
                                                 (spks_shifted_vec >= max(min(t_vec), stim_onset_time_shifted-0)) )]
     spks_time_mlist[i, j] = list(spks_shifted_vec)
   }
@@ -79,7 +80,7 @@ fix_comp1_timeshift_only = FALSE
 v_true_mat_list = NULL
 v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
                             gocue_time_vec - min(gocue_time_vec))
-N_restart = 1
+N_restart = 10
 MaxIter = 5 
 conv_thres = 5e-6 
 gamma = 0
