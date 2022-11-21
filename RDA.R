@@ -29,17 +29,19 @@ if (FALSE) {
 N_neuron = length(id_neuron_selected)
 N_trial = length(id_trial_selected)
 
+trial_length = max(dat$trial_intervals[id_trial_selected,2] - dat$stim_onset[id_trial_selected]) + 0.2
 if (identical(feedback_type, 1)) {
-  t_vec = seq(0, 2, length.out=200)
+  t_vec = seq(0, 2.8, length.out=200)
 } else {
   t_vec = seq(-2, 3,length.out=200)
 }
 
 ### Select neuron-trial pairs 
-stim_onset_time_vec = (dat$stim_onset - dat$stim_onset)[id_trial_selected]
-gocue_time_vec = (dat$gocue - dat$stim_onset)[id_trial_selected]
-reaction_time_vec = (dat$reaction_time - dat$stim_onset)[id_trial_selected]
-feedback_time_vec = (dat$feedback_time - dat$stim_onset)[id_trial_selected]
+trial_start_vec = dat$trial_intervals[,2] - trial_length
+stim_onset_time_vec = (dat$stim_onset - trial_start_vec)[id_trial_selected]
+gocue_time_vec = (dat$gocue - trial_start_vec)[id_trial_selected]
+reaction_time_vec = (dat$reaction_time - trial_start_vec)[id_trial_selected]
+feedback_time_vec = (dat$feedback_time - trial_start_vec)[id_trial_selected]
 spks_time_mlist = matrix(list(), nrow = N_neuron, ncol = N_trial)
 for (i in 1:N_neuron) {
   for (j in 1:N_trial) {
@@ -47,12 +49,13 @@ for (i in 1:N_neuron) {
     id_trial = id_trial_selected[j]
     
     spks_vec = dat$spks_pp[id_neuron, id_trial][[1]]
-    spks_shifted_vec = spks_vec - dat$stim_onset[id_trial]
-    stim_onset_time_shifted = dat$stim_onset[id_trial] - dat$stim_onset[id_trial]
-    feedback_time_shifted = dat$feedback_time[id_trial] - dat$stim_onset[id_trial]
-    trial_end_time_min = min(dat$trial_intervals[,2] - dat$stim_onset)
-    spks_shifted_vec = spks_shifted_vec[which( (spks_shifted_vec <= min(max(t_vec), feedback_time_shifted)) &  
-                                                (spks_shifted_vec >= max(min(t_vec), stim_onset_time_shifted-0)) )]
+    spks_shifted_vec = spks_vec - trial_start_vec[id_trial]
+    
+    stim_onset_time_shifted = dat$stim_onset[id_trial] - trial_start_vec[id_trial]
+    feedback_time_shifted = dat$feedback_time[id_trial] - trial_start_vec[id_trial]
+    spks_shifted_vec = spks_shifted_vec[which( (spks_shifted_vec <= min(max(t_vec), Inf+feedback_time_shifted)) &  
+                                                 (spks_shifted_vec >= max(min(t_vec), -Inf+stim_onset_time_shifted) ) )]
+    
     spks_time_mlist[i, j] = list(spks_shifted_vec)
   }
 }
@@ -68,7 +71,7 @@ N_clus_min = 3
 N_clus_max = 5
 N_component = 2
 if (identical(feedback_type, 1)) {
-  key_times_vec = c(min(t_vec), min(gocue_time_vec), 1.5)
+  key_times_vec = c(min(stim_onset_time_vec), min(gocue_time_vec), trial_length)
 } else {
   key_times_vec = c(-1.7, 0, 2.5)
 }
@@ -80,7 +83,7 @@ fix_comp1_timeshift_only = FALSE
 v_true_mat_list = NULL
 v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
                             gocue_time_vec - min(gocue_time_vec))
-N_restart = 10
+N_restart = 5
 MaxIter = 5 
 conv_thres = 5e-6 
 gamma = 0
