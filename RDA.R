@@ -31,7 +31,7 @@ N_trial = length(id_trial_selected)
 
 trial_length = max(dat$trial_intervals[id_trial_selected,2] - dat$stim_onset[id_trial_selected]) + 0.2
 if (identical(feedback_type, 1)) {
-  t_vec = seq(0, 2.8, length.out=200)
+  t_vec = seq(0, trial_length, length.out=200)
 } else {
   t_vec = seq(-2, 3,length.out=200)
 }
@@ -67,8 +67,8 @@ spks_time_mlist = spks_time_mlist[id_neuron_active, ]
 
 
 # Fit model for various cluster number ------------------------------------
-N_clus_min = 3
-N_clus_max = 5
+N_clus_min = 4
+N_clus_max = 4
 N_component = 2
 if (identical(feedback_type, 1)) {
   key_times_vec = c(min(stim_onset_time_vec), min(gocue_time_vec), trial_length)
