@@ -86,7 +86,7 @@ v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec),
 N_restart = 5
 MaxIter = 5 
 conv_thres = 5e-6 
-gamma = 0
+gamma = 0.01
 
 set.seed(1)
 res_list = list()

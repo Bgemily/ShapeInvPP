@@ -143,7 +143,7 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       }
       
       ### Calculate intensity components
-      F_hat_q = sqrt( mean(N_spks_subjtrial_vec_q^2) )
+      F_hat_q = mean(N_spks_subjtrial_vec_q)
       for (id_component in 1:N_component) {
         intensity_q_mat[id_component, ] = density_q_mat[id_component, ] * F_hat_q
       }
@@ -168,7 +168,7 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       }
       
       ### Calculate intensity components
-      F_hat_q = sqrt( mean(N_spks_subjtrial_vec_q^2) )
+      F_hat_q = mean(N_spks_subjtrial_vec_q)
       for (id_component in 1:N_component) {
         intensity_q_mat[id_component, ] = density_q_mat[id_component, ] * F_hat_q
       }
