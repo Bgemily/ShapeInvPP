@@ -30,8 +30,9 @@ doParallel::registerDoParallel(cores = N_cores)
 
 
 # Run simulations ---------------------------------------------------------
-test_random_restart = TRUE
+test_random_restart = FALSE
 test_algorithm_restart = FALSE
+verify_local_minima = TRUE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
@@ -185,6 +186,61 @@ if (test_algorithm_restart) {
         }
         param_name = "N_trial"
         param_value = N_trial
+        folder_path = paste0(top_level_folder, '/', setup,
+                             '/', method, 
+                             '/', default_setting,
+                             '/', param_name, '/', param_value)
+        dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
+        
+        now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+        save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
+        rm(results)
+      }
+    }
+  }
+}
+
+
+if (verify_local_minima) {
+  ### Parameters' possible values:
+  N_trial_list = list(1)
+  N_restart_algo_list = list(1, 2, 3, 4, 5, 6)
+  for (id_N_trial in 1:length(N_trial_list)){
+    N_trial = N_trial_list[[id_N_trial]]
+    method = paste0('shape_inv_pp_', 'jitter_init_N_trial', as.character(N_trial) )
+    default_setting = 'N_spks_total=300,N_subj=100,N_clus=1,N_comp=2'
+    for (id_N_split in 1:N_split) {
+      if (save_res_details & (id_N_split == 1)) {
+        save_center_pdf_array = TRUE
+      } else {
+        save_center_pdf_array = FALSE
+      }
+      for (id_N_restart in 1:length(N_restart_algo_list)) {
+        N_restart = N_restart_algo_list[[id_N_restart]]
+        results <- foreach(id_replicate = 1:N_replicate) %dopar% {
+          SEED = id_N_split * 1000 + id_N_trial * 100 + id_replicate + 10
+          print(paste0("SEED: ", SEED))
+          tryCatch(main_shapeinvpp(SEED = SEED,
+                                   N_trial = N_trial,
+                                   N_subj = 100,
+                                   N_clus = 1,
+                                   N_component_true = 2,
+                                   N_spks_total = 300,
+                                   timeshift_subj_max_vec = c(1/4, 1/4),
+                                   timeshift_trial_max = 0,
+                                   t_vec = seq(-1, 1, by=0.01),
+                                   ### Parameters for algorithms
+                                   N_restart = N_restart, 
+                                   freq_trun = 10, 
+                                   N_component = 2,
+                                   key_times_vec = c(-1,0,1),
+                                   fix_timeshift = FALSE,
+                                   fix_membership = FALSE,
+                                   save_center_pdf_array = save_center_pdf_array ),
+                   error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
+        }
+        param_name = "N_restart"
+        param_value = N_restart
         folder_path = paste0(top_level_folder, '/', setup,
                              '/', method, 
                              '/', default_setting,
