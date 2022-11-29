@@ -83,7 +83,7 @@ fix_comp1_timeshift_only = FALSE
 v_true_mat_list = NULL
 v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
                             gocue_time_vec - min(gocue_time_vec))
-N_restart = 5
+N_restart = 10
 MaxIter = 5 
 conv_thres = 5e-6 
 gamma = 0.01
@@ -178,7 +178,7 @@ results = list(res_list = res_list,
 # Save results ------------------------------------------------------------
 top_level_folder = "../Results/Rdata"
 setup = 'RDA_v2'
-method = paste0('shape_inv_pp_v5.1_gamma',gamma)
+method = paste0('shape_inv_pp_v5.3_gamma',gamma)
 default_setting = paste0('Session ', id_session, 
                          ', ', brain_region, 
                          ', scenario_num = ', paste0(scenario_num, collapse = '_'),
