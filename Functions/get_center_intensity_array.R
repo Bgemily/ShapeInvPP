@@ -109,7 +109,7 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       }
       
       ### Force densities to be zero before their starting time
-      if (N_component >= 2) {
+      if (FALSE & N_component >= 2) {
         for (id_component in 2:N_component) {
           index_before_start = which(t_vec <= key_times_vec[id_component])
           density_q_before_start = density_q_mat[id_component, index_before_start]
@@ -125,7 +125,10 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
           density_value_peak = max(abs(density_q_mat[id_component, ]))
           density_value_non_zero = density_value_peak*0.05
           if (abs(density_value_after_key_time) < density_value_non_zero) {
-            length_rmv = (min(t_vec[which(abs(density_q_mat[id_component, ]) >= density_value_non_zero)]) - key_times_vec[id_component]) / t_unit
+            length_rmv = (min(t_vec[which(abs(density_q_mat[id_component, ]) >= density_value_non_zero & t_vec > key_times_vec[id_component])]) - key_times_vec[id_component]) / t_unit
+            if (length_rmv == Inf) {
+              length_rmv = 0
+            }
             density_q_mat[id_component, ] = c( tail(density_q_mat[id_component, ], length(t_vec)-length_rmv), 
                                                rep(tail(density_q_mat[id_component, ], 1), length_rmv) )
             if (!fix_timeshift) {
