@@ -83,7 +83,7 @@ fix_comp1_timeshift_only = FALSE
 v_true_mat_list = NULL
 v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
                             gocue_time_vec - min(gocue_time_vec))
-N_restart = 10
+N_restart = 5
 MaxIter = 5 
 conv_thres = 5e-6 
 gamma = 0.01
