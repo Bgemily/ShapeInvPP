@@ -71,7 +71,7 @@ N_clus_min = 4
 N_clus_max = 4
 N_component = 2
 if (identical(feedback_type, 1)) {
-  key_times_vec = c(min(stim_onset_time_vec), min(gocue_time_vec), trial_length)
+  key_times_vec = c(min(stim_onset_time_vec), min(feedback_time_vec), trial_length)
 } else {
   key_times_vec = c(-1.7, 0, 2.5)
 }
@@ -82,7 +82,7 @@ fix_timeshift = FALSE
 fix_comp1_timeshift_only = FALSE
 v_true_mat_list = NULL
 v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
-                            gocue_time_vec - min(gocue_time_vec))
+                            feedback_time_vec - min(feedback_time_vec))
 N_restart = 10
 MaxIter = 5 
 conv_thres = 5e-6 
@@ -96,6 +96,7 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
   
   res_best = NA
   compl_log_lik_best = -Inf
+  compl_log_lik_history = c()
   for (id_restart in 1:N_restart) {
     ### Get initialization -----------
     res = get_init(spks_time_mlist = spks_time_mlist, 
@@ -145,7 +146,9 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
       compl_log_lik_best = compl_log_lik_new
       res_best = res_new
     }
+    compl_log_lik_history[id_restart] = compl_log_lik_best
   }
+  res_best$compl_log_lik_history = compl_log_lik_history
   
   # Save results of N_clus_tmp ----------------------------------------------
   res_list[[ind_N_clus]] = res_best
