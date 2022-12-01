@@ -81,7 +81,7 @@ freq_trun = Inf
 fix_timeshift = TRUE
 fix_comp1_timeshift_only = FALSE
 use_true_timeshift = FALSE
-rmv_conn_prob = TRUE
+rmv_conn_prob = FALSE
 v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
                             gocue_time_vec - min(gocue_time_vec))
 
@@ -147,7 +147,7 @@ results = list(res_list = res_list,
 # Save results ------------------------------------------------------------
 top_level_folder = "../Results/Rdata"
 setup = 'RDA_v2'
-method = 'kmeans'
+method = ifelse(rmv_conn_prob, yes = 'kmeans_density', no = 'kmeans_intensity')
 default_setting = paste0('Session ', id_session, 
                          ', ', brain_region, 
                          ', scenario_num = ', paste0(scenario_num, collapse = '_'),
