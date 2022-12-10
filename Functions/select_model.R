@@ -2,7 +2,8 @@
 select_model = function(spks_time_mlist, 
                         N_component,
                         key_times_vec,
-                        result_list)
+                        result_list,
+                        mode = 'intensity')
 {
   ICL_vec = rep(0,length(result_list))
   compl_log_lik_vec = rep(0,length(result_list))
@@ -24,6 +25,7 @@ select_model = function(spks_time_mlist,
     v_mat_list_tmp = res_tmp$v_mat_list
     center_intensity_array_tmp = res_tmp$center_intensity_array
     center_Nspks_mat_tmp = res_tmp$center_Nspks_mat
+    center_density_array_tmp = res_tmp$center_density_array
     pi_vec = clus_size_vec / sum(clus_size_vec)
     tau_mat = matrix(0, nrow = N_subj*N_trial, ncol = N_clus_tmp)
     ### Let tau_{(i,r),q} == 1  if z_{i}=q
@@ -40,7 +42,10 @@ select_model = function(spks_time_mlist,
     F_q_T = rowSums(center_Nspks_mat_tmp)
     tau_F = tau_mat %*% F_q_T 
     log_lik_tmp_1 = sum(-tau_F)
-    
+    if (mode == "density") {
+      log_lik_tmp_1 = 0
+    }
+
     # Second term of log likelihood: \sum_{q}{ \sum_{i,r}\sum_{t} \log{S^{w_{i,r}}f_{q}(t)+S^{v_{i,r}}g_{q}(t)} *tau_{i,r,q} }
     log_lik_tmp_2 = 0
     for (id_clus in 1:N_clus_tmp) {
@@ -54,7 +59,14 @@ select_model = function(spks_time_mlist,
             if (n0_shift_tmp > length(t_vec)) {
               n0_shift_tmp = length(t_vec)
             }
-            intensity_tmp = center_intensity_array_tmp[id_clus, id_component, ]
+            if (mode == "intensity") {
+              intensity_tmp = center_intensity_array_tmp[id_clus, id_component, ]
+            } else if (mode == "density") {
+              intensity_tmp = center_density_array_tmp[id_clus, id_component, ]
+            } else {
+              stop("Argument `mode` should be either 'intensity' or 'density'.")
+            }
+            
             intensity_shifted_curr_comp = c(rep(head(intensity_tmp,1), max(0, n0_shift_tmp) ),
                                       head(intensity_tmp, length(t_vec) - max(0, n0_shift_tmp)) )
             intensity_est = intensity_est + intensity_shifted_curr_comp
