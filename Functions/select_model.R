@@ -55,7 +55,7 @@ select_model = function(spks_time_mlist,
               n0_shift_tmp = length(t_vec)
             }
             intensity_tmp = center_intensity_array_tmp[id_clus, id_component, ]
-            intensity_shifted_curr_comp = c(rep(0, max(0, n0_shift_tmp) ),
+            intensity_shifted_curr_comp = c(rep(head(intensity_tmp,1), max(0, n0_shift_tmp) ),
                                       head(intensity_tmp, length(t_vec) - max(0, n0_shift_tmp)) )
             intensity_est = intensity_est + intensity_shifted_curr_comp
           }
@@ -80,7 +80,7 @@ select_model = function(spks_time_mlist,
     ### Fuzzy clustering entropy: \sum_{i}\sum_{q} \tau^{i,q} * \log(\pi_q)
     log_pi_vec = log(pi_vec)
     log_pi_vec[log_pi_vec==-Inf] = 0
-    clus_entropy = sum(tau_mat %*% log_pi_vec)
+    clus_entropy = sum(clus_size_vec * log_pi_vec)
     
     ### Compute penalty
     u_0 = -min(res_tmp$t_vec); u_1 = max(res_tmp$t_vec)
