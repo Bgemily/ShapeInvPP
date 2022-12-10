@@ -95,8 +95,8 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
   N_clus_tmp = c(N_clus_min:N_clus_max)[ind_N_clus]
   
   res_best = NA
-  compl_log_lik_best = -Inf
-  compl_log_lik_history = c()
+  l2_loss_best = Inf
+  l2_loss_history = c()
   for (id_restart in 1:N_restart) {
     ### Get initialization -----------
     res = get_init(spks_time_mlist = spks_time_mlist, 
@@ -134,21 +134,17 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
     time_estimation = time_end - time_start
     time_estimation = as.numeric(time_estimation, units='secs')
     
-    ### Calculate log likelihood
-    res = select_model(spks_time_mlist = spks_time_mlist, 
-                       N_component = N_component,
-                       key_times_vec = key_times_vec,
-                       result_list = list(res_new))
-    compl_log_lik_new = res$compl_log_lik_vec[1]
+    ### Extract loss function value
+    l2_loss_new = tail(res_new$loss_history, 2)[1]
     
     ### Update best estimation
-    if(compl_log_lik_new > compl_log_lik_best){
-      compl_log_lik_best = compl_log_lik_new
+    if(l2_loss_new < l2_loss_best){
+      l2_loss_best = l2_loss_new
       res_best = res_new
     }
-    compl_log_lik_history[id_restart] = compl_log_lik_best
+    l2_loss_history[id_restart] = l2_loss_best
   }
-  res_best$compl_log_lik_history = compl_log_lik_history
+  res_best$l2_loss_history = l2_loss_history
   
   # Save results of N_clus_tmp ----------------------------------------------
   res_list[[ind_N_clus]] = res_best
@@ -160,7 +156,8 @@ for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
 res_select_model = select_model(spks_time_mlist = spks_time_mlist, 
                                 N_component = N_component,
                                 key_times_vec = key_times_vec,
-                                result_list = res_list)
+                                result_list = res_list,
+                                mode = "density")
 cand_N_clus_vec = N_clus_min:N_clus_max
 N_clus_est = cand_N_clus_vec[res_select_model$id_best_res]
 ICL_vec = res_select_model$ICL_vec 
@@ -181,7 +178,7 @@ results = list(res_list = res_list,
 # Save results ------------------------------------------------------------
 top_level_folder = "../Results/Rdata"
 setup = 'RDA_v2'
-method = paste0('shape_inv_pp_v5.5_gamma',gamma)
+method = paste0('shape_inv_pp_v5.6_gamma',gamma)
 default_setting = paste0('Session ', id_session, 
                          ', ', brain_region, 
                          ', scenario_num = ', paste0(scenario_num, collapse = '_'),
