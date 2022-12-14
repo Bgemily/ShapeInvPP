@@ -67,13 +67,13 @@ select_model = function(spks_time_mlist,
               stop("Argument `mode` should be either 'intensity' or 'density'.")
             }
             
-            intensity_shifted_curr_comp = c(rep(head(intensity_tmp,1), max(0, n0_shift_tmp) ),
+            intensity_shifted_curr_comp = c(tail(intensity_tmp, max(0, n0_shift_tmp)),
                                       head(intensity_tmp, length(t_vec) - max(0, n0_shift_tmp)) )
             intensity_est = intensity_est + intensity_shifted_curr_comp
           }
           log_intensity_est = rep(0, length(t_vec))
           log_intensity_est[which(intensity_est>0)] = log(intensity_est[which(intensity_est>0)])
-          
+          log_intensity_est[which(intensity_est<=0)] = log(min(intensity_est[which(intensity_est>0)])) 
           ### Calculate observed intensity for current (subj, trial)
           event_time_vec_tmp = unlist(spks_time_mlist[id_subj, id_trial])
           if(length(event_time_vec_tmp)==0){
@@ -84,6 +84,7 @@ select_model = function(spks_time_mlist,
           
           ### Add log-likelihood: \sum_{s} \log[ S^w_{i,r}f(t_{i,r,s})+S^v_{/i,r}g(t_{i,r,s}) ] 
           log_lik_tmp_2 = log_lik_tmp_2 + sum(log_intensity_est*counts_tmp)
+          
         }
       }
     }
@@ -98,11 +99,21 @@ select_model = function(spks_time_mlist,
     u_0 = -min(res_tmp$t_vec); u_1 = max(res_tmp$t_vec)
     degr_free_vec = c()
     for (id_component in 1:N_component) {
-      degr_free_curr_comp = length(which( (key_times_vec[id_component]<=t_vec) & (t_vec<=u_1-max(v_mat_list_tmp[[id_component]])) ))
+      if (FALSE) {
+        degr_free_curr_comp = length(which( (key_times_vec[id_component]<=t_vec) & (t_vec<=u_1-max(v_mat_list_tmp[[id_component]])) ))
+      } else {
+        degr_free_curr_comp = length(t_vec)
+      }
       degr_free_vec[id_component] = degr_free_curr_comp
     }
-    penalty_tmp = 1/2 * log(N_subj*N_trial) * 
-      ( (N_clus_tmp - 1) + N_clus_tmp * sum(degr_free_vec) ) 
+    if (FALSE) {
+      penalty_tmp = 1/2 * log(N_subj*N_trial) * 
+        ( (N_clus_tmp - 1) + N_clus_tmp * sum(degr_free_vec) ) 
+    } else {
+      penalty_tmp = 1/2 * log(length(unlist(spks_time_mlist))) * 
+        ( (N_clus_tmp - 1) + N_clus_tmp * sum(degr_free_vec) ) 
+    }
+    
       
     ### Compute ICL
     compl_log_lik_tmp = log_lik_tmp + clus_entropy

@@ -157,7 +157,7 @@ res_select_model = select_model(spks_time_mlist = spks_time_mlist,
                                 N_component = N_component,
                                 key_times_vec = key_times_vec,
                                 result_list = res_list,
-                                mode = "density")
+                                mode = "intensity")
 cand_N_clus_vec = N_clus_min:N_clus_max
 N_clus_est = cand_N_clus_vec[res_select_model$id_best_res]
 ICL_vec = res_select_model$ICL_vec 
