@@ -65,6 +65,17 @@ id_neuron_selected = id_neuron_selected[id_neuron_active]
 N_neuron = length(id_neuron_selected)
 spks_time_mlist = spks_time_mlist[id_neuron_active, ]
 
+p_value_vec = c()
+for (idx_neuron in 1:nrow(spks_time_mlist)) {
+  spks_tmp_vec = unlist(spks_time_mlist[idx_neuron, ])
+  p_value = ks.test(spks_tmp_vec, "punif", min(t_vec), max(t_vec))[['p.value']]
+  p_value_vec[idx_neuron] = p_value
+}
+idx_neuron_non_unif = which(p_value_vec < 0.05)
+id_neuron_selected = id_neuron_selected[idx_neuron_non_unif]
+N_neuron = length(id_neuron_selected)
+spks_time_mlist = spks_time_mlist[idx_neuron_non_unif, ]
+
 
 # Fit model for various cluster number ------------------------------------
 N_clus_min = 3
@@ -178,7 +189,7 @@ results = list(res_list = res_list,
 # Save results ------------------------------------------------------------
 top_level_folder = "../Results/Rdata"
 setup = 'RDA_v2'
-method = paste0('shape_inv_pp_v5.6_gamma',gamma)
+method = paste0('shape_inv_pp_v5.7_gamma',gamma)
 default_setting = paste0('Session ', id_session, 
                          ', ', brain_region, 
                          ', scenario_num = ', paste0(scenario_num, collapse = '_'),
