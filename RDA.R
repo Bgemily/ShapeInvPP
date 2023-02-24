@@ -17,7 +17,7 @@ new.path = '../Data/Main/'
 id_session = 13
 scenario_num = c(1)
 feedback_type = c(1)
-brain_region = 'midbrain'
+brain_region = 'frontal'
 
 dat = readRDS(paste(new.path, "session",id_session,".rds",sep=''))
 id_trial_selected = which((dat$scenario_num %in% scenario_num) & (dat$feedback_type %in% feedback_type))
@@ -67,8 +67,8 @@ spks_time_mlist = spks_time_mlist[id_neuron_active, ]
 
 
 # Fit model for various cluster number ------------------------------------
-N_clus_min = 2
-N_clus_max = 6
+N_clus_min = 3
+N_clus_max = 5
 N_component = 2
 if (identical(feedback_type, 1)) {
   key_times_vec = c(min(stim_onset_time_vec), min(gocue_time_vec), trial_length)
@@ -83,7 +83,7 @@ fix_comp1_timeshift_only = FALSE
 v_true_mat_list = NULL
 v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
                             gocue_time_vec - min(gocue_time_vec))
-N_restart = 10
+N_restart = 20
 MaxIter = 10 
 conv_thres = 5e-6 
 gamma = 0.007
