@@ -6,8 +6,7 @@ get_init = function(spks_time_mlist,
                     N_component=1,
                     freq_trun=5, 
                     bw=0,
-                    v0 = 0.15, v1 = 0.1,
-                    t_vec=seq(0, v0, by=0.01),
+                    t_vec=seq(0, 1, by=0.01),
                     key_times_vec = c(min(t_vec),0,max(t_vec)),
                     N_start_kmean = 5,
                     fix_timeshift=FALSE,
@@ -34,7 +33,7 @@ get_init = function(spks_time_mlist,
       ### Jitter true time shift
       if(jitter_prop_true_timeshift>0){
         for (id_component in 1:N_component) {
-          v_mat_list[[id_component]] = jitter(v_mat_list[[id_component]], amount = jitter_prop_true_timeshift*(v1/2-0))
+          v_mat_list[[id_component]] = jitter(v_mat_list[[id_component]], amount = jitter_prop_true_timeshift*((-min(t_vec))/2-0))
         }
       }
     } else{
