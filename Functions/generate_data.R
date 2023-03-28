@@ -64,14 +64,14 @@ generate_data = function(SEED=NULL,
     center_N_spks_mat[1,1] = N_spks_total*(1/(N_spks_ratio+1))
     center_N_spks_mat[1,2] = 0 * N_spks_total*(N_spks_ratio/(N_spks_ratio+1))
   } else if (N_clus==4){
-    center_N_spks_mat[1,1] = N_spks_total*0.5
-    center_N_spks_mat[1,2] = N_spks_total*0.5
-    center_N_spks_mat[2,1] = N_spks_total*0.5
-    center_N_spks_mat[2,2] = N_spks_total*0.5
-    center_N_spks_mat[3,1] = N_spks_total*0.5
-    center_N_spks_mat[3,2] = N_spks_total*0.5
-    center_N_spks_mat[4,1] = N_spks_total*0.5
-    center_N_spks_mat[4,2] = N_spks_total*0.5
+    center_N_spks_mat[1,1] = N_spks_total*0.7*0.5
+    center_N_spks_mat[1,2] = N_spks_total*0.7*0.5
+    center_N_spks_mat[2,1] = N_spks_total*0.8*0.5
+    center_N_spks_mat[2,2] = N_spks_total*0.8*0.5
+    center_N_spks_mat[3,1] = N_spks_total*0.9*0.5
+    center_N_spks_mat[3,2] = N_spks_total*0.9*0.5
+    center_N_spks_mat[4,1] = N_spks_total*1*0.5
+    center_N_spks_mat[4,2] = N_spks_total*1*0.5
   } 
   
   
