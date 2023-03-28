@@ -6,6 +6,7 @@ generate_data = function(SEED=NULL,
                          clus_size_vec = rep(N_subj/N_clus, N_clus),
                          t_vec = seq(-1,1,by=0.01),
                          t_vec_extend = t_vec,
+                         key_times_vec = c(-1,0,1),
                          N_spks_total = 1000,
                          timeshift_subj_max_vec = c(1/8, 1/32),
                          timeshift_trial_max = 1/8,
@@ -94,28 +95,32 @@ generate_data = function(SEED=NULL,
     center_density_array_true[1,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     s_tmp = sqrt(1)*(1/4/sqrt(2))*(1); mu_tmp = s_tmp
-    center_density_array_true[1,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
+    t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
+    center_density_array_true[1,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
     
     ## Clus 2
     s_tmp = 1*(1/8)*(clus_sep); mu_tmp = -1*(1/2); 
     center_density_array_true[2,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     s_tmp = sqrt(1)*(1/4/sqrt(2))*(sqrt(clus_sep)); mu_tmp = s_tmp
-    center_density_array_true[2,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
+    t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
+    center_density_array_true[2,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
 
     ## Clus 3
     s_tmp = 1*(1/8)*(clus_sep^2); mu_tmp = -1*(1/2) 
     center_density_array_true[3,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     s_tmp = sqrt(1)*(1/4/sqrt(2))*(clus_sep); mu_tmp = s_tmp
-    center_density_array_true[3,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
+    t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
+    center_density_array_true[3,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
     
     ## Clus 4
     s_tmp = 1*(1/8)*(1); mu_tmp = -1*(1/2); 
     center_density_array_true[4,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     s_tmp = sqrt(1)*(1/4/sqrt(2))*(clus_sep); mu_tmp = s_tmp
-    center_density_array_true[4,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
+    t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
+    center_density_array_true[4,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
     
     ### Add weights (prop to N_spks) for two components
     for (id_clus in 1:N_clus){

@@ -37,6 +37,7 @@ main_kmeans_align = function(### Parameters for generative model
                     N_clus=N_clus, 
                     t_vec=t_vec,
                     t_vec_extend=t_vec_extend,
+                    key_times_vec=key_times_vec,
                     N_spks_total = N_spks_total,
                     timeshift_subj_max_vec = timeshift_subj_max_vec,
                     clus_sep = clus_sep,
