@@ -33,9 +33,8 @@ get_init = function(spks_time_mlist,
       v_mat_list = v_true_mat_list
       ### Jitter true time shift
       if(jitter_prop_true_timeshift>0){
-        u_0 = v1; u_1 = v0;
         for (id_component in 1:N_component) {
-          v_mat_list[[id_component]] = jitter(v_mat_list[[id_component]], amount = jitter_prop_true_timeshift*(u_0/2-0))
+          v_mat_list[[id_component]] = jitter(v_mat_list[[id_component]], amount = jitter_prop_true_timeshift*(v1/2-0))
         }
       }
     } else{

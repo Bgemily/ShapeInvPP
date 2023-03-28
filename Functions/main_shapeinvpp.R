@@ -6,8 +6,7 @@ main_shapeinvpp = function(### Parameters for generative model
                         N_trial = 1,
                         N_clus=2, 
                         N_component_true = 2,
-                        u_1 = 1, u_0 = 1,
-                        t_vec = seq(-u_0,u_1,by=0.01),
+                        t_vec = seq(-1,1,by=0.01),
                         t_vec_extend = t_vec,
                         N_spks_total = 1000,
                         timeshift_subj_max_vec = c(1/8, 1/32),
@@ -53,7 +52,6 @@ main_shapeinvpp = function(### Parameters for generative model
                     N_subj=N_subj,
                     N_trial=N_trial,
                     N_clus=N_clus, 
-                    u_1=u_1, u_0=u_0,
                     t_vec=t_vec,
                     t_vec_extend=t_vec_extend,
                     N_spks_total = N_spks_total,
@@ -111,7 +109,7 @@ main_shapeinvpp = function(### Parameters for generative model
         res = get_init_random(spks_time_mlist = spks_time_mlist, 
                               N_clus = N_clus_tmp,
                               N_component = N_component,
-                              v0 = u_1, v1 = u_0,
+                              v0 = max(t_vec), v1 = -min(t_vec),
                               t_vec = t_vec, 
                               key_times_vec = key_times_vec,
                               N_start_kmean = N_start_kmean,
@@ -132,7 +130,7 @@ main_shapeinvpp = function(### Parameters for generative model
         res = get_init(spks_time_mlist = spks_time_mlist, 
                        N_clus = N_clus_tmp,
                        N_component = N_component,
-                       v0 = u_1, v1 = u_0,
+                       v0 = max(t_vec), v1 = -min(t_vec),
                        t_vec = t_vec, 
                        key_times_vec = key_times_vec,
                        N_start_kmean = N_start_kmean,
@@ -166,7 +164,7 @@ main_shapeinvpp = function(### Parameters for generative model
                                bw = bw,
                                MaxIter = MaxIter, 
                                gamma=gamma,
-                               v0 = u_1, v1= u_0,
+                               v0 = max(t_vec), v1 = -min(t_vec),
                                t_vec=t_vec, 
                                t_vec_extend=t_vec_extend,
                                key_times_vec = key_times_vec,
@@ -302,7 +300,7 @@ main_shapeinvpp = function(### Parameters for generative model
     if (N_component == N_component_true) {
       v_mean_sq_err_vec = sapply(1:N_component, function(id_component){
         mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2) /
-          (ifelse(id_component == 1, yes = u_0/4, no = (u_1 - u_0/2)/2 ) )^2
+          (ifelse(id_component == 1, yes = (-min(t_vec))/4, no = (max(t_vec) - (-min(t_vec))/2)/2 ) )^2
       })
       v_mean_sq_err = mean(v_mean_sq_err_vec)
       
@@ -315,7 +313,7 @@ main_shapeinvpp = function(### Parameters for generative model
             mean(v_true_mat_list[[id_component]][clusters_list_est_permn[[id_clus]], ])
         }
         mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_align_mat_list_est[[id_component]]) )^2) /
-          (ifelse(id_component == 1, yes = u_0/4, no = (u_1 - u_0/2)/2 ) )^2
+          (ifelse(id_component == 1, yes = (-min(t_vec))/4, no = (max(t_vec) - (-min(t_vec))/2)/2 ) )^2
         v_align_mean_sq_err_vec[id_component] = mse_tmp
       }
       v_align_mean_sq_err = mean(v_align_mean_sq_err_vec)
