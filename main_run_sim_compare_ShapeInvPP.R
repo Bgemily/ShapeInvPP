@@ -43,12 +43,12 @@ method = 'shape_inv_pp'
 ### Parameters' possible values:
 timeshift_subj_max_vec_list = list(c(1/32, 1/32/4)*8, c(1/32, 1/32/4)*6, 
                                    c(1/32, 1/32/4)*4, c(1/32, 1/32/4)*2, c(1/32, 1/32/4)*1 )
-N_subj_list = list(20, 60, 100, 140, 180, 220, 260, 300)
+N_subj_list = list(100, 140, 180, 220, 260, 300)
 key_times_vec_list = list(c(-1,0,1), c(-1,0.1,1), c(-1,0.2,1), 
                           c(-1,0.3,1), c(-1,0.4,1), c(-1,0.5,1))
 
 if (test_N_component_2){
-  default_setting = 'N_spks_total=50,N_subj=100,N_clus=4,clus_sep=1.8,N_comp=2'
+  default_setting = 'N_spks_total=50,N_subj=100,N_clus=4,clus_sep=2,N_comp=2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -66,7 +66,7 @@ if (test_N_component_2){
                              N_spks_total = 50,
                              timeshift_subj_max_vec = timeshift_subj_max_vec,
                              t_vec = seq(-1,1.5,0.01),
-                             clus_sep = 1.8,
+                             clus_sep = 2,
                              ### Parameters for algorithms
                              freq_trun = 10,
                              gamma = 1,
@@ -102,7 +102,7 @@ if (test_N_component_2){
                              timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                              t_vec = seq(-1,1.5,0.01),
                              ### params when N_clus==4:
-                             clus_sep = 1.8,
+                             clus_sep = 2,
                              ### Parameters for algorithms
                              freq_trun = 10,
                              gamma = 1,
@@ -138,7 +138,7 @@ if (test_N_component_2){
                                  timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                                  t_vec = seq(-1,1.5,0.01),
                                  ### params when N_clus==4:
-                                 clus_sep = 1.8,
+                                 clus_sep = 2,
                                  ### Parameters for algorithms
                                  freq_trun = 10,
                                  gamma = 1,
