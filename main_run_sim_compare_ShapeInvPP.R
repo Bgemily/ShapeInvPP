@@ -37,7 +37,7 @@ test_N_clus_1 = FALSE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v2.9.8'
+setup = 'Compare_methods_v2.9.9'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
@@ -48,7 +48,7 @@ key_times_vec_list = list(c(-1,0,1.5), c(-1,0.1,1.5), c(-1,0.2,1.5),
                           c(-1,0.3,1.5), c(-1,0.4,1.5), c(-1,0.5,1.5))
 
 if (test_N_component_2){
-  default_setting = 'N_spks_total=60,N_subj=100,N_clus=4,clus_sep=2,N_comp=2'
+  default_setting = 'N_spks_total=50,N_subj=60,N_clus=4,clus_sep=2,N_comp=2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -69,7 +69,7 @@ if (test_N_component_2){
                              clus_sep = 2,
                              ### Parameters for algorithms
                              freq_trun = 10,
-                             gamma = 1,
+                             gamma = 0,
                              N_component = 2,
                              key_times_vec = key_times_vec_list[[1]],
                              fix_timeshift = FALSE,
@@ -105,7 +105,7 @@ if (test_N_component_2){
                              clus_sep = 2,
                              ### Parameters for algorithms
                              freq_trun = 10,
-                             gamma = 1,
+                             gamma = 0,
                              N_component = 2,
                              key_times_vec = key_times_vec,
                              fix_timeshift = FALSE,
@@ -141,7 +141,7 @@ if (test_N_component_2){
                                  clus_sep = 2,
                                  ### Parameters for algorithms
                                  freq_trun = 10,
-                                 gamma = 1,
+                                 gamma = 0,
                                  N_component = 2,
                                  key_times_vec = key_times_vec_list[[1]],
                                  fix_timeshift = FALSE,
