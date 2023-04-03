@@ -37,13 +37,13 @@ test_N_clus_1 = FALSE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v2.9.5'
+setup = 'Compare_methods_v2.9.6'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
 timeshift_subj_max_vec_list = list(c(1/32, 1/32/4)*8, c(1/32, 1/32/4)*6, 
                                    c(1/32, 1/32/4)*4, c(1/32, 1/32/4)*2, c(1/32, 1/32/4)*1 )
-N_subj_list = list(100, 140, 180, 220, 260, 300)
+N_subj_list = list(20, 60, 100, 140, 180, 220, 260, 300)
 key_times_vec_list = list(c(-1,0,1), c(-1,0.1,1), c(-1,0.2,1), 
                           c(-1,0.3,1), c(-1,0.4,1), c(-1,0.5,1))
 
