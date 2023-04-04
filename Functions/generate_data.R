@@ -64,14 +64,14 @@ generate_data = function(SEED=NULL,
     center_N_spks_mat[1,1] = N_spks_total*(1/(N_spks_ratio+1))
     center_N_spks_mat[1,2] = 0 * N_spks_total*(N_spks_ratio/(N_spks_ratio+1))
   } else if (N_clus==4){
-    center_N_spks_mat[1,1] = N_spks_total*0.7*0.5
-    center_N_spks_mat[1,2] = N_spks_total*0.7*0.5
-    center_N_spks_mat[2,1] = N_spks_total*0.8*0.5
-    center_N_spks_mat[2,2] = N_spks_total*0.8*0.5
-    center_N_spks_mat[3,1] = N_spks_total*0.9*0.5
-    center_N_spks_mat[3,2] = N_spks_total*0.9*0.5
-    center_N_spks_mat[4,1] = N_spks_total*1*0.5
-    center_N_spks_mat[4,2] = N_spks_total*1*0.5
+    center_N_spks_mat[1,1] = N_spks_total*0.5
+    center_N_spks_mat[1,2] = N_spks_total*0.5
+    center_N_spks_mat[2,1] = N_spks_total*0.5
+    center_N_spks_mat[2,2] = N_spks_total*0.5
+    center_N_spks_mat[3,1] = N_spks_total*0.5
+    center_N_spks_mat[3,2] = N_spks_total*0.5
+    center_N_spks_mat[4,1] = N_spks_total*0.5
+    center_N_spks_mat[4,2] = N_spks_total*0.5
   } 
   
   
@@ -99,15 +99,15 @@ generate_data = function(SEED=NULL,
     center_density_array_true[1,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
     
     ## Clus 2
-    s_tmp = 1*(1/8)*(clus_sep^1.5); mu_tmp = -1*(1/2); 
+    s_tmp = 1*(1/8)*(clus_sep); mu_tmp = -1*(1/2); 
     center_density_array_true[2,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
-    s_tmp = sqrt(1)*(1/4/sqrt(2))*(1); mu_tmp = s_tmp
+    s_tmp = sqrt(1)*(1/4/sqrt(2))*(sqrt(clus_sep)); mu_tmp = s_tmp
     t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
     center_density_array_true[2,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
 
     ## Clus 3
-    s_tmp = 1*(1/8)*(clus_sep^2); mu_tmp = -1*(1/2)
+    s_tmp = 1*(1/8)*(clus_sep^2); mu_tmp = -1*(1/2) 
     center_density_array_true[3,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     s_tmp = sqrt(1)*(1/4/sqrt(2))*(clus_sep); mu_tmp = s_tmp
