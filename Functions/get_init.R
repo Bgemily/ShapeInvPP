@@ -12,6 +12,7 @@ get_init = function(spks_time_mlist,
                     fix_timeshift=FALSE,
                     fix_comp1_timeshift_only=FALSE,
                     use_true_timeshift=FALSE, 
+                    add_rand_to_init_timeshift=TRUE,
                     v_true_mat_list = NULL,
                     v_trialwise_vec_list = NULL,
                     jitter_prop_true_timeshift=0,
@@ -64,7 +65,10 @@ get_init = function(spks_time_mlist,
         }
         if (length(spks_time_shifted_vec) > 0) {
           v_subjwise_vec_list[[id_component]][id_subj] = quantile(spks_time_shifted_vec, 0.05) 
-          v_subjwise_vec_list[[id_component]][id_subj] = runif(n = 1, min = -0.05, max = 0.05) + v_subjwise_vec_list[[id_component]][id_subj]
+          if (add_rand_to_init_timeshift){
+            v_subjwise_vec_list[[id_component]][id_subj] = runif(n = 1, min = -0.05, max = 0.05) + v_subjwise_vec_list[[id_component]][id_subj]
+          }
+          
         } else {
           v_subjwise_vec_list[[id_component]][id_subj] = key_times_vec[id_component] 
         }

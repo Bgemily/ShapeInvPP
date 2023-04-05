@@ -103,7 +103,8 @@ main_shapeinvpp = function(### Parameters for generative model
     
     # Restart -----------------------------------------------------------------
     res_best = NA
-    compl_log_lik_best = -Inf
+    l2_loss_best = Inf
+    l2_loss_history = c()
     for (id_restart in 1:N_restart) {
       ### Get initialization -----------
       if (rand_init) {
@@ -138,6 +139,7 @@ main_shapeinvpp = function(### Parameters for generative model
                        fix_timeshift = fix_timeshift, 
                        fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                        use_true_timeshift = use_true_timeshift, 
+                       add_rand_to_init_timeshift = ifelse(id_restart>1, TRUE, FALSE),
                        jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
                        v_true_mat_list = v_true_mat_list, 
                        v_trialwise_vec_list = v_trialwise_vec_list,
@@ -175,18 +177,17 @@ main_shapeinvpp = function(### Parameters for generative model
       time_estimation = time_end - time_start
       time_estimation = as.numeric(time_estimation, units='secs')
       
-      ### Calculate log likelihood
-      res = select_model(spks_time_mlist, 
-                         N_component = N_component,
-                         key_times_vec = key_times_vec,
-                         result_list = list(res_new))
-      compl_log_lik_new = res$compl_log_lik_vec[1]
+      ### Extract loss function value
+      l2_loss_new = tail(res_new$loss_history, 2)[1]
       
       ### Update best estimation
-      if(compl_log_lik_new > compl_log_lik_best){
-        compl_log_lik_best = compl_log_lik_new
+      if(l2_loss_new < l2_loss_best){
+        l2_loss_best = l2_loss_new
         res_best = res_new
       }
+      l2_loss_history[id_restart] = l2_loss_best
+      
+      
     }
     
     # Save results of N_clus_tmp ----------------------------------------------
