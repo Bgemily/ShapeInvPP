@@ -37,7 +37,7 @@ test_N_clus_1 = FALSE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v3.0.4'
+setup = 'Compare_methods_v3.0.5'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
@@ -45,11 +45,11 @@ timeshift_subj_max_vec_list = list(c(1/32, 1/32/4)*2, c(1/32, 1/32/4)*4,
                                    c(1/32, 1/32/4)*6, c(1/32, 1/32/4)*8,
                                    c(1/32, 1/32/4)*10)
 N_subj_list = list(60, 100, 140, 180, 220, 260)
-key_times_vec_list = list(c(-1,0,1), c(-1,0.1,1), c(-1,0.2,1), 
-                          c(-1,0.3,1), c(-1,0.4,1), c(-1,0.5,1))
+key_times_vec_list = list(c(-1,0-0.2,1), c(-1,0.1-0.2,1), c(-1,0.2-0.2,1), 
+                          c(-1,0.3-0.2,1), c(-1,0.4-0.2,1), c(-1,0.5-0.2,1))
 
 if (test_N_component_2){
-  default_setting = 'N_spks_total=20,N_subj=60,N_clus=4,clus_sep=2,N_comp=2'
+  default_setting = 'N_spks_total=30,N_subj=60,N_clus=4,clus_sep=2,N_comp=2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -64,7 +64,7 @@ if (test_N_component_2){
                              N_subj = N_subj_list[[1]],
                              N_clus = 4, 
                              N_component_true = 2,
-                             N_spks_total = 20,
+                             N_spks_total = 30,
                              timeshift_subj_max_vec = timeshift_subj_max_vec,
                              t_vec = seq(-1,1,0.01),
                              clus_sep = 2,
@@ -99,7 +99,7 @@ if (test_N_component_2){
                              N_subj = N_subj_list[[1]],
                              N_clus = 4, 
                              N_component_true = 2,
-                             N_spks_total = 20,
+                             N_spks_total = 30,
                              timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                              t_vec = seq(-1,1,0.01),
                              ### params when N_clus==4:
@@ -135,7 +135,7 @@ if (test_N_component_2){
                                  N_subj = N_subj,
                                  N_clus = 4, 
                                  N_component_true = 2,
-                                 N_spks_total = 20,
+                                 N_spks_total = 30,
                                  timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                                  t_vec = seq(-1,1,0.01),
                                  ### params when N_clus==4:
