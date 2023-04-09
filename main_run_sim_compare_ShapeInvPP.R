@@ -37,7 +37,7 @@ test_N_clus_1 = FALSE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v3.0.5'
+setup = 'Compare_methods_v3.0.6'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
