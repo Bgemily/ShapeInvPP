@@ -129,7 +129,7 @@ generate_data = function(SEED=NULL,
     }
     
     ## Clus 4
-    s_tmp = 1*(1/4)*(1); mu_tmp = -1*(1/2); 
+    s_tmp = 1*(1/4)*(1/2); mu_tmp = -1*(1/2); 
     center_density_array_true[4,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     s_tmp = sqrt(1)*(1/2/sqrt(2))*(clus_sep); mu_tmp = s_tmp
