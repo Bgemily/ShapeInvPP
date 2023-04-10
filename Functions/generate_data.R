@@ -114,11 +114,25 @@ generate_data = function(SEED=NULL,
     ## Clus 3
     if (TRUE) {
       t_vec_extend_shift = t_vec_extend - (-0.2-0)
-      center_density_22_unshift = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
-      center_density_22_unshift_half_support = center_density_22_unshift * I(cumsum(center_density_22_unshift)/sum(center_density_22_unshift)<=0.5) * 2
-      center_density_array_true[3,1, ] = (center_density_array_true[2,1, ] + 2*center_density_22_unshift_half_support) / 3
-      center_density_22_unshift_half_support_2 = center_density_array_true[2,2, ] * I(cumsum(center_density_array_true[2,2, ])/sum(center_density_array_true[2,2, ])>0.5) * 2
-      center_density_array_true[3,2, ] = center_density_22_unshift_half_support_2
+      center_density_22_shift = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
+      index_1 = min(which(cumsum(center_density_22_shift)/sum(center_density_22_shift)>=0.3))
+      index_2 = min(which(cumsum(center_density_22_shift)/sum(center_density_22_shift)>=0.7))
+      weight_first_half = c(rep(1,index_1),
+                            sapply((index_1+1):index_2, function(ind) 1 / (1 + exp((ind - (index_1 + index_2)/2) / ((index_2 - index_1)/(2*pi))))),
+                            rep(0,length(t_vec_extend)-index_2))
+      center_density_22_shift_half_support = center_density_22_shift * weight_first_half / sum(center_density_22_shift * weight_first_half) * sum(center_density_22_shift)
+      center_density_array_true[3,1, ] = (center_density_array_true[2,1, ] + 2*center_density_22_shift_half_support) / 3
+      
+      t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
+      center_density_22_shift = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
+      index_1 = min(which(cumsum(center_density_22_shift)/sum(center_density_22_shift)>=0.3))
+      index_2 = min(which(cumsum(center_density_22_shift)/sum(center_density_22_shift)>=0.7))
+      weight_first_half = c(rep(1,index_1),
+                            sapply((index_1+1):index_2, function(ind) 1 / (1 + exp((ind - (index_1 + index_2)/2) / ((index_2 - index_1)/(2*pi))))),
+                            rep(0,length(t_vec_extend)-index_2))
+      center_density_22_shift_half_support = center_density_22_shift * weight_first_half / sum(center_density_22_shift * weight_first_half) * sum(center_density_22_shift)
+      center_density_22_shift_half_support_2 = 2*center_density_array_true[2,2, ] - center_density_22_shift_half_support
+      center_density_array_true[3,2, ] = center_density_22_shift_half_support_2
     } else {
       s_tmp = 1*(1/4)*(clus_sep^2); mu_tmp = -1*(1/2) 
       center_density_array_true[3,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
@@ -129,7 +143,7 @@ generate_data = function(SEED=NULL,
     }
     
     ## Clus 4
-    s_tmp = 1*(1/4)*(1); mu_tmp = -1*(1/2); 
+    s_tmp = 1*(1/4)*(1/sqrt(2)); mu_tmp = -1*(1/2); 
     center_density_array_true[4,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     s_tmp = sqrt(1)*(1/2/sqrt(2))*(clus_sep); mu_tmp = s_tmp
