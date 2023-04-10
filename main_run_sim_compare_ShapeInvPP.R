@@ -37,7 +37,7 @@ test_N_clus_1 = FALSE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v3.0.9'
+setup = 'Compare_methods_v3.1.0'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
@@ -45,8 +45,8 @@ timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*4,
                                    c(1/32/4, 1/32)*6, c(1/32/4, 1/32)*8,
                                    c(1/32/4, 1/32)*10)
 N_subj_list = list(40, 60, 100, 140, 180, 220, 260)
-key_times_vec_list = list(c(-1,0-0.2,1), c(-1,0.1-0.2,1), c(-1,0.2-0.2,1), 
-                          c(-1,0.3-0.2,1), c(-1,0.4-0.2,1), c(-1,0.5-0.2,1))
+key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.1-0.2,1.5), c(-1,0.2-0.2,1.5), 
+                          c(-1,0.3-0.2,1.5), c(-1,0.4-0.2,1.5), c(-1,0.5-0.2,1.5))
 
 if (test_N_component_2){
   default_setting = 'N_spks_total=100,N_subj=40,N_clus=4,clus_sep=1.4,key_time_comp2=-0.2'
@@ -66,7 +66,7 @@ if (test_N_component_2){
                              N_component_true = 2,
                              N_spks_total = 100,
                              timeshift_subj_max_vec = timeshift_subj_max_vec,
-                             t_vec = seq(-1,1,0.01),
+                             t_vec = seq(-1,1.5,0.01),
                              clus_sep = 1.4,
                              ### Parameters for algorithms
                              freq_trun = 10,
@@ -101,7 +101,7 @@ if (test_N_component_2){
                              N_component_true = 2,
                              N_spks_total = 100,
                              timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                             t_vec = seq(-1,1,0.01),
+                             t_vec = seq(-1,1.5,0.01),
                              ### params when N_clus==4:
                              clus_sep = 1.4,
                              ### Parameters for algorithms
@@ -137,7 +137,7 @@ if (test_N_component_2){
                                  N_component_true = 2,
                                  N_spks_total = 100,
                                  timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                 t_vec = seq(-1,1,0.01),
+                                 t_vec = seq(-1,1.5,0.01),
                                  ### params when N_clus==4:
                                  clus_sep = 1.4,
                                  ### Parameters for algorithms
