@@ -214,6 +214,7 @@ main_shapeinvpp = function(### Parameters for generative model
   res = res_list[[res_select_model$id_best_res]]
   
   res$clusters_list -> clusters_list_est
+  res$clusters_history -> clusters_history
   res$v_mat_list -> v_mat_list_est
   res$center_intensity_array -> center_intensity_array_est
   res$center_density_array -> center_density_array_est
@@ -293,7 +294,8 @@ main_shapeinvpp = function(### Parameters for generative model
     # Compute errors of clusters, i.e. Z ------------------------------------
     ARI = get_one_ARI(memb_est_vec = clus2mem(clusters_list_est), 
                       memb_true_vec = mem_true_vec)
-    
+    ARI_history = sapply(clusters_history, function(clusters_list_tmp)get_one_ARI(memb_est_vec = clus2mem(clusters_list_tmp), 
+                                                                                  memb_true_vec = mem_true_vec))
 
     # Compute error of time shifts, i.e. w, v --------------------------------------------
     if (N_component == N_component_true) {
@@ -366,6 +368,7 @@ main_shapeinvpp = function(### Parameters for generative model
               non_identifiability = non_identifiability,
               # estimation error
               ARI=ARI, 
+              ARI_history = ARI_history,
               F_mean_sq_err=F_mean_sq_err, 
               F_mean_sq_err_vec=F_mean_sq_err_vec, 
               F_mse_squarel2_ratio=F_mse_squarel2_ratio,
