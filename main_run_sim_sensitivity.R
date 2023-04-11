@@ -33,7 +33,7 @@ registerDoParallel(cores=N_cores)
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'sensitivity_anal_v2.6.1'
+setup = 'sensitivity_anal_v2.6.2'
 method = 'ShapeInvPP'
 
 ### Parameters' possible values:
@@ -56,7 +56,7 @@ for (id_N_split in 1:N_split) {
                                N_clus = 4,
                                N_component_true = 2,
                                t_vec = seq(-1, 1.5, by=0.01),
-                               timeshift_subj_max_vec = c(1/32/4, 1/32)*2,
+                               timeshift_subj_max_vec = c(1/32/4, 1/32)*12,
                                ### params when N_clus==4:
                                N_spks_total = 70,
                                clus_sep = 1.4,
@@ -64,7 +64,7 @@ for (id_N_split in 1:N_split) {
                                freq_trun = 10,
                                gamma = gamma,
                                N_component = 2,
-                               key_times_vec = c(-1,0,1.5),
+                               key_times_vec = c(-1,0-0.2,1.5),
                                fix_timeshift = FALSE,
                                fix_membership = FALSE,
                                save_center_pdf_array = save_center_pdf_array ),
@@ -94,15 +94,15 @@ for (id_N_split in 1:N_split) {
                            N_clus = 4,
                            N_component_true = 2,
                            t_vec = seq(-1, 1.5, by=0.01),
-                           timeshift_subj_max_vec = c(1/32/4, 1/32)*2,
+                           timeshift_subj_max_vec = c(1/32/4, 1/32)*12,
                            ### params when N_clus==4:
                            N_spks_total = 70,
                            clus_sep = 1.4,
                            ### Parameters for algorithms
                            freq_trun = freq_trun,
-                           gamma = 0,
+                           gamma = 1,
                            N_component = 2,
-                           key_times_vec = c(-1,0,1.5),
+                           key_times_vec = c(-1,0-0.2,1.5),
                            fix_timeshift = FALSE,
                            fix_membership = FALSE,
                            save_center_pdf_array = save_center_pdf_array ),
