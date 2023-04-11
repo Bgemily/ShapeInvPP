@@ -27,6 +27,7 @@ do_cluster_pdf = function(spks_time_mlist,
   N_trial = ncol(spks_time_mlist)
   
   clusters_history = list()
+  center_density_array_history = list()
   loss_history = c()
   
   
@@ -82,8 +83,6 @@ do_cluster_pdf = function(spks_time_mlist,
     v_mat_list_update -> v_mat_list_current
     l2_loss_update -> l2_loss_current
     
-    clusters_history = c(clusters_history, list(clusters_list_current))
-    
     ### Update intensities 
     tmp = get_center_intensity_array(subjtrial_density_unsmooth_array = subjtrial_density_unsmooth_array,
                                      fft_subjtrial_density_unsmooth_array = fft_subjtrial_density_unsmooth_array,
@@ -101,6 +100,10 @@ do_cluster_pdf = function(spks_time_mlist,
     center_Nspks_mat_update = tmp$center_Nspks_mat
     center_intensity_array = tmp$center_intensity_array
     v_mat_list_tmp = tmp$v_mat_list
+    
+    clusters_history = c(clusters_history, list(clusters_list_current))
+    center_density_array_history = c(center_density_array_history, list(center_density_array_update))
+    
     
     ### Update time shifts and clusters 
     tmp = get_timeshift_and_clusters(subjtrial_density_smooth_array = subjtrial_density_smooth_array,
@@ -194,6 +197,7 @@ do_cluster_pdf = function(spks_time_mlist,
               loss_history = loss_history,
               dist_to_centr_vec = dist_to_centr_vec,
               clusters_history = clusters_history, 
+              center_density_array_history = center_density_array_history,
               center_density_array = center_density_array,
               center_Nspks_mat = center_Nspks_mat,
               center_intensity_array = center_intensity_array,
