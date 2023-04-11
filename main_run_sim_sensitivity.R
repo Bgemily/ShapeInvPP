@@ -33,12 +33,12 @@ registerDoParallel(cores=N_cores)
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'sensitivity_anal_v2.6'
+setup = 'sensitivity_anal_v2.6.1'
 method = 'ShapeInvPP'
 
 ### Parameters' possible values:
 freq_trun_vec = c(1,5,10,15,20,25,30)
-gamma_vec = c(0, 0.03, 0.1, 0.3, 1)
+gamma_vec = c(0, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100)
 
 default_setting = 'N_spks_total=70,N_subj=100,clus_sep=1.4'
 for (id_N_split in 1:N_split) {
