@@ -36,19 +36,19 @@ test_N_component_2 = TRUE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v2.8.1'
+setup = 'Compare_methods_v3.1.7'
 method = 'kcfc'
 
 ### Parameters' possible values:
-timeshift_subj_max_vec_list = list(c(1/4, 1/16), c(1/4, 1/16)*1.5, c(1/4, 1/16)*2,
-                              c(1/4, 1/16)*0.5, c(1/4, 1/16)*0.75, 
-                              c(1/4, 1/16)*0.25, c(1/4, 1/16)*0.125,
-                              c(1/4, 1/16)*1.25, c(1/4, 1/16)*1.75)
-clus_sep_list = list(2, 1.9, 1.8, 1.7, 1.6, 1.5, 1.4, 1.3)
-N_subj_list = list(100, 150, 200, 250, 300)
+timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*4, 
+                                   c(1/32/4, 1/32)*6, c(1/32/4, 1/32)*8,
+                                   c(1/32/4, 1/32)*10, c(1/32/4, 1/32)*12)
+N_subj_list = list(100, 120, 140, 160, 180, 200)
+key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.05-0.2,1.5), c(-1,0.1-0.2,1.5), 
+                          c(-1,0.15-0.2,1.5), c(-1,0.2-0.2,1.5), c(-1,0.25-0.2,1.5))
 
 if (test_N_component_2) {
-  default_setting = 'N_spks_total=100,N_subj=100,N_clus=4,clus_sep=1.3,N_comp=2'
+  default_setting = 'N_spks_total=70,N_subj=100,N_clus=4,clus_sep=1.4,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -59,14 +59,15 @@ if (test_N_component_2) {
       timeshift_subj_max_vec = timeshift_subj_max_vec_list[[id_timeshift_subj_max_vec]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_kcfc(SEED = SEED,
-                           N_subj = 100,
-                           N_clus = 4,
+        tryCatch(main_kcfc(SEED = SEED, 
+                           N_subj = N_subj_list[[1]],
+                           N_clus = 4, 
                            N_component_true = 2,
-                           N_spks_total = 100,
+                           N_spks_total = 70,
                            timeshift_subj_max_vec = timeshift_subj_max_vec,
-                           ### params when N_clus==4:
-                           clus_sep = 1.3,
+                           t_vec = seq(-1,1.5,0.01),
+                           clus_sep = 1.4,
+                           key_times_vec = key_times_vec_list[[1]],
                            ### Parameters for algorithms
                            bw = 'SJ',
                            N_component = 2,
@@ -86,26 +87,27 @@ if (test_N_component_2) {
       save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
       rm(results)
     }
-    for (id_clus_sep in 1:length(clus_sep_list)) {
-      clus_sep = clus_sep_list[[id_clus_sep]]
+    for (id_key_times_vec in 1:length(key_times_vec_list)) {
+      key_times_vec = key_times_vec_list[[id_key_times_vec]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_kcfc(SEED = SEED,
-                           N_subj = 100,
-                           N_clus = 4,
+        tryCatch(main_kcfc(SEED = SEED, 
+                           N_subj = N_subj_list[[1]],
+                           N_clus = 4, 
                            N_component_true = 2,
-                           N_spks_total = 100,
-                           timeshift_subj_max_vec = c(1/4, 1/16)*2,
-                           ### params when N_clus==4:
-                           clus_sep = clus_sep,
+                           N_spks_total = 70,
+                           timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
+                           t_vec = seq(-1,1.5,0.01),
+                           clus_sep = 1.4,
+                           key_times_vec = key_times_vec,
                            ### Parameters for algorithms
                            bw = 'SJ',
                            N_component = 2,
                            save_center_pdf_array = save_center_pdf_array),
                  error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
-      param_name = "clus_sep"
-      param_value = clus_sep
+      param_name = "key_times_vec"
+      param_value = paste0(key_times_vec, collapse = '_')
       folder_path = paste0(top_level_folder,
                            '/', setup,
                            '/', method,
@@ -121,14 +123,15 @@ if (test_N_component_2) {
       N_subj = N_subj_list[[id_N_subj]]
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
-        tryCatch(main_kcfc(SEED = SEED,
+        tryCatch(main_kcfc(SEED = SEED, 
                            N_subj = N_subj,
-                           N_clus = 4,
+                           N_clus = 4, 
                            N_component_true = 2,
-                           N_spks_total = 100,
-                           timeshift_subj_max_vec = c(1/4, 1/16)*2,
-                           ### params when N_clus==4:
-                           clus_sep = 1.3,
+                           N_spks_total = 70,
+                           timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
+                           t_vec = seq(-1,1.5,0.01),
+                           clus_sep = 1.4,
+                           key_times_vec = key_times_vec_list[[1]],
                            ### Parameters for algorithms
                            bw = 'SJ',
                            N_component = 2,
