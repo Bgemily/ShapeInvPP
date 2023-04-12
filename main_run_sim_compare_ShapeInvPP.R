@@ -35,7 +35,7 @@ test_N_component_2 = TRUE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v3.1.7'
+setup = 'Compare_methods_v3.1.8'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
@@ -68,7 +68,7 @@ if (test_N_component_2){
                              clus_sep = 1.4,
                              ### Parameters for algorithms
                              freq_trun = 10,
-                             gamma = 0,
+                             gamma = 1,
                              N_component = 2,
                              key_times_vec = key_times_vec_list[[1]],
                              fix_timeshift = FALSE,
@@ -104,7 +104,7 @@ if (test_N_component_2){
                              clus_sep = 1.4,
                              ### Parameters for algorithms
                              freq_trun = 10,
-                             gamma = 0,
+                             gamma = 1,
                              N_component = 2,
                              key_times_vec = key_times_vec,
                              fix_timeshift = FALSE,
@@ -140,7 +140,7 @@ if (test_N_component_2){
                                  clus_sep = 1.4,
                                  ### Parameters for algorithms
                                  freq_trun = 10,
-                                 gamma = 0,
+                                 gamma = 1,
                                  N_component = 2,
                                  key_times_vec = key_times_vec_list[[1]],
                                  fix_timeshift = FALSE,

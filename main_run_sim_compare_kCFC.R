@@ -36,7 +36,7 @@ test_N_component_2 = TRUE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_v3.1.7'
+setup = 'Compare_methods_v3.1.8'
 method = 'kcfc'
 
 ### Parameters' possible values:
