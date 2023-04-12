@@ -26,10 +26,6 @@ do_cluster_pdf = function(spks_time_mlist,
   N_subj = nrow(spks_time_mlist)
   N_trial = ncol(spks_time_mlist)
   
-  clusters_history = list()
-  center_density_array_history = list()
-  loss_history = c()
-  
   
   ### Calculate subj-trial-wise densities
   res = get_indiv_intensity_array(spks_time_mlist = spks_time_mlist, 
@@ -72,8 +68,14 @@ do_cluster_pdf = function(spks_time_mlist,
   v_mat_list_update = v_mat_list_current = v_mat_list
   l2_loss_update = l2_loss_current = Inf
   
+  clusters_history = list()
+  center_density_array_history = list()
+  clusters_history = c(clusters_history, list(clusters_list_init))
+  center_density_array_history = c(center_density_array_history, list(center_density_array))
+  
   n_iter = 1
   stopping = FALSE
+  loss_history = c()
   while (!stopping & n_iter<=MaxIter){
     ### *update -> *current
     n_iter = n_iter+1
