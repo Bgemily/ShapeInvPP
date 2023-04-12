@@ -41,7 +41,7 @@ method = 'shape_inv_pp'
 ### Parameters' possible values:
 timeshift_trial_max_list = list(0, 0.1, 0.2, 0.3, 0.4, 0.5)
 
-for (N_trial in c(1,3,5,10)){
+for (N_trial in c(1,3,10)){
   default_setting = paste0('N_spks_total=70,N_subj=100,N_clus=4,N_trial=', N_trial, ',clus_sep=1.4,N_comp=2')
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
