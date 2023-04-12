@@ -35,11 +35,11 @@ test_algorithm_restart = FALSE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Multi_restart_v3.1.3'
+setup = 'Multi_restart_v3.1.4'
 
 if (test_random_restart) {
   method = paste0('shape_inv_pp_', 'Nrestart_algo1_kmean5' )
-  default_setting = 'N_spks_total=70,N_subj=100,N_clus=4,clus_sep=1.4,N_comp=2'
+  default_setting = 'N_spks_total=70,N_subj=200,N_clus=4,clus_sep=1.4,N_comp=2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -50,7 +50,7 @@ if (test_random_restart) {
       SEED = id_N_split * 1000 + id_replicate + 10
       print(paste0("SEED: ", SEED))
       tryCatch(main_shapeinvpp(SEED = SEED,
-                               N_subj = 100,
+                               N_subj = 200,
                                N_clus = 4,
                                N_component_true = 2,
                                t_vec = seq(-1,1.5,0.01),
@@ -66,7 +66,7 @@ if (test_random_restart) {
                                freq_trun = 10, 
                                gamma = 1,
                                N_component = 2,
-                               key_times_vec = c(-1,0,1.5),
+                               key_times_vec = c(-1,0-0.2,1.5),
                                fix_timeshift = FALSE,
                                fix_membership = FALSE,
                                save_center_pdf_array = save_center_pdf_array ),
@@ -102,7 +102,7 @@ if (test_random_restart) {
         SEED = id_N_split * 1000 + id_replicate + 10
         print(paste0("SEED: ", SEED))
         tryCatch(main_shapeinvpp(SEED = SEED,
-                                 N_subj = 100,
+                                 N_subj = 200,
                                  N_clus = 4,
                                  N_component_true = 2,
                                  t_vec = seq(-1,1.5,0.01),
@@ -120,7 +120,7 @@ if (test_random_restart) {
                                  freq_trun = 10, 
                                  gamma = 1,
                                  N_component = 2,
-                                 key_times_vec = c(-1,0,1.5),
+                                 key_times_vec = c(-1,0-0.2,1.5),
                                  fix_timeshift = FALSE,
                                  fix_membership = FALSE,
                                  save_center_pdf_array = save_center_pdf_array ),
