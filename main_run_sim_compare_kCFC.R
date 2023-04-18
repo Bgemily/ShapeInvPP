@@ -40,12 +40,12 @@ setup = 'Compare_methods_v3.1.8'
 method = 'kcfc'
 
 ### Parameters' possible values:
-timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*4, 
-                                   c(1/32/4, 1/32)*6, c(1/32/4, 1/32)*8,
-                                   c(1/32/4, 1/32)*10, c(1/32/4, 1/32)*12)
+timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*3, 
+                                   c(1/32/4, 1/32)*4, c(1/32/4, 1/32)*5,
+                                   c(1/32/4, 1/32)*6, c(1/32/4, 1/32)*7)
 N_subj_list = list(100, 120, 140, 160, 180, 200)
-key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.05-0.2,1.5), c(-1,0.1-0.2,1.5), 
-                          c(-1,0.15-0.2,1.5), c(-1,0.2-0.2,1.5), c(-1,0.25-0.2,1.5))
+key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.02-0.2,1.5), c(-1,0.04-0.2,1.5), 
+                          c(-1,0.06-0.2,1.5), c(-1,0.08-0.2,1.5), c(-1,0.1-0.2,1.5))
 
 if (test_N_component_2) {
   default_setting = 'N_spks_total=70,N_subj=100,N_clus=4,clus_sep=1.4,key_time_comp2=-0.2'
