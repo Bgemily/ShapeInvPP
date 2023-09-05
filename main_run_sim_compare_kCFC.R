@@ -19,8 +19,8 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_replicate_total = 20
-N_split = 2
+N_replicate_total = 200
+N_split = 20
 
 N_replicate = N_replicate_total/N_split
 
