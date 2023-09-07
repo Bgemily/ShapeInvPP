@@ -12,6 +12,7 @@ get_init_random = function(spks_time_mlist,
                     fix_timeshift=FALSE,
                     fix_comp1_timeshift_only=FALSE,
                     use_true_timeshift=FALSE, 
+                    add_rand_to_init_timeshift=FALSE,
                     v_true_mat_list = NULL,
                     v_trialwise_vec_list = NULL,
                     jitter_prop_true_timeshift=0,
@@ -60,8 +61,16 @@ get_init_random = function(spks_time_mlist,
           v_subjwise_vec_list[[id_component]][id_subj] = runif(n = 1, min = min(t_vec), 
                                                                     max = quantile(spks_time_shifted_vec, 0.05) )
         } else {
-          v_subjwise_vec_list[[id_component]][id_subj] = quantile(spks_time_shifted_vec, 0.0)
-          v_subjwise_vec_list[[id_component]][id_subj] = v_subjwise_vec_list[[id_component]][id_subj] - key_times_vec[id_component] 
+          if (length(spks_time_shifted_vec) > 0) {
+            v_subjwise_vec_list[[id_component]][id_subj] = quantile(spks_time_shifted_vec, 0.0) 
+            if (add_rand_to_init_timeshift){
+              v_subjwise_vec_list[[id_component]][id_subj] = runif(n = 1, min = -0.05, max = 0.05) + v_subjwise_vec_list[[id_component]][id_subj]
+            }
+            v_subjwise_vec_list[[id_component]][id_subj] = v_subjwise_vec_list[[id_component]][id_subj] - key_times_vec[id_component] 
+          } else {
+            v_subjwise_vec_list[[id_component]][id_subj] = 0
+          }
+          
         }
       }
     }
@@ -84,6 +93,7 @@ get_init_random = function(spks_time_mlist,
   
   # Initialize clusters ---------------------------------------
   ### Smooth the point process 
+  if (FALSE) {
   subj_intensity_array = array(dim=c(N_subj, 1, length(t_vec)))
   subj_density_array = array(dim=c(N_subj, 1, length(t_vec)))
   subj_Nspks_mat = matrix(nrow=N_subj, ncol=1)
@@ -115,6 +125,8 @@ get_init_random = function(spks_time_mlist,
   } else{
     membership = kmeans(x=subj_intensity_array[,1,], centers = N_clus, nstart = N_start_kmean)$cluster
   }
+}
+  membership = sample(1:N_clus, size = N_subj, replace = TRUE)
   clusters = mem2clus(membership = membership, N_clus_min = N_clus)
   clusters_list = clusters
   membership_vec = membership

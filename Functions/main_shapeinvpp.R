@@ -119,6 +119,7 @@ main_shapeinvpp = function(### Parameters for generative model
                               fix_timeshift = fix_timeshift, 
                               fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                               use_true_timeshift = use_true_timeshift, 
+                              add_rand_to_init_timeshift = ifelse(id_restart>1, TRUE, FALSE),
                               jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
                               v_true_mat_list = v_true_mat_list, 
                               v_trialwise_vec_list = v_trialwise_vec_list,
@@ -139,7 +140,7 @@ main_shapeinvpp = function(### Parameters for generative model
                        fix_timeshift = fix_timeshift, 
                        fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                        use_true_timeshift = use_true_timeshift, 
-                       add_rand_to_init_timeshift = FALSE,
+                       add_rand_to_init_timeshift = ifelse(id_restart>1, TRUE, FALSE),
                        jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
                        v_true_mat_list = v_true_mat_list, 
                        v_trialwise_vec_list = v_trialwise_vec_list,
@@ -187,14 +188,13 @@ main_shapeinvpp = function(### Parameters for generative model
       }
       l2_loss_history[id_restart] = l2_loss_best
       
-      
+      print(l2_loss_new)
     }
     
     # Save results of N_clus_tmp ----------------------------------------------
     res_list[[ind_N_clus]] = res_best
     
   }
-  
   
 
   # Select best cluster number using ICL ------------------------------------
