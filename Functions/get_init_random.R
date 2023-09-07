@@ -60,7 +60,8 @@ get_init_random = function(spks_time_mlist,
           v_subjwise_vec_list[[id_component]][id_subj] = runif(n = 1, min = min(t_vec), 
                                                                     max = quantile(spks_time_shifted_vec, 0.05) )
         } else {
-          v_subjwise_vec_list[[id_component]][id_subj] = quantile(spks_time_shifted_vec, 0.05) 
+          v_subjwise_vec_list[[id_component]][id_subj] = quantile(spks_time_shifted_vec, 0.0)
+          v_subjwise_vec_list[[id_component]][id_subj] = v_subjwise_vec_list[[id_component]][id_subj] - key_times_vec[id_component] 
         }
       }
     }
@@ -68,7 +69,7 @@ get_init_random = function(spks_time_mlist,
     ### Force minimum time shifts in each component to be trial-wise time shift
     v_mat_list = rep(list(matrix(0, nrow = N_subj, ncol = N_trial)), N_component)
     for (id_component in 1:N_component){
-      v_subjwise_vec = v_subjwise_vec_list[[id_component]] - min(v_subjwise_vec_list[[id_component]])
+      v_subjwise_vec = v_subjwise_vec_list[[id_component]]
       v_trialwise_vec = v_trialwise_vec_list[[id_component]]
       v_mat_list[[id_component]] = matrix(v_subjwise_vec, nrow = N_subj, ncol = N_trial) + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_subj, ncol = N_trial)
       v_mat_list[[id_component]] = round(v_mat_list[[id_component]]/t_unit)*t_unit
