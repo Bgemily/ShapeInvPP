@@ -57,6 +57,7 @@ for (id_N_restart in 1:length(N_restart_algo_list)){
     } else {
       save_center_pdf_array = FALSE
     }
+    if (FALSE) {
     for (id_timeshift_subj_max_vec in 1:length(timeshift_subj_max_vec_list)) {
       timeshift_subj_max_vec = timeshift_subj_max_vec_list[[id_timeshift_subj_max_vec]]
       results <- foreach(j = 1:N_replicate) %dopar% {
@@ -174,8 +175,10 @@ for (id_N_restart in 1:length(N_restart_algo_list)){
       rm(results)
     }
     
+    }
+    
     if(N_restart > 1){
-      method = paste0('shape_inv_pp_', 'our_init_Nrestart_algo', as.character(N_restart) )
+      method = paste0('shape_inv_pp_', 'our_init_not_jitter_init_timeshift_Nrestart_algo', as.character(N_restart) )
       for (id_timeshift_subj_max_vec in 1:length(timeshift_subj_max_vec_list)) {
         timeshift_subj_max_vec = timeshift_subj_max_vec_list[[id_timeshift_subj_max_vec]]
         results <- foreach(j = 1:N_replicate) %dopar% {
