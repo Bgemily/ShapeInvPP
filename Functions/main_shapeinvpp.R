@@ -188,7 +188,6 @@ main_shapeinvpp = function(### Parameters for generative model
       }
       l2_loss_history[id_restart] = l2_loss_best
       
-      print(l2_loss_new)
     }
     
     # Save results of N_clus_tmp ----------------------------------------------
