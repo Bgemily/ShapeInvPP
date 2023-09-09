@@ -35,7 +35,7 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Multi_trial_v2.1.1'
+setup = 'Multi_trial_v2.2'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
