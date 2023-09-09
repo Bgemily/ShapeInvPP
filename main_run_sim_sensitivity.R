@@ -33,7 +33,7 @@ registerDoParallel(cores=N_cores)
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'sensitivity_anal_v2.6.2'
+setup = 'sensitivity_anal_v2.7'
 method = 'ShapeInvPP'
 
 ### Parameters' possible values:
