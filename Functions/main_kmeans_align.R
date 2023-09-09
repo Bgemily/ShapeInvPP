@@ -7,8 +7,7 @@ main_kmeans_align = function(### Parameters for generative model
   N_trial = 1,
   N_clus=2, 
   N_component_true = 2,
-  u_1 = 1, u_0 = 1,
-  t_vec = seq(-u_0,u_1,by=0.01),
+  t_vec = seq(-1,1,by=0.01),
   t_vec_extend = t_vec,
   N_spks_total = 1000,
   timeshift_subj_max_vec = c(1/8, 1/32),
@@ -36,9 +35,9 @@ main_kmeans_align = function(### Parameters for generative model
                     N_subj=N_subj,
                     N_trial=N_trial,
                     N_clus=N_clus, 
-                    u_1=u_1, u_0=u_0,
                     t_vec=t_vec,
                     t_vec_extend=t_vec_extend,
+                    key_times_vec=key_times_vec,
                     N_spks_total = N_spks_total,
                     timeshift_subj_max_vec = timeshift_subj_max_vec,
                     clus_sep = clus_sep,
@@ -82,7 +81,7 @@ main_kmeans_align = function(### Parameters for generative model
                                      K = N_clus,
                                      alignment = TRUE, 
                                     nonempty = 2, 
-                                    MaxItr = 30,
+                                    max_iter = 20,
                                      showplot = FALSE)
   time_end = Sys.time()
   time_estimation = time_end - time_start
@@ -96,7 +95,7 @@ main_kmeans_align = function(### Parameters for generative model
   clusters_list_est_permn = clusters_list_est[the_permn]
 
   # Extract center densities 
-  center_density_mat_est = t(fdakma_obj$templates)
+  center_density_mat_est = t(fdakma_obj$templates[1, , ])
   center_density_mat_est_permn = center_density_mat_est[the_permn, , drop = FALSE]
   center_density_array_est_permn = array(dim = c(N_clus, 1, length(t_vec)))
   center_density_array_est_permn[ , 1, ] = center_density_mat_est_permn
@@ -141,13 +140,16 @@ main_kmeans_align = function(### Parameters for generative model
         if (length(n0_init) == 0) {
           n0_init = 0
         }
+        f_target_array = array(data = f_target, dim = c(1,1,length(f_target)))
         f_origin_mat = matrix(density_est, nrow = 1)
-        n0 = align_multi_components(f_target = f_target,
+        n0 = align_multi_components(f_target_array = f_target_array,
                                     f_origin_mat = f_origin_mat,
+                                    n0_init_mat = as.matrix(n0_init),
+                                    v_trialwise_vec_list = list(c(0)),
+                                    N_spks_mat = as.matrix(c(1)),
                                     t_unit = t_unit, 
-                                    n0_vec = c(n0_init),
                                     n0_min_vec = -length(f_target) %/% 2,
-                                    n0_max_vec = length(f_target) %/% 2 )$n0_vec
+                                    n0_max_vec = length(f_target) %/% 2 )$n0_mat
         n0 = round(n0)
         if (n0 > 0) {
           density_est_shift = c(rep(0, n0), head(density_est, length(density_est) - n0) )
@@ -180,6 +182,7 @@ main_kmeans_align = function(### Parameters for generative model
     # Compute error of time shifts, i.e. w, v --------------------------------------------
     v_mean_sq_err_vec = NA
     v_mean_sq_err = NA
+    v_align_mean_sq_err_vec = v_align_mean_sq_err = NA
   }
   
   
@@ -219,6 +222,7 @@ main_kmeans_align = function(### Parameters for generative model
               dist_mse_mat = dist_mse_mat,
               v_mean_sq_err=v_mean_sq_err,
               v_mean_sq_err_vec=v_mean_sq_err_vec,
+              v_align_mean_sq_err = v_align_mean_sq_err,
               # other
               cand_N_clus_vec=NA,
               N_restart = NA,

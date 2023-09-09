@@ -38,12 +38,7 @@ extract_measurement_v2 = function(folder_path, param_name=NULL, measurement=c("A
       
       # Append parameter values as a new column 
       if (!is.null(param_name)){
-        if (FALSE) {
-          param_value = results[sapply(results,is.list)][[1]]$data_param[[param_name]]
-        } else {
-          param_value = as.numeric(param_value)
-        }
-        print(param_value)
+        param_value = results[sapply(results,is.list)][[1]]$data_param[[param_name]]
         meas_value_df = as.data.frame(cbind(matrix(param_value, byrow = TRUE, 
                                                    nrow = nrow(meas_value_mat), 
                                                    ncol = length(param_value), 

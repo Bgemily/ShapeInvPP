@@ -119,7 +119,7 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       }
       
       ### Force the second density to be non-zero right after their starting time
-      if (N_component >= 2) {
+      if (FALSE & N_component >= 2) {
         for (id_component in 2:N_component) {
           density_value_after_key_time = density_q_mat[id_component, which(t_vec > key_times_vec[id_component])[1]]
           density_value_peak = max(abs(density_q_mat[id_component, ]))
@@ -173,6 +173,23 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
         intensity_q_mat[id_component, ] = density_q_mat[id_component, ] * F_hat_q
       }
     }
+    
+    # Smooth density
+    if (freq_trun < Inf) {
+      for (id_component in 1:N_component) {
+        fft_density_tmp = fft(density_q_mat[id_component, ]) / length(t_vec)
+        fft_density_tmp_smooth = c(head(fft_density_tmp, freq_trun+1), 
+                                   rep(0, length(t_vec)-2*freq_trun-1),
+                                   tail(fft_density_tmp, freq_trun))
+        density_tmp_smooth = Re(fft(fft_density_tmp_smooth, inverse = TRUE))
+        
+        N_spks_tmp = sum(intensity_q_mat[id_component, ]) / sum(density_q_mat[id_component, ])
+        intensity_q_mat[id_component, ] = N_spks_tmp * density_tmp_smooth
+        density_q_mat[id_component, ] = density_tmp_smooth
+      }
+    }
+    
+    
     
     center_intensity_array[q, , ] = intensity_q_mat
     center_density_array[q, , ] = density_q_mat

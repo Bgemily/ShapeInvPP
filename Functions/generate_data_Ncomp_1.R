@@ -5,8 +5,7 @@ generate_data_Ncomp_1 = function(SEED=NULL,
                                  N_spks_total = 1000,
                                  N_clus=2, 
                                  clus_size_vec = rep(N_subj/N_clus, N_clus),
-                                 u_1 = 1, u_0 = 1,
-                                 t_vec = seq(-u_0,u_1,by=0.01),
+                                 t_vec = seq(-1,1,by=0.01),
                                  t_vec_extend = t_vec,
                                  timeshift_subj_max_vec = c(1/8),
                                  timeshift_trial_max = 1/8,
@@ -69,19 +68,19 @@ generate_data_Ncomp_1 = function(SEED=NULL,
     center_density_array_true[1,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec & t_vec<=mu_tmp+s_tmp) 
   } else if (N_clus==4) {
     ## Clus 1
-    s_tmp = u_0*(1/8)*(1); mu_tmp = -u_0*(1/2); 
+    s_tmp = 1*(1/8)*(1); mu_tmp = -1*(1/2); 
     center_density_array_true[1,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     ## Clus 2
-    s_tmp = u_0*(1/8)*(sqrt(clus_sep)); mu_tmp = -u_0*(1/2); 
+    s_tmp = 1*(1/8)*(sqrt(clus_sep)); mu_tmp = -1*(1/2); 
     center_density_array_true[2,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     ## Clus 3
-    s_tmp = u_0*(1/8)*(clus_sep^1); mu_tmp = -u_0*(1/2) 
+    s_tmp = 1*(1/8)*(clus_sep^1); mu_tmp = -1*(1/2) 
     center_density_array_true[3,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     ## Clus 4
-    s_tmp = u_0*(1/8)*(clus_sep^2); mu_tmp = -u_0*(1/2); 
+    s_tmp = 1*(1/8)*(clus_sep^2); mu_tmp = -1*(1/2); 
     center_density_array_true[4,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
   } 
   
@@ -115,10 +114,10 @@ generate_data_Ncomp_1 = function(SEED=NULL,
                                                                             t_vec = t_vec_extend, 
                                                                             N_sample = rpois(n=1, lambda=center_N_spks_mat[id_clus,1]) )+
                                                            stim_onset_vec[id_trial]+v_tmp_1 ))
-        ### Only keep spike times during [-u_0, u_1] 
+        ### Only keep spike times during [min(t_vec), max(t_vec)] 
         spks_time_vec = spks_time_mlist[id_subj,id_trial][[1]]
-        spks_time_mlist[id_subj,id_trial][[1]] = spks_time_vec[which(spks_time_vec >= -u_0 & 
-                                                                           spks_time_vec <= u_1)]
+        spks_time_mlist[id_subj,id_trial][[1]] = spks_time_vec[which(spks_time_vec >= min(t_vec) & 
+                                                                           spks_time_vec <= max(t_vec))]
       }
     }
   }

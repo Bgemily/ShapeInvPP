@@ -6,8 +6,7 @@ main_shapeinvpp = function(### Parameters for generative model
                         N_trial = 1,
                         N_clus=2, 
                         N_component_true = 2,
-                        u_1 = 1, u_0 = 1,
-                        t_vec = seq(-u_0,u_1,by=0.01),
+                        t_vec = seq(-1,1,by=0.01),
                         t_vec_extend = t_vec,
                         N_spks_total = 1000,
                         timeshift_subj_max_vec = c(1/8, 1/32),
@@ -53,9 +52,9 @@ main_shapeinvpp = function(### Parameters for generative model
                     N_subj=N_subj,
                     N_trial=N_trial,
                     N_clus=N_clus, 
-                    u_1=u_1, u_0=u_0,
                     t_vec=t_vec,
                     t_vec_extend=t_vec_extend,
+                    key_times_vec = key_times_vec,
                     N_spks_total = N_spks_total,
                     timeshift_subj_max_vec = timeshift_subj_max_vec,
                     timeshift_trial_max = timeshift_trial_max,
@@ -104,14 +103,14 @@ main_shapeinvpp = function(### Parameters for generative model
     
     # Restart -----------------------------------------------------------------
     res_best = NA
-    compl_log_lik_best = -Inf
+    l2_loss_best = Inf
+    l2_loss_history = c()
     for (id_restart in 1:N_restart) {
       ### Get initialization -----------
       if (rand_init) {
         res = get_init_random(spks_time_mlist = spks_time_mlist, 
                               N_clus = N_clus_tmp,
                               N_component = N_component,
-                              v0 = u_1, v1 = u_0,
                               t_vec = t_vec, 
                               key_times_vec = key_times_vec,
                               N_start_kmean = N_start_kmean,
@@ -120,6 +119,7 @@ main_shapeinvpp = function(### Parameters for generative model
                               fix_timeshift = fix_timeshift, 
                               fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                               use_true_timeshift = use_true_timeshift, 
+                              add_rand_to_init_timeshift = ifelse(id_restart>1, TRUE, FALSE),
                               jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
                               v_true_mat_list = v_true_mat_list, 
                               v_trialwise_vec_list = v_trialwise_vec_list,
@@ -132,7 +132,6 @@ main_shapeinvpp = function(### Parameters for generative model
         res = get_init(spks_time_mlist = spks_time_mlist, 
                        N_clus = N_clus_tmp,
                        N_component = N_component,
-                       v0 = u_1, v1 = u_0,
                        t_vec = t_vec, 
                        key_times_vec = key_times_vec,
                        N_start_kmean = N_start_kmean,
@@ -141,6 +140,7 @@ main_shapeinvpp = function(### Parameters for generative model
                        fix_timeshift = fix_timeshift, 
                        fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                        use_true_timeshift = use_true_timeshift, 
+                       add_rand_to_init_timeshift = ifelse(id_restart>1, TRUE, FALSE),
                        jitter_prop_true_timeshift = jitter_prop_true_timeshift, 
                        v_true_mat_list = v_true_mat_list, 
                        v_trialwise_vec_list = v_trialwise_vec_list,
@@ -166,7 +166,6 @@ main_shapeinvpp = function(### Parameters for generative model
                                bw = bw,
                                MaxIter = MaxIter, 
                                gamma=gamma,
-                               v0 = u_1, v1= u_0,
                                t_vec=t_vec, 
                                t_vec_extend=t_vec_extend,
                                key_times_vec = key_times_vec,
@@ -179,25 +178,22 @@ main_shapeinvpp = function(### Parameters for generative model
       time_estimation = time_end - time_start
       time_estimation = as.numeric(time_estimation, units='secs')
       
-      ### Calculate log likelihood
-      res = select_model(spks_time_mlist, 
-                         N_component = N_component,
-                         key_times_vec = key_times_vec,
-                         result_list = list(res_new))
-      compl_log_lik_new = res$compl_log_lik_vec[1]
+      ### Extract loss function value
+      l2_loss_new = tail(res_new$loss_history, 2)[1]
       
       ### Update best estimation
-      if(compl_log_lik_new > compl_log_lik_best){
-        compl_log_lik_best = compl_log_lik_new
+      if(l2_loss_new < l2_loss_best){
+        l2_loss_best = l2_loss_new
         res_best = res_new
       }
+      l2_loss_history[id_restart] = l2_loss_best
+      
     }
     
     # Save results of N_clus_tmp ----------------------------------------------
     res_list[[ind_N_clus]] = res_best
     
   }
-  
   
 
   # Select best cluster number using ICL ------------------------------------
@@ -217,6 +213,8 @@ main_shapeinvpp = function(### Parameters for generative model
   res = res_list[[res_select_model$id_best_res]]
   
   res$clusters_list -> clusters_list_est
+  res$clusters_history -> clusters_history
+  res$center_density_array_history -> center_density_array_history
   res$v_mat_list -> v_mat_list_est
   res$center_intensity_array -> center_intensity_array_est
   res$center_density_array -> center_density_array_est
@@ -245,8 +243,16 @@ main_shapeinvpp = function(### Parameters for generative model
     
     
     ### Calculate distance 
-    N_component_true = dim(center_density_array_true)[2]
-    if (N_component == N_component_true) {
+    calculate_F_mse_ratio = function(N_clus, N_component, 
+                                     clusters_list_true, clusters_list_est, 
+                                     center_density_array_true, center_density_array_est, 
+                                     t_vec, t_unit) 
+    {
+      permn = find_permn_clus_label(clusters_list_true = clusters_list_true, 
+                                    clusters_list_est = clusters_list_est)
+      center_density_array_est_permn = center_density_array_est[permn, , ,drop=FALSE]
+      clusters_list_est_permn = clusters_list_est[permn]
+      
       dist_mse_mat = matrix(nrow=N_clus, ncol=N_component)
       for (id_clus in 1:N_clus) {
         for (id_component in 1:N_component) {
@@ -288,21 +294,61 @@ main_shapeinvpp = function(### Parameters for generative model
       })
       F_mse_squarel2_ratio_mat =  dist_mse_mat / F_l2_squared_norm_mat 
       F_mse_squarel2_ratio = sum( rowMeans(F_mse_squarel2_ratio_mat) * weight_vec )
+      
+      return(list(dist_mse_mat = dist_mse_mat,
+                  F_mean_sq_err = F_mean_sq_err,
+                  F_mean_sq_err_vec = F_mean_sq_err_vec,
+                  F_mse_squarel2_ratio = F_mse_squarel2_ratio,
+                  F_mse_squarel2_ratio_mat = F_mse_squarel2_ratio_mat))
+    }
+    
+    N_component_true = dim(center_density_array_true)[2]
+    if (N_component == N_component_true) {
+      tmp = calculate_F_mse_ratio(N_clus = N_clus, N_component = N_component, 
+                                  clusters_list_true = data_generated$clus_true_list,
+                                  clusters_list_est = clusters_list_est,
+                                  center_density_array_true = center_density_array_true, 
+                                  center_density_array_est = center_density_array_est, 
+                                  t_vec = t_vec, 
+                                  t_unit = t_unit)
+      dist_mse_mat = tmp$dist_mse_mat
+      F_mean_sq_err = tmp$F_mean_sq_err
+      F_mean_sq_err_vec = tmp$F_mean_sq_err_vec
+      F_mse_squarel2_ratio = tmp$F_mse_squarel2_ratio
+      F_mse_squarel2_ratio_mat = tmp$F_mse_squarel2_ratio_mat
+      
+      F_mean_sq_err_history = c()
+      F_mse_squarel2_ratio_history = c()
+      for (id_iteration in 1:length(center_density_array_history)){
+        tmp = calculate_F_mse_ratio(N_clus = N_clus, N_component = N_component, 
+                                    clusters_list_true = data_generated$clus_true_list,
+                                    clusters_list_est = clusters_history[[id_iteration]],
+                                    center_density_array_true = center_density_array_true, 
+                                    center_density_array_est = center_density_array_history[[id_iteration]], 
+                                    t_vec = t_vec, 
+                                    t_unit = t_unit)
+        F_mean_sq_err_history[id_iteration] = tmp$F_mean_sq_err
+        F_mse_squarel2_ratio_history[id_iteration] = tmp$F_mse_squarel2_ratio
+      }
+      
     } else {
       F_mean_sq_err = F_mean_sq_err_vec = F_mse_squarel2_ratio = NA
       F_mse_squarel2_ratio_mat = dist_mse_mat = NA
+      F_mean_sq_err_history = NA
+      F_mse_squarel2_ratio_history = NA
     }
     
     # Compute errors of clusters, i.e. Z ------------------------------------
     ARI = get_one_ARI(memb_est_vec = clus2mem(clusters_list_est), 
                       memb_true_vec = mem_true_vec)
-    
+    ARI_history = sapply(clusters_history, function(clusters_list_tmp)get_one_ARI(memb_est_vec = clus2mem(clusters_list_tmp), 
+                                                                                  memb_true_vec = mem_true_vec))
 
     # Compute error of time shifts, i.e. w, v --------------------------------------------
     if (N_component == N_component_true) {
       v_mean_sq_err_vec = sapply(1:N_component, function(id_component){
         mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2) /
-          (ifelse(id_component == 1, yes = u_0/4, no = (u_1 - u_0/2)/2 ) )^2
+          (ifelse(id_component == 1, yes = (-min(t_vec))/4, no = (max(t_vec) - (-min(t_vec))/2)/2 ) )^2
       })
       v_mean_sq_err = mean(v_mean_sq_err_vec)
       
@@ -315,7 +361,7 @@ main_shapeinvpp = function(### Parameters for generative model
             mean(v_true_mat_list[[id_component]][clusters_list_est_permn[[id_clus]], ])
         }
         mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_align_mat_list_est[[id_component]]) )^2) /
-          (ifelse(id_component == 1, yes = u_0/4, no = (u_1 - u_0/2)/2 ) )^2
+          (ifelse(id_component == 1, yes = (-min(t_vec))/4, no = (max(t_vec) - (-min(t_vec))/2)/2 ) )^2
         v_align_mean_sq_err_vec[id_component] = mse_tmp
       }
       v_align_mean_sq_err = mean(v_align_mean_sq_err_vec)
@@ -336,6 +382,9 @@ main_shapeinvpp = function(### Parameters for generative model
     center_density_array_est_permn=NA
     center_intensity_array_est_permn=NA
     center_Nspks_mat_est_permn=NA
+    ARI_history = NA
+    F_mean_sq_err_history = NA
+    F_mse_squarel2_ratio_history = NA
   }
   
   
@@ -377,6 +426,9 @@ main_shapeinvpp = function(### Parameters for generative model
               v_mean_sq_err=v_mean_sq_err,
               v_mean_sq_err_vec=v_mean_sq_err_vec,
               v_align_mean_sq_err = v_align_mean_sq_err,
+              ARI_history = ARI_history,
+              F_mean_sq_err_history = F_mean_sq_err_history,
+              F_mse_squarel2_ratio_history = F_mse_squarel2_ratio_history,
               # other
               cand_N_clus_vec=cand_N_clus_vec,
               N_restart = N_restart,

@@ -35,19 +35,14 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Multi_trial_v2'
+setup = 'Multi_trial_v2.1.1'
+method = 'shape_inv_pp'
 
 ### Parameters' possible values:
-timeshift_subj_max_vec_list = list( c(1/4, 1/16)*0.1, c(1/4, 1/16)*0.3,
-                                    c(1/4, 1/16)*0.5,
-                                    c(1/4, 1/16)*0.75, c(1/4, 1/16)*1 )
-timeshift_trial_max_list = list(0, 1/16, 1/8, 3/16, 1/4, 5/16, 3/8, 7/16, 1/2)
+timeshift_trial_max_list = list(0, 0.1, 0.2, 0.3, 0.4, 0.5)
 
-for (id_timeshift_subj_max_vec in 1:length(timeshift_subj_max_vec_list)) {
-  timeshift_subj_max_vec = timeshift_subj_max_vec_list[[id_timeshift_subj_max_vec]]
-  method = paste0('shape_inv_pp','_timeshift_subj_max_vec_',
-                  paste0(timeshift_subj_max_vec, collapse = '_'))
-  default_setting = 'N_spks_total=100,N_subj=100,N_trial=10,N_clus=4,clus_sep=1.3,N_comp=2'
+for (N_trial in c(1,3,10)){
+  default_setting = paste0('N_spks_total=70,N_subj=100,N_clus=4,N_trial=', N_trial, ',clus_sep=1.4,N_comp=2')
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -59,22 +54,23 @@ for (id_timeshift_subj_max_vec in 1:length(timeshift_subj_max_vec_list)) {
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_shapeinvpp(SEED = SEED, 
-                             N_trial = 10,
-                             N_subj = 100,
-                             N_clus = 4, 
-                             N_component_true = 2,
-                             N_spks_total = 100,
-                             timeshift_subj_max_vec = timeshift_subj_max_vec,
-                             timeshift_trial_max = timeshift_trial_max,
-                             t_vec = seq(-1,1,0.01),
-                             clus_sep = 1.3,
-                             ### Parameters for algorithms
-                             freq_trun = 10,
-                             N_component = 2,
-                             key_times_vec = c(-1,0,1),
-                             fix_timeshift = FALSE,
-                             fix_membership = FALSE,
-                             save_center_pdf_array = save_center_pdf_array),
+                                 N_trial = N_trial,
+                                 N_subj = 100,
+                                 N_clus = 4, 
+                                 N_component_true = 2,
+                                 N_spks_total = 70,
+                                 timeshift_subj_max_vec = c(1/32/4, 1/32)*2,
+                                 timeshift_trial_max = timeshift_trial_max,
+                                 t_vec = seq(-1,1.5,0.01),
+                                 clus_sep = 1.4,
+                                 ### Parameters for algorithms
+                                 freq_trun = 10,
+                                 gamma = 1,
+                                 N_component = 2,
+                                 key_times_vec = c(-1,0-0.2,1.5),
+                                 fix_timeshift = FALSE,
+                                 fix_membership = FALSE,
+                                 save_center_pdf_array = save_center_pdf_array),
                  error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
       param_name = "timeshift_trial_max"
@@ -92,6 +88,9 @@ for (id_timeshift_subj_max_vec in 1:length(timeshift_subj_max_vec_list)) {
     }
   }
 }
+
+
+
 
 
 

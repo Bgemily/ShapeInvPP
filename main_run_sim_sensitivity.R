@@ -33,19 +33,58 @@ registerDoParallel(cores=N_cores)
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'sensitivity_anal_v2.5'
+setup = 'sensitivity_anal_v2.6.2'
 method = 'ShapeInvPP'
 
 ### Parameters' possible values:
 freq_trun_vec = c(1,5,10,15,20,25,30)
+gamma_vec = c(0, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100)
 
-default_setting = 'N_spks_total=30,N_subj=100,clus_sep=1.6'
+default_setting = 'N_spks_total=70,N_subj=100,clus_sep=1.4'
 for (id_N_split in 1:N_split) {
   if (save_res_details & (id_N_split == 1)) {
     save_center_pdf_array = TRUE
   } else {
     save_center_pdf_array = FALSE
   }
+  for (id_gamma in 1:length(gamma_vec)){
+    gamma = gamma_vec[id_gamma]
+    results <- foreach(j = 1:N_replicate) %dopar% {
+      SEED = sample(1:1e7,1)
+      tryCatch(main_shapeinvpp(SEED = SEED,
+                               N_subj = 100,
+                               N_clus = 4,
+                               N_component_true = 2,
+                               t_vec = seq(-1, 1.5, by=0.01),
+                               timeshift_subj_max_vec = c(1/32/4, 1/32)*12,
+                               ### params when N_clus==4:
+                               N_spks_total = 70,
+                               clus_sep = 1.4,
+                               ### Parameters for algorithms
+                               freq_trun = 10,
+                               gamma = gamma,
+                               N_component = 2,
+                               key_times_vec = c(-1,0-0.2,1.5),
+                               fix_timeshift = FALSE,
+                               fix_membership = FALSE,
+                               save_center_pdf_array = save_center_pdf_array ),
+               error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
+    }
+    param_name = "gamma"
+    param_value = gamma
+    folder_path = paste0(top_level_folder,
+                         '/', setup,
+                         '/', method,
+                         '/', default_setting,
+                         '/', param_name, '/', param_value)
+    dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
+    
+    now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
+    save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
+    rm(results)
+    
+  }
+  
   for (id_freq_trun in 1:length(freq_trun_vec)){
     freq_trun = freq_trun_vec[id_freq_trun]
     results <- foreach(j = 1:N_replicate) %dopar% {
@@ -54,15 +93,16 @@ for (id_N_split in 1:N_split) {
                            N_subj = 100,
                            N_clus = 4,
                            N_component_true = 2,
-                           t_vec = seq(-1, 1, by=0.01),
-                           timeshift_subj_max_vec = c(1/4, 1/16),
+                           t_vec = seq(-1, 1.5, by=0.01),
+                           timeshift_subj_max_vec = c(1/32/4, 1/32)*12,
                            ### params when N_clus==4:
-                           N_spks_total = 30,
-                           clus_sep = 1.6,
+                           N_spks_total = 70,
+                           clus_sep = 1.4,
                            ### Parameters for algorithms
                            freq_trun = freq_trun,
+                           gamma = 1,
                            N_component = 2,
-                           key_times_vec = c(-1,0,1),
+                           key_times_vec = c(-1,0-0.2,1.5),
                            fix_timeshift = FALSE,
                            fix_membership = FALSE,
                            save_center_pdf_array = save_center_pdf_array ),
@@ -84,97 +124,6 @@ for (id_N_split in 1:N_split) {
   }
 }
 
-
-default_setting = 'N_spks_total=50,N_subj=100,clus_sep=1.6'
-for (id_N_split in 1:N_split) {
-  if (save_res_details & (id_N_split == 1)) {
-    save_center_pdf_array = TRUE
-  } else {
-    save_center_pdf_array = FALSE
-  }
-  for (id_freq_trun in 1:length(freq_trun_vec)){
-    freq_trun = freq_trun_vec[id_freq_trun]
-    results <- foreach(j = 1:N_replicate) %dopar% {
-      SEED = sample(1:1e7,1)
-      tryCatch(main_shapeinvpp(SEED = SEED,
-                           N_subj = 100,
-                           N_clus = 4,
-                           N_component_true = 2,
-                           t_vec = seq(-1, 1, by=0.01),
-                           timeshift_subj_max_vec = c(1/4, 1/16),
-                           ### params when N_clus==4:
-                           N_spks_total = 50,
-                           clus_sep = 1.6,
-                           ### Parameters for algorithms
-                           freq_trun = freq_trun,
-                           N_component = 2,
-                           key_times_vec = c(-1,0,1),
-                           fix_timeshift = FALSE,
-                           fix_membership = FALSE,
-                           save_center_pdf_array = save_center_pdf_array ),
-               error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
-    }
-    param_name = "freq_trun"
-    param_value = freq_trun
-    folder_path = paste0(top_level_folder,
-                         '/', setup,
-                         '/', method,
-                         '/', default_setting,
-                         '/', param_name, '/', param_value)
-    dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
-
-    now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
-    save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
-    rm(results)
-
-  }
-}
-
-
-default_setting = 'N_spks_total=100,N_subj=100,clus_sep=1.6'
-for (id_N_split in 1:N_split) {
-  if (save_res_details & (id_N_split == 1)) {
-    save_center_pdf_array = TRUE
-  } else {
-    save_center_pdf_array = FALSE
-  }
-  for (id_freq_trun in 1:length(freq_trun_vec)){
-    freq_trun = freq_trun_vec[id_freq_trun]
-    results <- foreach(j = 1:N_replicate) %dopar% {
-      SEED = sample(1:1e7,1)
-      tryCatch(main_shapeinvpp(SEED = SEED,
-                           N_subj = 100,
-                           N_clus = 4,
-                           N_component_true = 2,
-                           t_vec = seq(-1, 1, by=0.01),
-                           timeshift_subj_max_vec = c(1/4, 1/16),
-                           ### params when N_clus==4:
-                           N_spks_total = 100,
-                           clus_sep = 1.6,
-                           ### Parameters for algorithms
-                           freq_trun = freq_trun,
-                           N_component = 2,
-                           key_times_vec = c(-1,0,1),
-                           fix_timeshift = FALSE,
-                           fix_membership = FALSE,
-                           save_center_pdf_array = save_center_pdf_array ),
-               error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
-    }
-    param_name = "freq_trun"
-    param_value = freq_trun
-    folder_path = paste0(top_level_folder,
-                         '/', setup,
-                         '/', method,
-                         '/', default_setting,
-                         '/', param_name, '/', param_value)
-    dir.create(path = folder_path, recursive = TRUE, showWarnings = FALSE)
-
-    now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
-    save(results, file = paste0(folder_path, '/', 'N_replicate', N_replicate, '_', now_replicate, '.Rdata'))
-    rm(results)
-
-  }
-}
 
 
 
