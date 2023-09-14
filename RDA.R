@@ -13,7 +13,7 @@ library(fdapace)
 
 
 
-for (id_session in 1:39) {
+for (id_session in c(13,28)) {
   # Prepare data ------------------------------------------------------------
   new.path = '../Data/Main/'
   scenario_num = c(1)
@@ -30,10 +30,6 @@ for (id_session in 1:39) {
   N_neuron = length(id_neuron_selected)
   N_trial = length(id_trial_selected)
   
-  if((N_neuron < 200)|(id_session==13)){
-    next
-  } 
-
   trial_length = max(dat$trial_intervals[id_trial_selected,2] - dat$stim_onset[id_trial_selected]) + 0.2
   if (identical(feedback_type, 1)) {
     t_vec = seq(0, trial_length, length.out=200)
@@ -71,7 +67,7 @@ for (id_session in 1:39) {
   spks_time_mlist = spks_time_mlist[id_neuron_active, ]
 
   # Fit model for various cluster number ------------------------------------
-  N_clus_min = 3
+  N_clus_min = 2
   N_clus_max = 5
   N_component = 2
   if (identical(feedback_type, 1)) {
@@ -87,12 +83,13 @@ for (id_session in 1:39) {
   v_true_mat_list = NULL
   v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
                               gocue_time_vec - min(gocue_time_vec))
-  N_restart = 20
+  N_restart = 5
   MaxIter = 10 
   conv_thres = 5e-6 
-  gamma = 0.007
+  # gamma = 0.007
   
   set.seed(1)
+  for (gamma in c(0.01, 0.03, 0.1, 1, 10, 0.001, 0)) {
   res_list = list()
   for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
     res_list[[ind_N_clus]] = list()
@@ -146,9 +143,10 @@ for (id_session in 1:39) {
         l2_loss_best = l2_loss_new
         res_best = res_new
       }
-      l2_loss_history[id_restart] = l2_loss_best
+      l2_loss_history[id_restart] = l2_loss_new
     }
     res_best$l2_loss_history = l2_loss_history
+    res_best$time_estimation = time_estimation
     
     # Save results of N_clus_tmp ----------------------------------------------
     res_list[[ind_N_clus]] = res_best
@@ -182,7 +180,7 @@ for (id_session in 1:39) {
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
   setup = 'RDA_v2'
-  method = paste0('shape_inv_pp_v5.6_gamma',gamma)
+  method = paste0('shape_inv_pp_v5.7_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
                            ', scenario_num = ', paste0(scenario_num, collapse = '_'),
@@ -196,7 +194,7 @@ for (id_session in 1:39) {
   now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
   save(results, file = paste0(folder_path, '/', 'res', '_', now_replicate, '.Rdata'))
   
-  
+  }
 }
 
 
