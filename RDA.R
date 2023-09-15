@@ -108,6 +108,7 @@ for (id_session in c(13,28)) {
                      N_start_kmean = N_start_kmean,
                      freq_trun = freq_trun,
                      fix_timeshift = fix_timeshift, 
+                     add_rand_to_init_timeshift = ifelse(id_restart>1, TRUE, FALSE),
                      v_trialwise_vec_list = v_trialwise_vec_list,
                      fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                      v_true_mat_list = v_true_mat_list,

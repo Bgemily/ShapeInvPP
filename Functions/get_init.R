@@ -70,6 +70,9 @@ get_init = function(spks_time_mlist,
             v_subjwise_vec_list[[id_component]][id_subj] = runif(n = 1, min = -0.05, max = 0.05) + v_subjwise_vec_list[[id_component]][id_subj]
           }
           v_subjwise_vec_list[[id_component]][id_subj] = v_subjwise_vec_list[[id_component]][id_subj] - key_times_vec[id_component] 
+          if (v_subjwise_vec_list[[id_component]][id_subj] < 0) {
+            v_subjwise_vec_list[[id_component]][id_subj] = 0
+          }
         } else {
           v_subjwise_vec_list[[id_component]][id_subj] = 0
         }
