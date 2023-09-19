@@ -19,8 +19,8 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_replicate_total = 20
-N_split = 2
+N_replicate_total = 2000
+N_split = 200
 
 N_replicate = N_replicate_total/N_split
 
@@ -35,7 +35,7 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Multi_trial_v2.1.1'
+setup = 'Multi_trial_v2.2'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:

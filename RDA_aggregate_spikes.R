@@ -65,10 +65,18 @@ for (id_session in c(13,28)) {
   id_neuron_selected = id_neuron_selected[id_neuron_active]
   N_neuron = length(id_neuron_selected)
   spks_time_mlist = spks_time_mlist[id_neuron_active, ]
+  
+  ### Aggregate spike trains over all selected neurons
+  spks_time_mlist_aggre = matrix(list(), nrow = 1, ncol = N_trial)
+  for (id_trial in 1:N_trial) {
+    spks_time_mlist_aggre[1,id_trial] = list(unlist(spks_time_mlist[,id_trial]))
+  }
+  
+  
 
   # Fit model for various cluster number ------------------------------------
-  N_clus_min = 2
-  N_clus_max = 5
+  N_clus_min = 1
+  N_clus_max = 1
   N_component = 2
   if (identical(feedback_type, 1)) {
     key_times_vec = c(min(stim_onset_time_vec), min(gocue_time_vec), trial_length)
@@ -100,7 +108,7 @@ for (id_session in c(13,28)) {
     l2_loss_history = c()
     for (id_restart in 1:N_restart) {
       ### Get initialization -----------
-      res = get_init(spks_time_mlist = spks_time_mlist, 
+      res = get_init(spks_time_mlist = spks_time_mlist_aggre, 
                      N_clus = N_clus_tmp,
                      N_component = N_component,
                      t_vec = t_vec, 
@@ -119,7 +127,7 @@ for (id_session in c(13,28)) {
       
       # Apply algorithm ---------
       time_start = Sys.time()
-      res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
+      res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist_aggre,
                                v_trialwise_vec_list = v_trialwise_vec_list,
                                clusters_list_init = clusters_list_init,
                                v_mat_list_init = v_mat_list_init,
@@ -156,7 +164,7 @@ for (id_session in c(13,28)) {
   
   
   # Select best cluster number using ICL ------------------------------------
-  res_select_model = select_model(spks_time_mlist = spks_time_mlist, 
+  res_select_model = select_model(spks_time_mlist = spks_time_mlist_aggre, 
                                   N_component = N_component,
                                   key_times_vec = key_times_vec,
                                   result_list = res_list,
@@ -173,15 +181,15 @@ for (id_session in c(13,28)) {
   results = list(res_list = res_list, 
                  cand_N_clus_vec = cand_N_clus_vec, 
                  res_select_model = res_select_model,
-                 spks_time_mlist = spks_time_mlist,
+                 spks_time_mlist = spks_time_mlist_aggre,
                  id_neuron_selected = id_neuron_selected,
                  id_trial_selected = id_trial_selected)
   
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v2'
-  method = paste0('shape_inv_pp_v5.7_gamma',gamma)
+  setup = 'RDA_aggregate_spiketrains'
+  method = paste0('shape_inv_pp_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
                            ', scenario_num = ', paste0(scenario_num, collapse = '_'),

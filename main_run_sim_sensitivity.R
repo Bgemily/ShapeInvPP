@@ -17,8 +17,8 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_replicate_total = 50
-N_split = 5
+N_replicate_total = 2000
+N_split = 200
 
 N_replicate = N_replicate_total/N_split
 
@@ -33,7 +33,7 @@ registerDoParallel(cores=N_cores)
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'sensitivity_anal_v2.6.2'
+setup = 'sensitivity_anal_v2.7'
 method = 'ShapeInvPP'
 
 ### Parameters' possible values:

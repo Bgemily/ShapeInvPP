@@ -65,10 +65,11 @@ for (id_session in c(13,28)) {
   id_neuron_selected = id_neuron_selected[id_neuron_active]
   N_neuron = length(id_neuron_selected)
   spks_time_mlist = spks_time_mlist[id_neuron_active, ]
+  
 
   # Fit model for various cluster number ------------------------------------
-  N_clus_min = 2
-  N_clus_max = 5
+  N_clus_min = 1
+  N_clus_max = 1
   N_component = 2
   if (identical(feedback_type, 1)) {
     key_times_vec = c(min(stim_onset_time_vec), min(gocue_time_vec), trial_length)
@@ -180,8 +181,8 @@ for (id_session in c(13,28)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v2'
-  method = paste0('shape_inv_pp_v5.7_gamma',gamma)
+  setup = 'RDA_not_cluster'
+  method = paste0('shape_inv_pp_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
                            ', scenario_num = ', paste0(scenario_num, collapse = '_'),
