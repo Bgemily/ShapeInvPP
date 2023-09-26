@@ -52,6 +52,8 @@ get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
   
   ### Get distance between each subj and each cluster -----
   dist_mat = matrix(0, nrow=N_subj, ncol=N_clus)
+  l2_loss_mat_1 = matrix(0, nrow=N_subj, ncol=N_clus)
+  l2_loss_mat_2 = matrix(0, nrow=N_subj, ncol=N_clus)
   for (id_clus in 1:N_clus) {
     dist_1_vec = dist_mat_tmp[, id_clus]
     center_Nspks_q_scalar = sum(center_Nspks_mat[id_clus,1:N_component])
@@ -59,12 +61,16 @@ get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
                                     (N_spks_mat - center_Nspks_q_scalar)^2 )
     dist_vec = dist_1_vec + dist_2_vec
     dist_mat[,id_clus] = dist_vec
+    l2_loss_mat_1[,id_clus] = dist_1_vec
+    l2_loss_mat_2[,id_clus] = dist_2_vec / gamma
   }
   
   
   ### Select memberships to minimize total distance -----
   membership = numeric(N_subj)
   dist_to_centr_vec = numeric(N_subj)
+  l2_loss_vec_1 = numeric(N_subj)
+  l2_loss_vec_2 = numeric(N_subj)
   for (i in 1:N_subj) {
     dist_vec_tmp = dist_mat[i, ]
     mem_tmp = which.min(dist_vec_tmp)
@@ -73,10 +79,13 @@ get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
     }
     membership[i] = mem_tmp
     dist_to_centr_vec[i] = min(dist_vec_tmp)
+    l2_loss_vec_1[i] = l2_loss_mat_1[i, mem_tmp]
+    l2_loss_vec_2[i] = l2_loss_mat_2[i, mem_tmp]
   }
   clusters_list = mem2clus(membership = membership, N_clus_min = N_clus)
   l2_loss = sum(dist_to_centr_vec)
-  
+  l2_loss_part_1 = sum(l2_loss_vec_1)
+  l2_loss_part_2 = sum(l2_loss_vec_2)
   
   ### Extract time shifts based on selected memberships -----
   for (id_clus in 1:N_clus) {
@@ -106,6 +115,8 @@ get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
   return(list(clusters_list = clusters_list, 
               v_mat_list = v_mat_list,
               l2_loss = l2_loss,
+              l2_loss_part_1 = l2_loss_part_1,
+              l2_loss_part_2 = l2_loss_part_2,
               dist_to_centr_vec = dist_to_centr_vec))
 }
 

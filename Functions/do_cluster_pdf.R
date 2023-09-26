@@ -133,6 +133,11 @@ do_cluster_pdf = function(spks_time_mlist,
     l2_loss_update = l2_loss
     delta_loss = (l2_loss_current - l2_loss_update) / (l2_loss_update + .Machine$double.eps)
     stopping = delta_loss < conv_thres
+    ### Save the two l2_loss terms concerning distribution and N_spks
+    if (!stopping & n_iter<=MaxIter) {
+      l2_loss_part_1 = tmp$l2_loss_part_1
+      l2_loss_part_2 = tmp$l2_loss_part_2
+    }
     
   }
   
@@ -167,7 +172,11 @@ do_cluster_pdf = function(spks_time_mlist,
   center_Nspks_mat = center_Nspks_mat_current
   center_intensity_array = center_intensity_array
   v_mat_list = v_mat_list_current
-  
+  v_subjwise_vec_list = list()
+  for (id_component in 1:N_component) {
+    id_trial_tmp = 1
+    v_subjwise_vec_list[[id_component]] = v_mat_list[[id_component]][ ,id_trial_tmp] - v_trialwise_vec_list[[id_component]][id_trial_tmp]
+  }
   
   ### Extend estimated densities and intensities to t_vec_extend
   if (length(t_vec)<length(t_vec_extend)){
@@ -197,6 +206,8 @@ do_cluster_pdf = function(spks_time_mlist,
   
   return(list(clusters_list = clusters_list, 
               loss_history = loss_history,
+              l2_loss_part_1 = l2_loss_part_1,
+              l2_loss_part_2 = l2_loss_part_2,
               dist_to_centr_vec = dist_to_centr_vec,
               clusters_history = clusters_history, 
               center_density_array_history = center_density_array_history,
@@ -204,6 +215,7 @@ do_cluster_pdf = function(spks_time_mlist,
               center_Nspks_mat = center_Nspks_mat,
               center_intensity_array = center_intensity_array,
               v_mat_list = v_mat_list,
+              v_subjwise_vec_list = v_subjwise_vec_list,
               t_vec = t_vec,
               t_vec_extend = t_vec_extend,
               N_iteration = N_iteration))
