@@ -84,10 +84,11 @@ for (id_session in c(13,28)) {
   v_true_mat_list = NULL
   v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
                               gocue_time_vec - min(gocue_time_vec))
-  N_restart = 5
+  N_restart = 1
   MaxIter = 10 
   conv_thres = 5e-6 
   # gamma = 0.007
+  N_fold_cv = 5
   
   set.seed(1)
   for (gamma in c(0.01)) {
@@ -103,86 +104,111 @@ for (id_session in c(13,28)) {
     res_list[[ind_N_clus]] = list()
     N_clus_tmp = c(N_clus_min:N_clus_max)[ind_N_clus]
     
-    ### Split the trials into two sets: training set and testing set. -----------
-    sample_size_training = round(N_trial * 0.7)
-    id_trial_training = sample(x = 1:N_trial, size = sample_size_training, replace = FALSE)
-    spks_time_mlist_training = spks_time_mlist[ , id_trial_training, drop=FALSE]
-    v_trialwise_vec_list_training = lapply(v_trialwise_vec_list, function(vec)vec[id_trial_training])
-    id_trial_testing = setdiff(1:N_trial, id_trial_training)
-    spks_time_mlist_testing = spks_time_mlist[ , id_trial_testing, drop=FALSE]
-    v_trialwise_vec_list_testing = lapply(v_trialwise_vec_list, function(vec)vec[id_trial_testing])
-    
-    # Fit model on training data with multiple restarts -----------
-    res_best = NA
-    l2_loss_best = Inf
-    l2_loss_history = c()
-    for (id_restart in 1:N_restart) {
-      ### Get initialization -----------
-      res = get_init(spks_time_mlist = spks_time_mlist_training, 
-                     N_clus = N_clus_tmp,
-                     N_component = N_component,
-                     t_vec = t_vec, 
-                     key_times_vec = key_times_vec,
-                     N_start_kmean = N_start_kmean,
-                     freq_trun = freq_trun,
-                     fix_timeshift = fix_timeshift, 
-                     add_rand_to_init_timeshift = ifelse(id_restart>1, TRUE, FALSE),
-                     v_trialwise_vec_list = v_trialwise_vec_list_training,
-                     fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                     v_true_mat_list = v_true_mat_list,
-                     rmv_conn_prob = TRUE)
-      clusters_list_init = res$clusters_list
-      v_mat_list_init = res$v_mat_list
-      
-      
-      # Apply algorithm ---------
-      time_start = Sys.time()
-      res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist_training,
-                               v_trialwise_vec_list = v_trialwise_vec_list_training,
-                               clusters_list_init = clusters_list_init,
-                               v_mat_list_init = v_mat_list_init,
-                               N_component = N_component, 
-                               freq_trun = freq_trun,
-                               gamma = gamma,
-                               t_vec=t_vec, 
-                               key_times_vec = key_times_vec,
-                               fix_timeshift = fix_timeshift, 
-                               MaxIter = MaxIter, 
-                               conv_thres = conv_thres, 
-                               fix_comp1_timeshift_only = fix_comp1_timeshift_only )
-      time_end = Sys.time()
-      time_estimation = time_end - time_start
-      time_estimation = as.numeric(time_estimation, units='secs')
-      
-      ### Extract loss function value
-      l2_loss_new = tail(res_new$loss_history, 2)[1]
-      
-      ### Update best estimation
-      if(l2_loss_new < l2_loss_best){
-        l2_loss_best = l2_loss_new
-        res_best = res_new
-      }
-      l2_loss_history[id_restart] = l2_loss_new
+    ### Split the trials into N_fold_cv folds -----------
+    id_trial_shuffle = sample(1:N_trial, size = N_trial, replace = FALSE)
+    fold_size = N_trial %/% N_fold_cv
+    membership_trial = rep(1:N_fold_cv, each = fold_size)
+    N_trial_remainder = N_trial - N_fold_cv*fold_size
+    if (N_trial_remainder > 0) {
+      membership_trial = c(membership_trial, 1:N_trial_remainder)
     }
-    res_best$l2_loss_history = l2_loss_history
-    res_best$time_estimation = time_estimation
     
-    # Save results of N_clus_tmp ----------------------------------------------
-    res_list[[ind_N_clus]] = res_best
-    
-    # Apply fitted model on testing data ----------------------------------------------
-    tmp = evaluate_model(spks_time_mlist = spks_time_mlist_testing, 
-                         v_trialwise_vec_list = v_trialwise_vec_list_testing, 
-                         N_component = N_component, 
-                         key_times_vec = key_times_vec, 
-                         model_fitted_list = res_best)
-    compl_log_lik_vec[ind_N_clus] = tmp$compl_log_lik
-    log_lik_vec[ind_N_clus] = tmp$log_lik
-    log_lik_tmp_1_vec[ind_N_clus] = tmp$log_lik_tmp_1
-    log_lik_tmp_2_vec[ind_N_clus] = tmp$log_lik_tmp_2
-    clus_entropy_vec[ind_N_clus] = tmp$clus_entropy
-    L2_loss_part_1_vec[ind_N_clus] = tmp$L2_loss_part_1
-    L2_loss_part_2_vec[ind_N_clus] = tmp$L2_loss_part_2
+    # Cross-validation --------
+    compl_log_lik_cv = 0
+    log_lik_cv = 0
+    log_lik_tmp_1_cv = 0
+    log_lik_tmp_2_cv = 0
+    clus_entropy_cv = 0
+    L2_loss_part_1_cv = 0
+    L2_loss_part_2_cv = 0
+    for (id_fold in 1:N_fold_cv) {
+      # Get training set and testing set
+      id_trial_training = id_trial_shuffle[membership_trial!=id_fold]
+      spks_time_mlist_training = spks_time_mlist[ , id_trial_training, drop=FALSE]
+      v_trialwise_vec_list_training = lapply(v_trialwise_vec_list, function(vec)vec[id_trial_training])
+      id_trial_testing = id_trial_shuffle[membership_trial==id_fold]
+      spks_time_mlist_testing = spks_time_mlist[ , id_trial_testing, drop=FALSE]
+      v_trialwise_vec_list_testing = lapply(v_trialwise_vec_list, function(vec)vec[id_trial_testing])
+      
+      # Fit model on the rest (N_fold_cv-1) folds with multiple restarts -----------
+      res_best = NA
+      l2_loss_best = Inf
+      l2_loss_history = c()
+      for (id_restart in 1:N_restart) {
+        ### Get initialization -----------
+        res = get_init(spks_time_mlist = spks_time_mlist_training, 
+                       N_clus = N_clus_tmp,
+                       N_component = N_component,
+                       t_vec = t_vec, 
+                       key_times_vec = key_times_vec,
+                       N_start_kmean = N_start_kmean,
+                       freq_trun = freq_trun,
+                       fix_timeshift = fix_timeshift, 
+                       add_rand_to_init_timeshift = ifelse(id_restart>1, TRUE, FALSE),
+                       v_trialwise_vec_list = v_trialwise_vec_list_training,
+                       fix_comp1_timeshift_only = fix_comp1_timeshift_only,
+                       v_true_mat_list = v_true_mat_list,
+                       rmv_conn_prob = TRUE)
+        clusters_list_init = res$clusters_list
+        v_mat_list_init = res$v_mat_list
+        
+        
+        # Apply algorithm ---------
+        time_start = Sys.time()
+        res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist_training,
+                                 v_trialwise_vec_list = v_trialwise_vec_list_training,
+                                 clusters_list_init = clusters_list_init,
+                                 v_mat_list_init = v_mat_list_init,
+                                 N_component = N_component, 
+                                 freq_trun = freq_trun,
+                                 gamma = gamma,
+                                 t_vec=t_vec, 
+                                 key_times_vec = key_times_vec,
+                                 fix_timeshift = fix_timeshift, 
+                                 MaxIter = MaxIter, 
+                                 conv_thres = conv_thres, 
+                                 fix_comp1_timeshift_only = fix_comp1_timeshift_only )
+        time_end = Sys.time()
+        time_estimation = time_end - time_start
+        time_estimation = as.numeric(time_estimation, units='secs')
+        
+        ### Extract loss function value
+        l2_loss_new = tail(res_new$loss_history, 2)[1]
+        
+        ### Update best estimation
+        if(l2_loss_new < l2_loss_best){
+          l2_loss_best = l2_loss_new
+          res_best = res_new
+        }
+        l2_loss_history[id_restart] = l2_loss_new
+      }
+      res_best$l2_loss_history = l2_loss_history
+      res_best$time_estimation = time_estimation
+      
+      # Save results of N_clus_tmp ----------------------------------------------
+      res_list[[ind_N_clus]] = res_best
+      
+      # Apply fitted model on testing data ----------------------------------------------
+      tmp = evaluate_model(spks_time_mlist = spks_time_mlist_testing, 
+                           v_trialwise_vec_list = v_trialwise_vec_list_testing, 
+                           N_component = N_component, 
+                           key_times_vec = key_times_vec, 
+                           model_fitted_list = res_best)
+      compl_log_lik_cv = compl_log_lik_cv + tmp$compl_log_lik
+      log_lik_cv = log_lik_cv + tmp$log_lik
+      log_lik_tmp_1_cv = log_lik_tmp_1_cv + tmp$log_lik_tmp_1
+      log_lik_tmp_2_cv = log_lik_tmp_2_cv + tmp$log_lik_tmp_2
+      clus_entropy_cv = clus_entropy_cv + tmp$clus_entropy
+      L2_loss_part_1_cv = L2_loss_part_1_cv + tmp$L2_loss_part_1
+      L2_loss_part_2_cv = L2_loss_part_2_cv + tmp$L2_loss_part_2
+    }
+    compl_log_lik_vec[ind_N_clus] = compl_log_lik_cv
+    log_lik_vec[ind_N_clus] = log_lik_cv
+    log_lik_tmp_1_vec[ind_N_clus] = log_lik_tmp_1_cv
+    log_lik_tmp_2_vec[ind_N_clus] = log_lik_tmp_2_cv
+    clus_entropy_vec[ind_N_clus] = clus_entropy_cv
+    L2_loss_part_1_vec[ind_N_clus] = L2_loss_part_1_cv
+    L2_loss_part_2_vec[ind_N_clus] = L2_loss_part_2_cv
     
   }
   
@@ -211,7 +237,7 @@ for (id_session in c(13,28)) {
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
   setup = 'RDA_v2'
-  method = paste0('shape_inv_pp_v6_gamma',gamma)
+  method = paste0('shape_inv_pp_v6.1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
                            ', scenario_num = ', paste0(scenario_num, collapse = '_'),
