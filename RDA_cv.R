@@ -68,8 +68,8 @@ for (id_session in c(13,28)) {
 
 
   # Fit model for various cluster number ------------------------------------
-  N_clus_min = 2
-  N_clus_max = 5
+  N_clus_min = 5
+  N_clus_max = 7
   N_component = 2
   if (identical(feedback_type, 1)) {
     key_times_vec = c(min(stim_onset_time_vec), min(gocue_time_vec), trial_length)
