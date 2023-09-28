@@ -1,18 +1,11 @@
-
+# Apply fitted model on a given data with spike times and trialwise time shifts 
+# and evaluate metrics including: log likelihood, l2 loss of distribution, l2 loss of N_spks, etc.
 evaluate_model = function(spks_time_mlist, 
                           v_trialwise_vec_list,
                         N_component,
                         key_times_vec,
                         model_fitted_list)
 {
-  compl_log_lik_vec = 0
-  log_lik_vec = 0
-  log_lik_1_vec = 0
-  log_lik_2_vec = 0
-  clus_entropy_vec = 0
-  l2_loss_part_1 = 0
-  l2_loss_part_2 = 0
-  
   N_subj = nrow(spks_time_mlist)
   N_trial = ncol(spks_time_mlist)
   
