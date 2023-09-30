@@ -4,7 +4,8 @@ evaluate_model = function(spks_time_mlist,
                           v_trialwise_vec_list,
                         N_component,
                         key_times_vec,
-                        model_fitted_list)
+                        model_fitted_list,
+                        freq_trun = 10)
 {
   N_subj = nrow(spks_time_mlist)
   N_trial = ncol(spks_time_mlist)
@@ -46,6 +47,7 @@ evaluate_model = function(spks_time_mlist,
   # L2_loss_part_2: sum_{i,r} |Lambda_{i,r}(T)|^{-1} * |N_{i,r}(T)-Lambda_{i,r}(T)|^2
   log_lik_tmp_2 = 0
   L2_loss_part_1 = 0
+  L2_loss_part_1_smoothdensity = 0
   L2_loss_part_2 = 0
   for (id_clus in 1:N_clus) {
     for (id_subj in clusters_list[[id_clus]]){
@@ -80,6 +82,14 @@ evaluate_model = function(spks_time_mlist,
         intensity_empirical = counts_tmp / t_unit
         L2_loss_part_1_tmp = length(event_time_vec_tmp) * max(t_vec)^{-1} * sum((intensity_empirical/sum(intensity_empirical*t_unit) - intensity_est/sum(intensity_est*t_unit))^2 * t_unit)
         L2_loss_part_1 = L2_loss_part_1 + L2_loss_part_1_tmp
+        ### Add L2_loss_part_1_tmp_smoothdensity: N_{i,r}(T) * T^{-1} * \| \tilde{y}_{i,r}(t)/N_{i,r}(T) - lambda_{i,r}(t)/Lambda_{i,r}(T) \|^2
+        intensity_empirical_fft = fft(intensity_empirical) / length(intensity_empirical)
+        intensity_empirical_fft_trun = c(head(intensity_empirical_fft, freq_trun+1), 
+                                     rep(0, length(t_vec)-2*freq_trun-1),
+                                     tail(intensity_empirical_fft, freq_trun))
+        intensity_empirical_smoothdensity = Re(fft(intensity_empirical_fft_trun, inverse = TRUE))
+        L2_loss_part_1_tmp_smoothdensity = length(event_time_vec_tmp) * max(t_vec)^{-1} * sum((intensity_empirical_smoothdensity/sum(intensity_empirical*t_unit) - intensity_est/sum(intensity_est*t_unit))^2 * t_unit)
+        L2_loss_part_1_smoothdensity = L2_loss_part_1_smoothdensity + L2_loss_part_1_tmp_smoothdensity
         ### Add L2_loss_part_2_tmp: |Lambda_{i,r}(T)|^{-1} * |N_{i,r}(T)-Lambda_{i,r}(T)|^2
         L2_loss_part_2_tmp = (sum(intensity_est*t_unit)+.Machine$double.eps)^(-1) * (length(event_time_vec_tmp) - sum(intensity_est*t_unit))^2 
         L2_loss_part_2 = L2_loss_part_2 + L2_loss_part_2_tmp
@@ -106,5 +116,6 @@ evaluate_model = function(spks_time_mlist,
               log_lik_tmp_2 = log_lik_tmp_2,
               clus_entropy = clus_entropy,
               L2_loss_part_1 = L2_loss_part_1,
-              L2_loss_part_2 = L2_loss_part_2))
+              L2_loss_part_2 = L2_loss_part_2,
+              L2_loss_part_1_smoothdensity = L2_loss_part_1_smoothdensity))
 }
