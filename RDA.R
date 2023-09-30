@@ -84,13 +84,13 @@ for (id_session in c(13)) {
   v_true_mat_list = NULL
   v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
                               gocue_time_vec - min(gocue_time_vec))
-  N_restart = 5
+  N_restart = 1
   MaxIter = 10 
   conv_thres = 5e-6 
   # gamma = 0.007
   
   set.seed(1)
-  for (gamma in c(0, 10^10)) {
+  for (gamma in c(0.005, 0.007, 0.01, 0.003, 0.001, 0, 0.02, 0.03, 0.015, 0.025)) {
   res_list = list()
   compl_log_lik_vec = c()
   log_lik_vec = c()
@@ -99,6 +99,7 @@ for (id_session in c(13)) {
   clus_entropy_vec = c()
   L2_loss_part_1_vec = c()
   L2_loss_part_2_vec = c()
+  L2_loss_part_1_smoothdensity_vec = c()
   for (ind_N_clus in 1:length(cand_N_clus_vec)) {
     res_list[[ind_N_clus]] = list()
     N_clus_tmp = cand_N_clus_vec[ind_N_clus]
@@ -165,13 +166,15 @@ for (id_session in c(13)) {
                          v_trialwise_vec_list = v_trialwise_vec_list, 
                          N_component = N_component, 
                          key_times_vec = key_times_vec, 
-                         model_fitted_list = res_best)
+                         model_fitted_list = res_best,
+                         freq_trun = freq_trun)
     log_lik_vec[ind_N_clus] = tmp$log_lik
     log_lik_tmp_1_vec[ind_N_clus] = tmp$log_lik_tmp_1
     log_lik_tmp_2_vec[ind_N_clus] = tmp$log_lik_tmp_2
     clus_entropy_vec[ind_N_clus] = tmp$clus_entropy
     L2_loss_part_1_vec[ind_N_clus] = tmp$L2_loss_part_1
     L2_loss_part_2_vec[ind_N_clus] = tmp$L2_loss_part_2
+    L2_loss_part_1_smoothdensity_vec[ind_N_clus] = tmp$L2_loss_part_1_smoothdensity
     compl_log_lik_vec[ind_N_clus] = tmp$compl_log_lik
   }
   
@@ -186,7 +189,9 @@ for (id_session in c(13)) {
                  clus_entropy_vec = clus_entropy_vec,
                  L2_loss_part_1_vec = L2_loss_part_1_vec,
                  L2_loss_part_2_vec = L2_loss_part_2_vec,
+                 L2_loss_part_1_smoothdensity_vec = L2_loss_part_1_smoothdensity_vec,
                  spks_time_mlist = spks_time_mlist,
+                 v_trialwise_vec_list = v_trialwise_vec_list, 
                  id_neuron_selected = id_neuron_selected,
                  id_trial_selected = id_trial_selected)
   
@@ -194,7 +199,7 @@ for (id_session in c(13)) {
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
   setup = 'RDA_v2'
-  method = paste0('shape_inv_pp_v6.2.3_gamma',gamma)
+  method = paste0('shape_inv_pp_v6.2.4_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
                            ', scenario_num = ', paste0(scenario_num, collapse = '_'),
