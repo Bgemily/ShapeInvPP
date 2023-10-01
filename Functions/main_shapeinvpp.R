@@ -378,6 +378,7 @@ main_shapeinvpp = function(### Parameters for generative model
     F_mean_sq_err=F_mean_sq_err_vec=F_mse_squarel2_ratio=NA
     F_mse_squarel2_ratio_mat = dist_mse_mat = NA
     v_mean_sq_err=v_mean_sq_err_vec=NA
+    v_align_mean_sq_err_vec = v_align_mean_sq_err = NA
     clusters_list_est_permn=NA
     center_density_array_est_permn=NA
     center_intensity_array_est_permn=NA

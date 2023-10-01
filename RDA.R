@@ -13,7 +13,7 @@ library(fdapace)
 
 
 
-for (id_session in c(13,28)) {
+for (id_session in c(13)) {
   # Prepare data ------------------------------------------------------------
   new.path = '../Data/Main/'
   scenario_num = c(1)
@@ -68,7 +68,8 @@ for (id_session in c(13,28)) {
 
   # Fit model for various cluster number ------------------------------------
   N_clus_min = 2
-  N_clus_max = 5
+  N_clus_max = 6
+  cand_N_clus_vec = N_clus_min:N_clus_max
   N_component = 2
   if (identical(feedback_type, 1)) {
     key_times_vec = c(min(stim_onset_time_vec), min(gocue_time_vec), trial_length)
@@ -83,17 +84,25 @@ for (id_session in c(13,28)) {
   v_true_mat_list = NULL
   v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
                               gocue_time_vec - min(gocue_time_vec))
-  N_restart = 5
+  N_restart = 1
   MaxIter = 10 
   conv_thres = 5e-6 
   # gamma = 0.007
   
   set.seed(1)
-  for (gamma in c(0.01, 0.03, 0.1, 1, 10, 0.001, 0)) {
+  for (gamma in c(0.005, 0.007, 0.01, 0.003, 0.001, 0, 0.02, 0.03, 0.015, 0.025)) {
   res_list = list()
-  for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
+  compl_log_lik_vec = c()
+  log_lik_vec = c()
+  log_lik_tmp_1_vec = c()
+  log_lik_tmp_2_vec = c()
+  clus_entropy_vec = c()
+  L2_loss_part_1_vec = c()
+  L2_loss_part_2_vec = c()
+  L2_loss_part_1_smoothdensity_vec = c()
+  for (ind_N_clus in 1:length(cand_N_clus_vec)) {
     res_list[[ind_N_clus]] = list()
-    N_clus_tmp = c(N_clus_min:N_clus_max)[ind_N_clus]
+    N_clus_tmp = cand_N_clus_vec[ind_N_clus]
     
     res_best = NA
     l2_loss_best = Inf
@@ -152,28 +161,37 @@ for (id_session in c(13,28)) {
     # Save results of N_clus_tmp ----------------------------------------------
     res_list[[ind_N_clus]] = res_best
     
+    # Apply fitted model on testing data ----------------------------------------------
+    tmp = evaluate_model(spks_time_mlist = spks_time_mlist, 
+                         v_trialwise_vec_list = v_trialwise_vec_list, 
+                         N_component = N_component, 
+                         key_times_vec = key_times_vec, 
+                         model_fitted_list = res_best,
+                         freq_trun = freq_trun)
+    log_lik_vec[ind_N_clus] = tmp$log_lik
+    log_lik_tmp_1_vec[ind_N_clus] = tmp$log_lik_tmp_1
+    log_lik_tmp_2_vec[ind_N_clus] = tmp$log_lik_tmp_2
+    clus_entropy_vec[ind_N_clus] = tmp$clus_entropy
+    L2_loss_part_1_vec[ind_N_clus] = tmp$L2_loss_part_1
+    L2_loss_part_2_vec[ind_N_clus] = tmp$L2_loss_part_2
+    L2_loss_part_1_smoothdensity_vec[ind_N_clus] = tmp$L2_loss_part_1_smoothdensity
+    compl_log_lik_vec[ind_N_clus] = tmp$compl_log_lik
   }
-  
-  
-  # Select best cluster number using ICL ------------------------------------
-  res_select_model = select_model(spks_time_mlist = spks_time_mlist, 
-                                  N_component = N_component,
-                                  key_times_vec = key_times_vec,
-                                  result_list = res_list,
-                                  mode = "intensity")
-  cand_N_clus_vec = N_clus_min:N_clus_max
-  N_clus_est = cand_N_clus_vec[res_select_model$id_best_res]
-  ICL_vec = res_select_model$ICL_vec 
-  compl_log_lik_vec = res_select_model$compl_log_lik_vec 
-  log_lik_vec = res_select_model$log_lik_vec
-  penalty_vec = res_select_model$penalty_vec
   
   
   # Retrieve estimation results of the best cluster number ------------------
   results = list(res_list = res_list, 
                  cand_N_clus_vec = cand_N_clus_vec, 
-                 res_select_model = res_select_model,
+                 compl_log_lik_vec = compl_log_lik_vec,
+                 log_lik_vec = log_lik_vec,
+                 log_lik_tmp_1_vec = log_lik_tmp_1_vec,
+                 log_lik_tmp_2_vec = log_lik_tmp_2_vec,
+                 clus_entropy_vec = clus_entropy_vec,
+                 L2_loss_part_1_vec = L2_loss_part_1_vec,
+                 L2_loss_part_2_vec = L2_loss_part_2_vec,
+                 L2_loss_part_1_smoothdensity_vec = L2_loss_part_1_smoothdensity_vec,
                  spks_time_mlist = spks_time_mlist,
+                 v_trialwise_vec_list = v_trialwise_vec_list, 
                  id_neuron_selected = id_neuron_selected,
                  id_trial_selected = id_trial_selected)
   
@@ -181,7 +199,7 @@ for (id_session in c(13,28)) {
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
   setup = 'RDA_v2'
-  method = paste0('shape_inv_pp_v5.7_gamma',gamma)
+  method = paste0('shape_inv_pp_v6.2.4_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
                            ', scenario_num = ', paste0(scenario_num, collapse = '_'),
