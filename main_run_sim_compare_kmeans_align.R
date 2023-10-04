@@ -37,7 +37,7 @@ save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Compare_methods_v3.1.8'
-method = 'kmeans_align_v2'
+method = 'kmeans_align_v3_maxiter50'
 
 ### Parameters' possible values:
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*3, 
