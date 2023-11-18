@@ -65,6 +65,7 @@ do_cluster_pdf = function(spks_time_mlist,
   clusters_list_update = clusters_list_current = clusters_list_init
   center_density_array_update = center_density_array_current = center_density_array
   center_Nspks_mat_update = center_Nspks_mat_current = center_Nspks_mat
+  center_intensity_array_update = center_intensity_array_current = center_intensity_array
   v_mat_list_update = v_mat_list_current = v_mat_list
   l2_loss_update = l2_loss_current = Inf
   
@@ -82,6 +83,7 @@ do_cluster_pdf = function(spks_time_mlist,
     clusters_list_update -> clusters_list_current
     center_density_array_update -> center_density_array_current 
     center_Nspks_mat_update -> center_Nspks_mat_current
+    center_intensity_array_update -> center_intensity_array_current 
     v_mat_list_update -> v_mat_list_current
     l2_loss_update -> l2_loss_current
     
@@ -100,7 +102,7 @@ do_cluster_pdf = function(spks_time_mlist,
                                      fix_timeshift = fix_timeshift )
     center_density_array_update = tmp$center_density_array
     center_Nspks_mat_update = tmp$center_Nspks_mat
-    center_intensity_array = tmp$center_intensity_array
+    center_intensity_array_update = tmp$center_intensity_array
     v_mat_list_tmp = tmp$v_mat_list
     
     clusters_history = c(clusters_history, list(clusters_list_current))
@@ -147,22 +149,25 @@ do_cluster_pdf = function(spks_time_mlist,
   N_iteration = n_iter
   
   ### Update intensities 
-  tmp = get_center_intensity_array(subjtrial_density_unsmooth_array = subjtrial_density_unsmooth_array,
-                                   fft_subjtrial_density_unsmooth_array = fft_subjtrial_density_unsmooth_array,
-                                   N_spks_mat = N_spks_mat,
-                                   v_trialwise_vec_list = v_trialwise_vec_list,
-                                   clusters_list = clusters_list_current, 
-                                   v_mat_list = v_mat_list_current,
-                                   N_component = N_component,
-                                   freq_trun = freq_trun, 
-                                   bw = bw,
-                                   t_vec = t_vec,
-                                   key_times_vec = key_times_vec,
-                                   fix_timeshift = fix_timeshift )
-  center_density_array_current = tmp$center_density_array
-  center_Nspks_mat_current = tmp$center_Nspks_mat
-  center_intensity_array = tmp$center_intensity_array
-  v_mat_list_current = tmp$v_mat_list
+  if (FALSE) {
+    tmp = get_center_intensity_array(subjtrial_density_unsmooth_array = subjtrial_density_unsmooth_array,
+                                     fft_subjtrial_density_unsmooth_array = fft_subjtrial_density_unsmooth_array,
+                                     N_spks_mat = N_spks_mat,
+                                     v_trialwise_vec_list = v_trialwise_vec_list,
+                                     clusters_list = clusters_list_current, 
+                                     v_mat_list = v_mat_list_current,
+                                     N_component = N_component,
+                                     freq_trun = freq_trun, 
+                                     bw = bw,
+                                     t_vec = t_vec,
+                                     key_times_vec = key_times_vec,
+                                     fix_timeshift = fix_timeshift )
+    center_density_array_current = tmp$center_density_array
+    center_Nspks_mat_current = tmp$center_Nspks_mat
+    center_intensity_array_current = tmp$center_intensity_array
+    v_mat_list_current = tmp$v_mat_list
+  }
+  
   
   
   # Get final result --------------------------------------------------------
@@ -170,7 +175,7 @@ do_cluster_pdf = function(spks_time_mlist,
   clusters_list = clusters_list_current
   center_density_array = center_density_array_current
   center_Nspks_mat = center_Nspks_mat_current
-  center_intensity_array = center_intensity_array
+  center_intensity_array = center_intensity_array_current
   v_mat_list = v_mat_list_current
   v_subjwise_vec_list = list()
   for (id_component in 1:N_component) {
