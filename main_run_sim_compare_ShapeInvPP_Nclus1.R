@@ -41,12 +41,12 @@ method = 'shape_inv_pp'
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*3, 
                                    c(1/32/4, 1/32)*4, c(1/32/4, 1/32)*5,
                                    c(1/32/4, 1/32)*6, c(1/32/4, 1/32)*7)
-N_subj_list = list(100, 120, 140, 160, 180, 200)
+N_subj_list = list(25, 30, 35, 40, 45, 50)
 key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.02-0.2,1.5), c(-1,0.04-0.2,1.5), 
                           c(-1,0.06-0.2,1.5), c(-1,0.08-0.2,1.5), c(-1,0.1-0.2,1.5))
 
 if (test_N_component_2){
-  default_setting = 'N_spks_total=70,N_subj=100,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2'
+  default_setting = 'N_spks_total=70,N_subj=25,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
