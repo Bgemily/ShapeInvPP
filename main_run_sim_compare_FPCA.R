@@ -36,18 +36,18 @@ test_N_component_2 = TRUE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus1_v2'
+setup = 'Compare_methods_Nclus1_v2.1'
 method = 'fpca_hotfix'
 
 ### Parameters' possible values:
-timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*3, 
-                                   c(1/32/4, 1/32)*4, c(1/32/4, 1/32)*5,
-                                   c(1/32/4, 1/32)*6, c(1/32/4, 1/32)*7)
-key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.02-0.2,1.5), c(-1,0.04-0.2,1.5), 
-                          c(-1,0.06-0.2,1.5), c(-1,0.08-0.2,1.5), c(-1,0.1-0.2,1.5))
+timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*4, c(1/32/4, 1/32)*5,
+                                   c(1/32/4, 1/32)*6, c(1/32/4, 1/32)*7,
+                                   c(1/32/4, 1/32)*8, c(1/32/4, 1/32)*9)
+key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.04-0.2,1.5), c(-1,0.08-0.2,1.5), 
+                          c(-1,0.12-0.2,1.5), c(-1,0.16-0.2,1.5), c(-1,0.2-0.2,1.5))
 
 if (test_N_component_2){
-  default_setting = 'N_spks_total=400,N_subj=25,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2'
+  default_setting = 'N_spks_total=1000,N_subj=100,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -60,10 +60,10 @@ if (test_N_component_2){
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_fpca(SEED = SEED,
-                           N_subj = 25,
+                           N_subj = 100,
                            N_clus = 1,
                            N_component_true = 2,
-                           N_spks_total = 400,
+                           N_spks_total = 1000,
                            timeshift_subj_max_vec = timeshift_subj_max_vec,
                            t_vec = seq(-1,1.5,0.01),
                            clus_sep = 1.4,
@@ -92,10 +92,10 @@ if (test_N_component_2){
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_fpca(SEED = SEED, 
-                           N_subj = 25,
+                           N_subj = 100,
                            N_clus = 1, 
                            N_component_true = 2,
-                           N_spks_total = 400,
+                           N_spks_total = 1000,
                            timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                            t_vec = seq(-1,1.5,0.01),
                            key_times_vec = key_times_vec,
