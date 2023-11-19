@@ -46,8 +46,7 @@ key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.02-0.2,1.5), c(-1,0.04-0.2,1.5
                           c(-1,0.06-0.2,1.5), c(-1,0.08-0.2,1.5), c(-1,0.1-0.2,1.5))
 
 for (timeshift_trial_max in timeshift_trial_max_list){
-  default_setting = paste0("timeshift_trial_max=",timeshift_trial_max,",", 
-                           'N_spks_total=70,N_subj=100,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
+  default_setting = paste0("timeshift_trial_max=",timeshift_trial_max,",", 'N_spks_total=70,N_subj=25,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -60,7 +59,7 @@ for (timeshift_trial_max in timeshift_trial_max_list){
         SEED = sample(1:1e7,1)
         tryCatch(main_shapeinvpp(SEED = SEED, 
                                  N_trial = N_trial,
-                                 N_subj = 100,
+                                 N_subj = 25,
                                  N_clus = 1, 
                                  N_component_true = 2,
                                  N_spks_total = 70,
@@ -96,7 +95,7 @@ for (timeshift_trial_max in timeshift_trial_max_list){
 }
 
 if(TRUE){
-  default_setting = paste0('N_spks_total=70,N_subj=100,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
+  default_setting = paste0('N_spks_total=70,N_subj=25,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -108,7 +107,7 @@ if(TRUE){
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_shapeinvpp(SEED = SEED, 
-                                 N_subj = 100,
+                                 N_subj = 25,
                                  N_clus = 1, 
                                  N_component_true = 2,
                                  N_spks_total = 70,
@@ -143,7 +142,7 @@ if(TRUE){
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_shapeinvpp(SEED = SEED, 
-                                 N_subj = 100,
+                                 N_subj = 25,
                                  N_clus = 1, 
                                  N_component_true = 2,
                                  N_spks_total = 70,
