@@ -11,6 +11,7 @@ main_fpca = function(### Parameters for generative model
                       t_vec_extend = t_vec,
                       N_spks_total = 1000,
                       timeshift_subj_max_vec = c(1/8, 1/32),
+                      key_times_vec = c(min(t_vec),0,max(t_vec)),
                       ### params when N_clus==4:
                       clus_sep = 2,
                       ### params when N_clus==1:
@@ -36,7 +37,7 @@ main_fpca = function(### Parameters for generative model
                     N_clus=N_clus, 
                     t_vec=t_vec,
                     t_vec_extend=t_vec_extend,
-                    key_times_vec = c(-1, 0, 1.5),
+                    key_times_vec = key_times_vec,
                     N_spks_total = N_spks_total,
                     timeshift_subj_max_vec = timeshift_subj_max_vec,
                     clus_sep = clus_sep,

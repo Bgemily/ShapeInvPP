@@ -37,7 +37,7 @@ save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Compare_methods_Nclus1_v2'
-method = 'fpca'
+method = 'fpca_hotfix'
 
 ### Parameters' possible values:
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*3, 
@@ -67,6 +67,7 @@ if (test_N_component_2){
                            timeshift_subj_max_vec = timeshift_subj_max_vec,
                            t_vec = seq(-1,1.5,0.01),
                            clus_sep = 1.4,
+                           key_times_vec = key_times_vec_list[[1]],
                            ### Parameters for algorithms
                            bw = 'SJ',
                            N_component = 2,
@@ -97,6 +98,7 @@ if (test_N_component_2){
                            N_spks_total = 70,
                            timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                            t_vec = seq(-1,1.5,0.01),
+                           key_times_vec = key_times_vec,
                            ### params when N_clus==4:
                            clus_sep = 1.4,
                            ### Parameters for algorithms
