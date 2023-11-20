@@ -18,8 +18,8 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_replicate_total = 20
-N_split = 2
+N_replicate_total = 200
+N_split = 20
 
 N_replicate = N_replicate_total/N_split
 
@@ -33,7 +33,7 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus1_v2.3'
+setup = 'Compare_methods_Nclus1_v2.4'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
