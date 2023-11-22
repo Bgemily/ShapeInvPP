@@ -33,14 +33,14 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus1_v2.4.1'
+setup = 'Compare_methods_Nclus1_v2.4.3'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
-timeshift_trial_max_list = list(0, 0.1, 0.2)
+timeshift_trial_max_list = list(0, 0.05, 0.1, 0.2)
 N_trial_list = list(1,2,3,4,5,6,7,8,9,10)
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2 )
-N_subj_list = list(25, 40, 55, 70, 85, 100, 115, 130, 145, 160)
+N_subj_list = list(25, 50, 75, 100, 125, 150, 175, 200, 225, 250)
 key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.04-0.2,1.5), c(-1,0.08-0.2,1.5),
                           c(-1,0.12-0.2,1.5), c(-1,0.16-0.2,1.5), c(-1,0.2-0.2,1.5))
 
@@ -145,7 +145,7 @@ for (use_true_timeshift in c(FALSE, TRUE)){
   }
 }
 if (TRUE) {
-  default_setting = paste0('N_trial=2,N_spks_total=50,N_subj=25,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
+  default_setting = paste0('N_trial=2,timeshift_trial_max=0.1,N_spks_total=50,N_subj=25,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -163,7 +163,7 @@ if (TRUE) {
                                  N_component_true = 2,
                                  N_spks_total = 50,
                                  timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                 timeshift_trial_max = 0.2,
+                                 timeshift_trial_max = 0.1,
                                  t_vec = seq(-1,1.5,0.01),
                                  ### params when N_clus==4:
                                  clus_sep = 1.4,
@@ -193,12 +193,12 @@ if (TRUE) {
   }
 }
 
-if(FALSE){
+if(TRUE){
   timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*3,
                                      c(1/32/4, 1/32)*4, c(1/32/4, 1/32)*5,
                                      c(1/32/4, 1/32)*6, c(1/32/4, 1/32)*7 )
   
-  default_setting = paste0('N_spks_total=1000,N_subj=100,N_clus=1,clus_sep=1.4,key_time_comp2=0')
+  default_setting = 'N_trial=2,timeshift_trial_max=0.05,N_spks_total=1000,N_subj=25,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -210,18 +210,20 @@ if(FALSE){
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_shapeinvpp(SEED = SEED, 
-                                 N_subj = 100,
+                                 N_trial = 2,
+                                 N_subj = 25,
                                  N_clus = 1, 
                                  N_component_true = 2,
                                  N_spks_total = 1000,
                                  timeshift_subj_max_vec = timeshift_subj_max_vec,
+                                 timeshift_trial_max = 0.05,
                                  t_vec = seq(-1,1.5,0.01),
                                  clus_sep = 1.4,
                                  ### Parameters for algorithms
                                  freq_trun = 10,
                                  gamma = 1,
                                  N_component = 2,
-                                 key_times_vec = c(-1,0,1.5),
+                                 key_times_vec = c(-1,0-0.2,1.5),
                                  fix_timeshift = FALSE,
                                  fix_membership = FALSE,
                                  save_center_pdf_array = save_center_pdf_array),
