@@ -71,9 +71,24 @@ main_fpca = function(### Parameters for generative model
   id_pp = 1
   for (id_subj in 1:N_subj){
     for (id_trial in 1:N_trial) {
-      res_smooth = density(unlist(spks_time_mlist[id_subj, id_trial]), bw = bw, from = min(t_vec), to = max(t_vec))
-      yList[[id_pp]] = res_smooth$y
-      tList[[id_pp]] = res_smooth$x
+      if (FALSE) {
+        res_smooth = density(unlist(spks_time_mlist[id_subj, id_trial]), bw = bw, from = min(t_vec), to = max(t_vec))
+        yList[[id_pp]] = res_smooth$y
+        tList[[id_pp]] = res_smooth$x
+      } else {
+        shift_curve = function(f_vec, t_vec, t_shift){
+          n0 = round(t_shift/(t_vec[2]-t_vec[1]))
+          f_vec_shifted = c(rep(head(f_vec,1), n0),
+                            head(f_vec,length(t_vec)-n0))
+          return(f_vec_shifted) }
+        density_true_comp1 = shift_curve(f_vec = center_density_array_true[mem_true_vec[id_subj], 1, ],
+                                           t_vec = t_vec, t_shift = v_true_mat_list[[1]][id_subj, id_trial] )
+        density_true_comp2 = shift_curve(f_vec = center_density_array_true[mem_true_vec[id_subj], 2, ],
+                                           t_vec = t_vec, t_shift = v_true_mat_list[[2]][id_subj, id_trial] )
+        density_true = density_true_comp1 + density_true_comp2
+        yList[[id_pp]] = density_true
+        tList[[id_pp]] = t_vec
+      }
       id_pp = id_pp + 1
     }
     
