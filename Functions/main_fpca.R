@@ -11,6 +11,7 @@ main_fpca = function(### Parameters for generative model
                       t_vec_extend = t_vec,
                       N_spks_total = 1000,
                       timeshift_subj_max_vec = c(1/8, 1/32),
+                      timeshift_trial_max = 1/8,
                       key_times_vec = c(min(t_vec),0,max(t_vec)),
                       ### params when N_clus==4:
                       clus_sep = 2,
@@ -40,6 +41,7 @@ main_fpca = function(### Parameters for generative model
                     key_times_vec = key_times_vec,
                     N_spks_total = N_spks_total,
                     timeshift_subj_max_vec = timeshift_subj_max_vec,
+                    timeshift_trial_max = timeshift_trial_max,
                     clus_sep = clus_sep,
                     N_spks_ratio = N_spks_ratio,
                     sd_shrinkage = sd_shrinkage,
@@ -66,10 +68,15 @@ main_fpca = function(### Parameters for generative model
   # Prepare data for FPCA ######
   yList = list()
   tList = list()
+  id_pp = 1
   for (id_subj in 1:N_subj){
-    res_smooth = density(spks_time_mlist[[id_subj]], bw = bw, from = min(t_vec), to = max(t_vec))
-    yList[[id_subj]] = res_smooth$y
-    tList[[id_subj]] = res_smooth$x
+    for (id_trial in 1:N_trial) {
+      res_smooth = density(unlist(spks_time_mlist[id_subj, id_trial]), bw = bw, from = min(t_vec), to = max(t_vec))
+      yList[[id_pp]] = res_smooth$y
+      tList[[id_pp]] = res_smooth$x
+      id_pp = id_pp + 1
+    }
+    
   }
   
   
