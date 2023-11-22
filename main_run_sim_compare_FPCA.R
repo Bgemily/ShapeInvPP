@@ -47,7 +47,7 @@ timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*3,
 #                           c(-1,0.21-0.2,1.5), c(-1,0.23-0.2,1.5), c(-1,0.25-0.2,1.5))
 
 if (test_N_component_2){
-  default_setting = 'N_trial=2,timeshift_trial_max=0.1,use_true_density,N_subj=25,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2'
+  default_setting = 'N_trial=2,timeshift_trial_max=0.05,use_true_density,N_subj=25,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -64,9 +64,9 @@ if (test_N_component_2){
                            N_subj = 25,
                            N_clus = 1,
                            N_component_true = 2,
-                           N_spks_total = 1000,
+                           N_spks_total = 100,
                            timeshift_subj_max_vec = timeshift_subj_max_vec,
-                           timeshift_trial_max = 0.1,
+                           timeshift_trial_max = 0.05,
                            t_vec = seq(-1,1.5,0.01),
                            clus_sep = 1.4,
                            key_times_vec = c(-1,0-0.2,1.5),
