@@ -36,7 +36,7 @@ test_N_component_2 = TRUE
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus1_v2.4.5'
+setup = 'Compare_methods_Nclus1_v3'
 method = 'fpca'
 
 ### Parameters' possible values:

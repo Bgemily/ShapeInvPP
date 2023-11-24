@@ -33,7 +33,7 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = TRUE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus1_v2.4.5'
+setup = 'Compare_methods_Nclus1_v3'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
@@ -43,7 +43,7 @@ timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2 )
 N_subj_list = list(25, 50, 75, 100, 125, 150, 175, 200, 225, 250)
 key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.04-0.2,1.5), c(-1,0.08-0.2,1.5),
                           c(-1,0.12-0.2,1.5), c(-1,0.16-0.2,1.5), c(-1,0.2-0.2,1.5))
-if (FALSE) {
+if (TRUE) {
   for (timeshift_trial_max in timeshift_trial_max_list){
     default_setting = paste0("timeshift_trial_max=",timeshift_trial_max,",", 
                              'N_spks_total=50,N_subj=25,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
