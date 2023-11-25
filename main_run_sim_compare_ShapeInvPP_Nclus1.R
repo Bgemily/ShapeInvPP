@@ -30,7 +30,7 @@ N_cores = 10
 doParallel::registerDoParallel(cores = N_cores)
 
 # Run simulations ---------------------------------------------------------
-save_res_details = TRUE
+save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Compare_methods_Nclus1_v3'
@@ -145,7 +145,7 @@ if (TRUE) {
     }
   }
   if (TRUE) {
-    default_setting = paste0('N_trial=2,timeshift_trial_max=0.1,N_spks_total=50,N_subj=25,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
+    default_setting = paste0('N_trial=2,N_spks_total=50,N_subj=25,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
     for (id_N_split in 1:N_split) {
       if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
@@ -163,7 +163,7 @@ if (TRUE) {
                                    N_component_true = 2,
                                    N_spks_total = 50,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                   timeshift_trial_max = 0.1,
+                                   timeshift_trial_max = 0.05,
                                    t_vec = seq(-1,1.5,0.01),
                                    ### params when N_clus==4:
                                    clus_sep = 1.4,
