@@ -192,7 +192,6 @@ main_shapeinvpp = function(### Parameters for generative model
     
     # Save results of N_clus_tmp ----------------------------------------------
     res_list[[ind_N_clus]] = res_best
-    
   }
   
 
@@ -222,7 +221,21 @@ main_shapeinvpp = function(### Parameters for generative model
   res$loss_history -> loss_history
   res$N_iteration -> N_iteration
   
-  
+  # Evaluate L2 loss and log-likelihood for the results of the best cluster number -----
+  tmp = evaluate_model(spks_time_mlist = spks_time_mlist, 
+                       v_trialwise_vec_list = v_trialwise_vec_list, 
+                       N_component = N_component, 
+                       key_times_vec = key_times_vec, 
+                       model_fitted_list = res,
+                       freq_trun = freq_trun)
+  log_lik = tmp$log_lik
+  log_lik_tmp_1 = tmp$log_lik_tmp_1
+  log_lik_tmp_2 = tmp$log_lik_tmp_2
+  clus_entropy = tmp$clus_entropy
+  L2_loss_part_1 = tmp$L2_loss_part_1
+  L2_loss_part_2 = tmp$L2_loss_part_2
+  L2_loss_part_1_smoothdensity = tmp$L2_loss_part_1_smoothdensity
+  compl_log_lik = tmp$compl_log_lik
   
   # Compute estimation error ------------------------------------------------
   if (N_clus_est == N_clus) {
@@ -430,6 +443,15 @@ main_shapeinvpp = function(### Parameters for generative model
               ARI_history = ARI_history,
               F_mean_sq_err_history = F_mean_sq_err_history,
               F_mse_squarel2_ratio_history = F_mse_squarel2_ratio_history,
+              # L2 loss and log-likelihood
+              log_lik = log_lik,
+              log_lik_tmp_1 = log_lik_tmp_1,
+              log_lik_tmp_2 = log_lik_tmp_2,
+              clus_entropy = clus_entropy,
+              L2_loss_part_1 = L2_loss_part_1,
+              L2_loss_part_2 = L2_loss_part_2,
+              L2_loss_part_1_smoothdensity = L2_loss_part_1_smoothdensity,
+              compl_log_lik = compl_log_lik,
               # other
               cand_N_clus_vec=cand_N_clus_vec,
               N_restart = N_restart,
