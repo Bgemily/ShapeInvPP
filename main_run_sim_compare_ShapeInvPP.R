@@ -31,7 +31,7 @@ doParallel::registerDoParallel(cores = N_cores)
 
 # Run simulations ---------------------------------------------------------
 test_N_component_2 = TRUE
-save_res_details = TRUE
+save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Compare_methods_Nclus4_v4'
