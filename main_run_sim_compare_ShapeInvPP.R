@@ -164,7 +164,7 @@ if (TRUE) {
           tryCatch(main_shapeinvpp(SEED = SEED, 
                                    N_trial = 2,
                                    N_subj = N_subj,
-                                   N_clus = 1, 
+                                   N_clus = 4, 
                                    N_component_true = 2,
                                    N_spks_total = 50,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
