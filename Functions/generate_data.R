@@ -61,8 +61,8 @@ generate_data = function(SEED=NULL,
   # Generate expected number of spikes --------------------------------------------
   center_N_spks_mat = matrix(nrow=N_clus,ncol=2)
   if (N_clus==1){
-    center_N_spks_mat[1,1] = N_spks_total*(1/(N_spks_ratio+1))
-    center_N_spks_mat[1,2] = 0 * N_spks_total*(N_spks_ratio/(N_spks_ratio+1))
+    center_N_spks_mat[1,1] = N_spks_total*0.7*0.5
+    center_N_spks_mat[1,2] = N_spks_total*0.7*0.5
   } else if (N_clus==4){
     center_N_spks_mat[1,1] = N_spks_total*0.7*0.5
     center_N_spks_mat[1,2] = N_spks_total*0.7*0.5
@@ -83,12 +83,13 @@ generate_data = function(SEED=NULL,
   # Generate spike density functions --------------------------------------------  
   center_density_array_true = array(dim = c(N_clus, 2, length(t_vec_extend)))
   if(N_clus==1){
-    s_tmp = 3/10; mu_tmp = -0.5; 
-    center_density_array_true[1,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec & t_vec<=mu_tmp+s_tmp) 
+    ## Clus 1
+    s_tmp = 1*(1/4)*(1); mu_tmp = -0.35; 
+    center_density_array_true[1,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
-    s_tmp = 1/5; mu_tmp = s_tmp; 
-    center_density_array_true[1,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend & t_vec_extend<=(mu_tmp+s_tmp)^2) 
-    center_density_array_true[1,2, ] = 0 * center_density_array_true[1,2, ]
+    s_tmp = sqrt(1)*(1/2/sqrt(2))*(1); mu_tmp = s_tmp
+    t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
+    center_density_array_true[1,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
     
     ### Add weights for two components
     center_density_array_true[1,1,] = center_density_array_true[1,1,]*center_N_spks_mat[1,1]/sum(center_N_spks_mat[1,1:2])
@@ -223,3 +224,4 @@ generate_data = function(SEED=NULL,
   ))
   
 }
+

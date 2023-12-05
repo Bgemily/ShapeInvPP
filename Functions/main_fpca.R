@@ -11,6 +11,8 @@ main_fpca = function(### Parameters for generative model
                       t_vec_extend = t_vec,
                       N_spks_total = 1000,
                       timeshift_subj_max_vec = c(1/8, 1/32),
+                      timeshift_trial_max = 1/8,
+                      key_times_vec = c(min(t_vec),0,max(t_vec)),
                       ### params when N_clus==4:
                       clus_sep = 2,
                       ### params when N_clus==1:
@@ -36,9 +38,10 @@ main_fpca = function(### Parameters for generative model
                     N_clus=N_clus, 
                     t_vec=t_vec,
                     t_vec_extend=t_vec_extend,
-                    key_times_vec = c(-1, 0, 1),
+                    key_times_vec = key_times_vec,
                     N_spks_total = N_spks_total,
                     timeshift_subj_max_vec = timeshift_subj_max_vec,
+                    timeshift_trial_max = timeshift_trial_max,
                     clus_sep = clus_sep,
                     N_spks_ratio = N_spks_ratio,
                     sd_shrinkage = sd_shrinkage,
@@ -65,10 +68,30 @@ main_fpca = function(### Parameters for generative model
   # Prepare data for FPCA ######
   yList = list()
   tList = list()
+  id_pp = 1
   for (id_subj in 1:N_subj){
-    res_smooth = density(spks_time_mlist[[id_subj]], bw = bw, from = min(t_vec), to = max(t_vec))
-    yList[[id_subj]] = res_smooth$y
-    tList[[id_subj]] = res_smooth$x
+    for (id_trial in 1:N_trial) {
+      if (FALSE) {
+        res_smooth = density(unlist(spks_time_mlist[id_subj, id_trial]), bw = bw, from = min(t_vec), to = max(t_vec))
+        yList[[id_pp]] = res_smooth$y
+        tList[[id_pp]] = res_smooth$x
+      } else {
+        shift_curve = function(f_vec, t_vec, t_shift){
+          n0 = round(t_shift/(t_vec[2]-t_vec[1]))
+          f_vec_shifted = c(rep(head(f_vec,1), n0),
+                            head(f_vec,length(t_vec)-n0))
+          return(f_vec_shifted) }
+        density_true_comp1 = shift_curve(f_vec = center_density_array_true[mem_true_vec[id_subj], 1, ],
+                                           t_vec = t_vec, t_shift = v_true_mat_list[[1]][id_subj, id_trial] )
+        density_true_comp2 = shift_curve(f_vec = center_density_array_true[mem_true_vec[id_subj], 2, ],
+                                           t_vec = t_vec, t_shift = v_true_mat_list[[2]][id_subj, id_trial] )
+        density_true = density_true_comp1 + density_true_comp2
+        yList[[id_pp]] = density_true
+        tList[[id_pp]] = t_vec
+      }
+      id_pp = id_pp + 1
+    }
+    
   }
   
   
@@ -155,13 +178,16 @@ main_fpca = function(### Parameters for generative model
       if (length(n0_init) == 0) {
         n0_init = 0
       }
+      f_target_array = array(data = f_target, dim = c(1,1,length(f_target)))
       f_origin_mat = matrix(density_est, nrow = 1)
-      n0 = align_multi_components(f_target = f_target,
+      n0 = align_multi_components(f_target_array = f_target_array,
                                   f_origin_mat = f_origin_mat,
+                                  n0_init_mat = as.matrix(n0_init),
+                                  v_trialwise_vec_list = list(c(0)),
+                                  N_spks_mat = as.matrix(c(1)),
                                   t_unit = t_unit, 
-                                  n0_vec = c(n0_init),
                                   n0_min_vec = -length(f_target) %/% 2,
-                                  n0_max_vec = length(f_target) %/% 2 )$n0_vec
+                                  n0_max_vec = length(f_target) %/% 2 )$n0_mat
       n0 = round(n0)
       if (n0 > 0) {
         density_est_shift = c(rep(0, n0), head(density_est, length(density_est) - n0) )
@@ -215,13 +241,16 @@ main_fpca = function(### Parameters for generative model
         if (length(n0_init) == 0) {
           n0_init = 0
         }
+        f_target_array = array(data = f_target, dim = c(1,1,length(f_target)))
         f_origin_mat = matrix(density_est, nrow = 1)
-        n0 = align_multi_components(f_target = f_target,
+        n0 = align_multi_components(f_target_array = f_target_array,
                                     f_origin_mat = f_origin_mat,
+                                    n0_init_mat = as.matrix(n0_init),
+                                    v_trialwise_vec_list = list(c(0)),
+                                    N_spks_mat = as.matrix(c(1)),
                                     t_unit = t_unit, 
-                                    n0_vec = c(n0_init),
                                     n0_min_vec = -length(f_target) %/% 2,
-                                    n0_max_vec = length(f_target) %/% 2 )$n0_vec
+                                    n0_max_vec = length(f_target) %/% 2 )$n0_mat
         n0 = round(n0)
         if (n0 > 0) {
           density_est_shift = c(rep(0, n0), head(density_est, length(density_est) - n0) )
