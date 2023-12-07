@@ -11,7 +11,7 @@ generate_data = function(SEED=NULL,
                          timeshift_subj_max_vec = c(1/8, 1/32),
                          timeshift_trial_max = 1/8,
                          ### params when N_clus==4:
-                         clus_sep = 2,
+                         clus_sep = 2-1,
                          ### params when N_clus==1:
                          N_spks_ratio = 3/2,
                          sd_shrinkage = 1,
@@ -64,19 +64,19 @@ generate_data = function(SEED=NULL,
     center_N_spks_mat[1,1] = N_spks_total*0.7*0.5
     center_N_spks_mat[1,2] = N_spks_total*0.7*0.5
   } else if (N_clus==4){
-    center_N_spks_mat[1,1] = N_spks_total*0.7*(0.5-(clus_sep-1)/4)
-    center_N_spks_mat[1,2] = N_spks_total*0.7*(0.5+(clus_sep-1)/4)
-    center_N_spks_mat[2,1] = N_spks_total*0.8*(1-clus_sep/2)
-    center_N_spks_mat[2,2] = N_spks_total*0.8*(clus_sep/2)
+    center_N_spks_mat[1,1] = N_spks_total*0.7*(0.5-(clus_sep)/4)
+    center_N_spks_mat[1,2] = N_spks_total*0.7*(0.5+(clus_sep)/4)
+    center_N_spks_mat[2,1] = N_spks_total*0.8*(0.5-clus_sep/2)
+    center_N_spks_mat[2,2] = N_spks_total*0.8*(0.5+clus_sep/2)
     if (TRUE){
-      center_N_spks_mat[3,1] = N_spks_total*0.9*(0.5+(clus_sep-1)/4)
-      center_N_spks_mat[3,2] = N_spks_total*0.9*(0.5-(clus_sep-1)/4)
+      center_N_spks_mat[3,1] = N_spks_total*0.9*(0.5+(clus_sep)/4)
+      center_N_spks_mat[3,2] = N_spks_total*0.9*(0.5-(clus_sep)/4)
     } else {
       center_N_spks_mat[3,1] = N_spks_total*0.9*0.5
       center_N_spks_mat[3,2] = N_spks_total*0.9*0.5
     }
-    center_N_spks_mat[4,1] = N_spks_total*(clus_sep/2)
-    center_N_spks_mat[4,2] = N_spks_total*(1-clus_sep/2)
+    center_N_spks_mat[4,1] = N_spks_total*(0.5+clus_sep/2)
+    center_N_spks_mat[4,2] = N_spks_total*(0.5-clus_sep/2)
   } 
   
   
@@ -151,11 +151,29 @@ generate_data = function(SEED=NULL,
     t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
     center_density_array_true[4,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
     
+    
     ### Add weights (prop to N_spks) for two components
     for (id_clus in 1:N_clus){
       center_density_array_true[id_clus,1,] = center_density_array_true[id_clus,1,]*center_N_spks_mat[id_clus,1]/sum(center_N_spks_mat[id_clus,1:2])
       center_density_array_true[id_clus,2,] = center_density_array_true[id_clus,2,]*center_N_spks_mat[id_clus,2]/sum(center_N_spks_mat[id_clus,1:2])
     }
+    ### Adjust Cluster 2 intensity components                        
+    if (TRUE){
+      s_tmp = 1*(0.25); mu_tmp = s_tmp; 
+      t_vec_extend_shift = t_vec_extend - (-0.2-0)
+      tmp_density = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
+      center_density_array_true[2,1, ] = center_density_array_true[2,1, ] + 0.4*tmp_density*min(clus_sep,0.5)
+      
+      s_tmp = 1*(0.25); mu_tmp = s_tmp; 
+      t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
+      tmp_density = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) + mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
+      center_density_array_true[2,2, ] = center_density_array_true[2,2, ] - 0.4*tmp_density*min(clus_sep,0.5)
+      
+      N_spks_current_clus_total = sum(center_N_spks_mat[2,1:2])
+      center_N_spks_mat[2,1] = sum(center_density_array_true[2,1, ]*t_unit) * N_spks_current_clus_total
+      center_N_spks_mat[2,2] = sum(center_density_array_true[2,2, ]*t_unit) * N_spks_current_clus_total
+    }
+    
     
   } 
   
@@ -166,6 +184,15 @@ generate_data = function(SEED=NULL,
     center_intensity_array_true[id_clus,2, ] = center_density_array_true[id_clus,2,]*sum(center_N_spks_mat[id_clus,1:2])    
   }
   
+  ### Add baseline intensity for all components
+  for (id_clus in 1:N_clus){
+    intensity_baseline = 10
+    center_intensity_array_true[id_clus,1, ] = intensity_baseline + center_intensity_array_true[id_clus,1, ] 
+    center_N_spks_mat[id_clus,1] = sum(center_intensity_array_true[id_clus,1, ]*t_unit)
+    
+    center_density_array_true[id_clus,1,] = center_intensity_array_true[id_clus,1, ] / sum(center_N_spks_mat[id_clus,1:2])
+    center_density_array_true[id_clus,2,] = center_intensity_array_true[id_clus,2, ] / sum(center_N_spks_mat[id_clus,1:2])
+  }
   
   # Generate spike times ---------------------------------------------
   rejection_sampling = function(density_vec, t_vec, N_sample){
