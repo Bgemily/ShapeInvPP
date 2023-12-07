@@ -64,10 +64,10 @@ generate_data = function(SEED=NULL,
     center_N_spks_mat[1,1] = N_spks_total*0.7*0.5
     center_N_spks_mat[1,2] = N_spks_total*0.7*0.5
   } else if (N_clus==4){
-    center_N_spks_mat[1,1] = N_spks_total*0.7*(0.5-(clus_sep)/4)
-    center_N_spks_mat[1,2] = N_spks_total*0.7*(0.5+(clus_sep)/4)
-    center_N_spks_mat[2,1] = N_spks_total*0.8*(0.5-clus_sep/2)
-    center_N_spks_mat[2,2] = N_spks_total*0.8*(0.5+clus_sep/2)
+    center_N_spks_mat[1,1] = N_spks_total*0.7*(0.5)
+    center_N_spks_mat[1,2] = N_spks_total*0.7*(0.5)
+    center_N_spks_mat[2,1] = N_spks_total*0.8*(0.5-max(0,clus_sep-0.5))
+    center_N_spks_mat[2,2] = N_spks_total*0.8*(0.5+max(0,clus_sep-0.5))
     if (TRUE){
       center_N_spks_mat[3,1] = N_spks_total*0.9*(0.5+(clus_sep)/4)
       center_N_spks_mat[3,2] = N_spks_total*0.9*(0.5-(clus_sep)/4)
@@ -186,7 +186,7 @@ generate_data = function(SEED=NULL,
   
   ### Add baseline intensity for all components
   for (id_clus in 1:N_clus){
-    intensity_baseline = 10
+    intensity_baseline = 20
     center_intensity_array_true[id_clus,1, ] = intensity_baseline + center_intensity_array_true[id_clus,1, ] 
     center_N_spks_mat[id_clus,1] = sum(center_intensity_array_true[id_clus,1, ]*t_unit)
     

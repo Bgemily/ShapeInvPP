@@ -34,7 +34,7 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus4_v4.1'
+setup = 'Compare_methods_Nclus4_v4.2'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
