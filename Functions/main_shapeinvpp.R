@@ -286,11 +286,21 @@ main_shapeinvpp = function(### Parameters for generative model
                                       t_unit = t_unit, 
                                       n0_min_vec = -length(f_target) %/% 2,
                                       n0_max_vec = length(f_target) %/% 2 )$n0_mat
-          n0 = round(n0)
+          n0 = round(n0) 
           if (n0 > 0) {
-            density_est_shift = c(rep(0, n0), head(density_est, length(density_est) - n0) )
+            if (FALSE) {
+              density_est_shift = c(rep(0, n0), head(density_est, length(density_est) - n0) )
+            } else {
+              density_est_shift = c(rep(head(density_est,1), n0), head(density_est, length(density_est) - n0) )
+            }
+            
           } else if (n0 < 0) {
-            density_est_shift = c(tail(density_est, length(density_est) - abs(n0)), rep(0, abs(n0)) )
+            if (FALSE) {
+              density_est_shift = c(tail(density_est, length(density_est) - abs(n0)), rep(0, abs(n0)) )
+            } else {
+              density_est_shift = c(tail(density_est, length(density_est) - abs(n0)), rep(tail(density_est,1), abs(n0)) )
+            }
+            
           } else if (n0 == 0) {
             density_est_shift = density_est
           }
