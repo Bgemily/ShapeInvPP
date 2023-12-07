@@ -18,8 +18,8 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_replicate_total = 20
-N_split = 2
+N_replicate_total = 10
+N_split = 1
 
 N_replicate = N_replicate_total/N_split
 
@@ -34,22 +34,22 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus4_v4'
+setup = 'Compare_methods_Nclus4_v4.1'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
 timeshift_trial_max_list = list(0, 0.05, 0.1, 0.2)
-N_trial_list = list(1,2,3,4,5,6,7,8,9,10)
+N_trial_list = list(1,3,5,7,9)
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2 )
-N_subj_list = list(100, 120, 140, 160, 180, 200)
+N_subj_list = list(40, 60, 80, 100, 120, 140)
 key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.04-0.2,1.5), c(-1,0.08-0.2,1.5),
                           c(-1,0.12-0.2,1.5), c(-1,0.16-0.2,1.5), c(-1,0.2-0.2,1.5))
-clus_sep_list = list(1.4, 1.5, 1.6, 1.7, 1.8, 1.9)
+clus_sep_list = list(0.5, 0.6, 0.7, 0.8, 0.9)
 
 if (TRUE) {
   for (timeshift_trial_max in timeshift_trial_max_list) {
     default_setting = paste0("timeshift_trial_max=",timeshift_trial_max,",", 
-                             'N_spks_total=50,N_subj=100,N_clus=4,clus_sep=1.4,key_time_comp2=-0.2')
+                             'N_spks_total=50,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
     for (id_N_split in 1:N_split){
       if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
@@ -70,7 +70,7 @@ if (TRUE) {
                                    timeshift_trial_max = timeshift_trial_max,
                                    t_vec = seq(-1,1.5,0.01),
                                    ### params when N_clus==4:
-                                   clus_sep = 1.4,
+                                   clus_sep = 0.5,
                                    ### Parameters for algorithms
                                    freq_trun = 10,
                                    gamma = 1,
@@ -101,7 +101,7 @@ if (TRUE) {
 if (TRUE) {
   for (use_true_timeshift in c(FALSE, TRUE)){
     default_setting = paste0("use_true_timeshift_", use_true_timeshift,",", 
-                             'N_spks_total=50,N_subj=100,N_clus=4,clus_sep=1.4,key_time_comp2=-0.2')
+                             'N_spks_total=50,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
     for (id_N_split in 1:N_split) {
       if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
@@ -122,7 +122,7 @@ if (TRUE) {
                                    timeshift_trial_max = 0,
                                    t_vec = seq(-1,1.5,0.01),
                                    ### params when N_clus==4:
-                                   clus_sep = 1.4,
+                                   clus_sep = 0.5,
                                    ### Parameters for algorithms
                                    freq_trun = 10,
                                    gamma = 1,
@@ -150,7 +150,7 @@ if (TRUE) {
     }
   }
   if (TRUE) {
-    default_setting = paste0('N_trial=2,N_spks_total=50,N_subj=100,N_clus=4,clus_sep=1.4,key_time_comp2=-0.2')
+    default_setting = paste0('N_trial=2,N_spks_total=50,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
     for (id_N_split in 1:N_split) {
       if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
@@ -171,7 +171,7 @@ if (TRUE) {
                                    timeshift_trial_max = 0.05,
                                    t_vec = seq(-1,1.5,0.01),
                                    ### params when N_clus==4:
-                                   clus_sep = 1.4,
+                                   clus_sep = 0.5,
                                    ### Parameters for algorithms
                                    freq_trun = 10,
                                    gamma = 1,
@@ -200,7 +200,7 @@ if (TRUE) {
 }
 
 if (TRUE) {
-  default_setting = 'N_trial=1,N_spks_total=50,N_subj=100,N_clus=4,clus_sep=1.4,key_time_comp2=-0.2'
+  default_setting = 'N_trial=1,N_spks_total=50,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
