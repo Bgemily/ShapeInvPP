@@ -71,7 +71,7 @@ if (TRUE) {
                                    key_times_vec = key_times_vec_list[[1]],
                                    ### Parameters for algorithms
                                    bw = 'SJ',
-                                   N_component = 2,
+                                   N_component = 1,
                                    save_center_pdf_array = save_center_pdf_array),
                  error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
       }
