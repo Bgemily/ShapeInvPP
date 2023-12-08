@@ -17,8 +17,8 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_replicate_total = 10
-N_split = 1
+N_replicate_total = 200
+N_split = 20
 
 N_replicate = N_replicate_total/N_split
 
@@ -41,7 +41,7 @@ freq_trun_vec = c(1,2,3,4,5,6,7,8,9,10)
 gamma_vec = 10^c(-2,-1.5,-1,-0.5,0,0.5,1)
 
 if (TRUE) {
-  default_setting = 'N_trial=1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'N_trial=1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.9,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -60,7 +60,7 @@ if (TRUE) {
                                  timeshift_subj_max_vec = c(1/32/4, 1/32)*2,
                                  ### params when N_clus==4:
                                  N_spks_total = 150,
-                                 clus_sep = 0.5,
+                                 clus_sep = 0.9,
                                  ### Parameters for algorithms
                                  freq_trun = 5,
                                  gamma = gamma,
@@ -137,7 +137,7 @@ if (FALSE) {
 }
 
 if (TRUE) {
-  default_setting = 'N_trial=1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'N_trial=1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.9,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -156,7 +156,7 @@ if (TRUE) {
                                  timeshift_subj_max_vec = c(1/32/4, 1/32)*2,
                                  ### params when N_clus==4:
                                  N_spks_total = 150,
-                                 clus_sep = 0.5,
+                                 clus_sep = 0.9,
                                  ### Parameters for algorithms
                                  freq_trun = freq_trun,
                                  gamma = 1,
