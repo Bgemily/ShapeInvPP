@@ -19,8 +19,8 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_replicate_total = 200
-N_split = 20
+N_replicate_total = 10
+N_split = 1
 
 N_replicate = N_replicate_total/N_split
 
@@ -36,20 +36,20 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus4_v4'
+setup = 'Compare_methods_Nclus4_v4.2'
 method = 'kmeans_align'
 
 ### Parameters' possible values:
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*3, 
                                    c(1/32/4, 1/32)*4, c(1/32/4, 1/32)*5,
                                    c(1/32/4, 1/32)*6, c(1/32/4, 1/32)*7)
-N_subj_list = list(100, 120, 140, 160, 180, 200)
+N_subj_list = list(40, 60, 80, 100, 120, 140)
 key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.02-0.2,1.5), c(-1,0.04-0.2,1.5), 
                           c(-1,0.06-0.2,1.5), c(-1,0.08-0.2,1.5), c(-1,0.1-0.2,1.5))
-clus_sep_list = list(1.4, 1.5, 1.6, 1.7, 1.8, 1.9)
+clus_sep_list = list(0.5, 0.6, 0.7, 0.8, 0.9)
 
 if (TRUE) {
-  default_setting = 'N_trial=1,N_spks_total=50,N_subj=100,N_clus=4,clus_sep=1.4,key_time_comp2=-0.2'
+  default_setting = 'N_trial=1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -64,7 +64,7 @@ if (TRUE) {
                                    N_subj = N_subj_list[[1]],
                                    N_clus = 4, 
                                    N_component_true = 2,
-                                   N_spks_total = 50,
+                                   N_spks_total = 150,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                                    t_vec = seq(-1,1.5,0.01),
                                    clus_sep = clus_sep,
