@@ -17,8 +17,8 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_replicate_total = 20
-N_split = 2
+N_replicate_total = 10
+N_split = 1
 
 N_replicate = N_replicate_total/N_split
 
@@ -33,15 +33,15 @@ registerDoParallel(cores=N_cores)
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'sensitivity_anal_v3'
+setup = 'sensitivity_anal_v3.1'
 method = 'ShapeInvPP'
 
 ### Parameters' possible values:
-freq_trun_vec = c(1,5,10,15,20,25,30)
-gamma_vec = c(0.01, 0.03, 0.1, 0.3, 1, 3, 10)
+freq_trun_vec = c(1,2,3,4,5,6,7,8,9,10)
+gamma_vec = 10^c(-2,-1.5,-1,-0.5,0,0.5,1)
 
 if (TRUE) {
-  default_setting = 'N_trial=1,N_spks_total=50,N_subj=100,clus_sep=1.4'
+  default_setting = 'N_trial=1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -53,16 +53,16 @@ if (TRUE) {
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_shapeinvpp(SEED = SEED,
-                                 N_subj = 100,
+                                 N_subj = 40,
                                  N_clus = 4,
                                  N_component_true = 2,
                                  t_vec = seq(-1, 1.5, by=0.01),
                                  timeshift_subj_max_vec = c(1/32/4, 1/32)*2,
                                  ### params when N_clus==4:
-                                 N_spks_total = 50,
-                                 clus_sep = 1.4,
+                                 N_spks_total = 150,
+                                 clus_sep = 0.5,
                                  ### Parameters for algorithms
-                                 freq_trun = 10,
+                                 freq_trun = 5,
                                  gamma = gamma,
                                  N_component = 2,
                                  key_times_vec = c(-1,0-0.2,1.5),
@@ -87,7 +87,7 @@ if (TRUE) {
   }
 }
 
-if (TRUE) {
+if (FALSE) {
   default_setting = 'N_trial=10,timeshift_trial_max=0.2,N_spks_total=50,N_subj=100,clus_sep=1.4'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
@@ -136,8 +136,8 @@ if (TRUE) {
   }
 }
 
-if (FALSE) {
-  default_setting = 'N_spks_total=50,N_subj=100,clus_sep=1.4'
+if (TRUE) {
+  default_setting = 'N_trial=1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -149,14 +149,14 @@ if (FALSE) {
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_shapeinvpp(SEED = SEED,
-                                 N_subj = 100,
+                                 N_subj = 40,
                                  N_clus = 4,
                                  N_component_true = 2,
                                  t_vec = seq(-1, 1.5, by=0.01),
                                  timeshift_subj_max_vec = c(1/32/4, 1/32)*2,
                                  ### params when N_clus==4:
-                                 N_spks_total = 50,
-                                 clus_sep = 1.4,
+                                 N_spks_total = 150,
+                                 clus_sep = 0.5,
                                  ### Parameters for algorithms
                                  freq_trun = freq_trun,
                                  gamma = 1,
