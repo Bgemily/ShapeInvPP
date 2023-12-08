@@ -49,7 +49,7 @@ clus_sep_list = list(0.5, 0.6, 0.7, 0.8, 0.9)
 if (TRUE) {
   for (timeshift_trial_max in timeshift_trial_max_list) {
     default_setting = paste0("timeshift_trial_max=",timeshift_trial_max,",", 
-                             'N_spks_total=50,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
+                             'N_spks_total=100,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
     for (id_N_split in 1:N_split){
       if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
@@ -65,7 +65,7 @@ if (TRUE) {
                                    N_subj = N_subj_list[[1]],
                                    N_clus = 4, 
                                    N_component_true = 2,
-                                   N_spks_total = 50,
+                                   N_spks_total = 100,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                                    timeshift_trial_max = timeshift_trial_max,
                                    t_vec = seq(-1,1.5,0.01),
@@ -101,7 +101,7 @@ if (TRUE) {
 if (TRUE) {
   for (use_true_timeshift in c(FALSE, TRUE)){
     default_setting = paste0("use_true_timeshift_", use_true_timeshift,",", 
-                             'N_spks_total=50,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
+                             'N_spks_total=100,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
     for (id_N_split in 1:N_split) {
       if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
@@ -117,7 +117,7 @@ if (TRUE) {
                                    N_subj = N_subj,
                                    N_clus = 4, 
                                    N_component_true = 2,
-                                   N_spks_total = 50,
+                                   N_spks_total = 100,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                                    timeshift_trial_max = 0,
                                    t_vec = seq(-1,1.5,0.01),
@@ -150,7 +150,7 @@ if (TRUE) {
     }
   }
   if (TRUE) {
-    default_setting = paste0('N_trial=2,N_spks_total=50,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
+    default_setting = paste0('N_trial=2,N_spks_total=100,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
     for (id_N_split in 1:N_split) {
       if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
@@ -166,7 +166,7 @@ if (TRUE) {
                                    N_subj = N_subj,
                                    N_clus = 4, 
                                    N_component_true = 2,
-                                   N_spks_total = 50,
+                                   N_spks_total = 100,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                                    timeshift_trial_max = 0.05,
                                    t_vec = seq(-1,1.5,0.01),
@@ -200,7 +200,7 @@ if (TRUE) {
 }
 
 if (TRUE) {
-  default_setting = 'N_trial=1,N_spks_total=50,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'N_trial=1,N_spks_total=100,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -215,7 +215,7 @@ if (TRUE) {
                                  N_subj = N_subj_list[[1]],
                                  N_clus = 4, 
                                  N_component_true = 2,
-                                 N_spks_total = 50,
+                                 N_spks_total = 100,
                                  timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                                  t_vec = seq(-1,1.5,0.01),
                                  clus_sep = clus_sep,
