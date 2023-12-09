@@ -33,14 +33,14 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Init_compr_v4'
-default_setting = 'timeshift_trial_max=0.2,N_spks_total=50,N_subj=100,N_clus=4,clus_sep=1.4,key_time_comp2=-0.2'
+setup = 'Init_compr_v4.1'
+default_setting = 'timeshift_trial_max=0.2,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
 
 ### Parameters' possible values:
 N_restart_algo_list = list(1, 3, 5)
 N_trial_list = list(1,2,3,4,5,6,7,8,9,10)
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2 )
-N_subj_list = list(100 )
+N_subj_list = list(40 )
 key_times_vec_list = list(c(-1,0-0.2,1.5) )
 
 
@@ -63,12 +63,12 @@ for (id_N_restart in 1:length(N_restart_algo_list)){
                                  N_subj = N_subj_list[[1]],
                                  N_clus = 4, 
                                  N_component_true = 2,
-                                 N_spks_total = 50,
+                                 N_spks_total = 150,
                                  timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                                  timeshift_trial_max = 0.2,
                                  t_vec = seq(-1,1.5,0.01),
                                  ### params when N_clus==4:
-                                 clus_sep = 1.4,
+                                 clus_sep = 0.5,
                                  ### Parameters for algorithms
                                  rand_init = FALSE,
                                  N_restart = N_restart,
@@ -118,12 +118,12 @@ for (id_N_restart in 1:length(N_restart_algo_list)){
                                  N_subj = N_subj_list[[1]],
                                  N_clus = 4, 
                                  N_component_true = 2,
-                                 N_spks_total = 50,
+                                 N_spks_total = 150,
                                  timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                                  timeshift_trial_max = 0.2,
                                  t_vec = seq(-1,1.5,0.01),
                                  ### params when N_clus==4:
-                                 clus_sep = 1.4,
+                                 clus_sep = 0.5,
                                  ### Parameters for algorithms
                                  rand_init = TRUE,
                                  N_restart = N_restart,
