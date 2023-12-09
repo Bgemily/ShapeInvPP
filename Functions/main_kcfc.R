@@ -75,10 +75,39 @@ main_kcfc = function(### Parameters for generative model
   
   ### Apply kCFC --------------------------------
   time_start = Sys.time()
-  kcfcObj = fdapace::kCFC(y = yList, t = tList, k = N_clus, 
-                 kSeed = 123, maxIter = 20,
-                 optnsSW = list(dataType='Dense', maxK=N_component, FVEthreshold = 1), 
-                 optnsCS = list(dataType='Dense', maxK=N_component, FVEthreshold = 1))
+  if (FALSE) {
+    kcfcObj = fdapace::kCFC(y = yList, t = tList, k = N_clus, 
+                            kSeed = 123, maxIter = 50,
+                            optnsSW = list(dataType='Dense', maxK=N_component, FVEthreshold = 1), 
+                            optnsCS = list(dataType='Dense', maxK=N_component, FVEthreshold = 1))
+    
+  } else {
+    max_attempts <- 5  # You can adjust the number of maximum attempts as needed
+    
+    for (attempt in 1:max_attempts) {
+      tryCatch({
+        # Your original code with kSeed incremented by 1
+        kcfcObj <- fdapace::kCFC(y = yList, t = tList, k = N_clus, 
+                                 kSeed = 123 + attempt - 1, maxIter = 20,
+                                 optnsSW = list(dataType='Dense', maxK=N_component, FVEthreshold = 1), 
+                                 optnsCS = list(dataType='Dense', maxK=N_component, FVEthreshold = 1))
+        
+        # If no error, break out of the loop
+        break
+      }, error = function(e) {
+        # Print the error (you can customize this part)
+        cat(sprintf("Attempt %d failed with error: %s\n", attempt, conditionMessage(e)))
+        
+        if (attempt == max_attempts) {
+          stop("Maximum number of attempts reached. Exiting.")
+        }
+        
+        # Increment the kSeed for the next attempt
+        cat("Retrying with a different kSeed...\n")
+      })
+    }
+    
+  }
   time_end = Sys.time()
   time_estimation = time_end - time_start
   time_estimation = as.numeric(time_estimation, units='secs')

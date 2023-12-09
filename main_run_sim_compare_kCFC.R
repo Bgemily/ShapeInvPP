@@ -36,18 +36,18 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus4_v4.2.1'
+setup = 'Compare_methods_Nclus4_v4.2.2'
 method = 'kcfc'
 
 ### Parameters' possible values:
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2 )
-N_subj_list = list(60, 80, 100, 120, 140)
+N_subj_list = list(40, 60, 80, 100, 120, 140)
 key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.04-0.2,1.5), c(-1,0.08-0.2,1.5),
                           c(-1,0.12-0.2,1.5), c(-1,0.16-0.2,1.5), c(-1,0.2-0.2,1.5))
 clus_sep_list = list(0.5, 0.6, 0.7, 0.8, 0.9)
 
 if (TRUE) {
-  default_setting = 'N_trial=1,N_spks_total=150,N_subj=60,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'N_trial=1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
