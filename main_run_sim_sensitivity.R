@@ -41,7 +41,7 @@ freq_trun_vec = c(2,4,6,8,10,12,14,16)
 gamma_vec = 10^c(-2,-1.5,-1,-0.5,0,0.5,1)
 
 if (TRUE) {
-  default_setting = 'N_trial=2,timeshift_trial_max=0.05,N_spks_total=150,N_subj=60,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'N_trial=2,timeshift_trial_max=0.05,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -54,7 +54,7 @@ if (TRUE) {
         SEED = sample(1:1e7,1)
         tryCatch(main_shapeinvpp(SEED = SEED,
                                  N_trial = 2,
-                                 N_subj = 60,
+                                 N_subj = 40,
                                  N_clus = 4,
                                  N_component_true = 2,
                                  t_vec = seq(-1, 1.5, by=0.01),
@@ -90,7 +90,7 @@ if (TRUE) {
 }
 
 if (TRUE) {
-  default_setting = 'N_trial=2,timeshift_trial_max=0.05,N_spks_total=150,N_subj=60,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'N_trial=2,timeshift_trial_max=0.05,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -103,7 +103,7 @@ if (TRUE) {
         SEED = sample(1:1e7,1)
         tryCatch(main_shapeinvpp(SEED = SEED,
                                  N_trial = 2,
-                                 N_subj = 60,
+                                 N_subj = 40,
                                  N_clus = 4,
                                  N_component_true = 2,
                                  t_vec = seq(-1, 1.5, by=0.01),
