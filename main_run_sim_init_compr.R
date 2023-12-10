@@ -34,7 +34,7 @@ save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Init_compr_v4.1'
-default_setting = 'timeshift_trial_max=0.2,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+default_setting = 'timeshift_trial_max=0.05,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
 
 ### Parameters' possible values:
 N_restart_algo_list = list(1, 3, 5)
@@ -65,7 +65,7 @@ for (id_N_restart in 1:length(N_restart_algo_list)){
                                  N_component_true = 2,
                                  N_spks_total = 150,
                                  timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                 timeshift_trial_max = 0.2,
+                                 timeshift_trial_max = 0.05,
                                  t_vec = seq(-1,1.5,0.01),
                                  ### params when N_clus==4:
                                  clus_sep = 0.5,
@@ -120,7 +120,7 @@ for (id_N_restart in 1:length(N_restart_algo_list)){
                                  N_component_true = 2,
                                  N_spks_total = 150,
                                  timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                 timeshift_trial_max = 0.2,
+                                 timeshift_trial_max = 0.05,
                                  t_vec = seq(-1,1.5,0.01),
                                  ### params when N_clus==4:
                                  clus_sep = 0.5,
