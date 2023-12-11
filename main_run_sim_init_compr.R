@@ -106,7 +106,7 @@ if (FALSE) {
 if (TRUE) {
   for (id_N_restart in 1:length(N_restart_algo_list)){
     N_restart = N_restart_algo_list[[id_N_restart]]
-    method = paste0('shape_inv_pp_', 'naive_init_Nrestart_algo', as.character(N_restart) )
+    method = paste0('shape_inv_pp_', 'rand_init_v2_Nrestart_algo', as.character(N_restart) )
     for (id_N_split in 1:N_split) {
       if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE

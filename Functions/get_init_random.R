@@ -58,7 +58,8 @@ get_init_random = function(spks_time_mlist,
         }
         
         if (TRUE) {
-          v_subjwise_vec_list[[id_component]][id_subj] = 0
+          v_subjwise_vec_list[[id_component]][id_subj] = runif(n = 1, min = min(t_vec), 
+                                                               max = quantile(spks_time_shifted_vec, 0.05) )
         } else {
           if (length(spks_time_shifted_vec) > 0) {
             v_subjwise_vec_list[[id_component]][id_subj] = quantile(spks_time_shifted_vec, 0.0) 
