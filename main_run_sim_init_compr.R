@@ -17,8 +17,8 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_replicate_total = 10
-N_split = 1
+N_replicate_total = 20
+N_split = 2
 
 N_replicate = N_replicate_total/N_split
 
@@ -33,7 +33,7 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Init_compr_v4.1'
+setup = 'Init_compr_v4.2'
 default_setting = 'timeshift_trial_max=0.2,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
 
 ### Parameters' possible values:
@@ -45,7 +45,7 @@ key_times_vec_list = list(c(-1,0-0.2,1.5) )
 
 
 # Test proposed init scheme -----
-if (FALSE) {
+if (TRUE) {
   for (id_N_restart in 1:length(N_restart_algo_list)){
     N_restart = N_restart_algo_list[[id_N_restart]]
     method = paste0('shape_inv_pp_', 'our_init_Nrestart_algo', as.character(N_restart) )
@@ -58,7 +58,7 @@ if (FALSE) {
       for (id_N_trial in 1:length(N_trial_list)) {
         N_trial = N_trial_list[[id_N_trial]]
         results <- foreach(j = 1:N_replicate) %dopar% {
-          SEED = 100*id_N_split + j
+          SEED = sample(1:10000000,1)
           tryCatch(main_shapeinvpp(SEED = SEED, 
                                    N_trial = N_trial,
                                    N_subj = N_subj_list[[1]],
