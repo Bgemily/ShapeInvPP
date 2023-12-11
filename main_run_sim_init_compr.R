@@ -17,8 +17,8 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_replicate_total = 20
-N_split = 2
+N_replicate_total = 200
+N_split = 20
 
 N_replicate = N_replicate_total/N_split
 
@@ -33,7 +33,7 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Init_compr_v4.2'
+setup = 'Init_compr_v4.3'
 default_setting = 'timeshift_trial_max=0.2,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
 
 ### Parameters' possible values:
