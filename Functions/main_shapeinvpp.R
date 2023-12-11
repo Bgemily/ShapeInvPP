@@ -317,12 +317,19 @@ main_shapeinvpp = function(### Parameters for generative model
       })
       F_mse_squarel2_ratio_mat =  dist_mse_mat / F_l2_squared_norm_mat 
       F_mse_squarel2_ratio = sum( rowMeans(F_mse_squarel2_ratio_mat) * weight_vec )
+      F_l2_squared_norm_mat_2 = apply(center_density_array_est_permn, 1:2, function(density){
+        sum(density^2 * t_unit)
+      })
+      F_mse_squarel2_ratio_mat_2 =  dist_mse_mat / F_l2_squared_norm_mat_2 
+      F_mse_squarel2_ratio_2 = sum( rowMeans(F_mse_squarel2_ratio_mat_2) * weight_vec )
       
       return(list(dist_mse_mat = dist_mse_mat,
                   F_mean_sq_err = F_mean_sq_err,
                   F_mean_sq_err_vec = F_mean_sq_err_vec,
                   F_mse_squarel2_ratio = F_mse_squarel2_ratio,
-                  F_mse_squarel2_ratio_mat = F_mse_squarel2_ratio_mat))
+                  F_mse_squarel2_ratio_mat = F_mse_squarel2_ratio_mat,
+                  F_mse_squarel2_ratio_2 = F_mse_squarel2_ratio_2,
+                  F_mse_squarel2_ratio_mat_2 = F_mse_squarel2_ratio_mat_2))
     }
     
     N_component_true = dim(center_density_array_true)[2]
@@ -339,9 +346,12 @@ main_shapeinvpp = function(### Parameters for generative model
       F_mean_sq_err_vec = tmp$F_mean_sq_err_vec
       F_mse_squarel2_ratio = tmp$F_mse_squarel2_ratio
       F_mse_squarel2_ratio_mat = tmp$F_mse_squarel2_ratio_mat
+      F_mse_squarel2_ratio_2 = tmp$F_mse_squarel2_ratio_2
+      F_mse_squarel2_ratio_mat_2 = tmp$F_mse_squarel2_ratio_mat_2
       
       F_mean_sq_err_history = c()
       F_mse_squarel2_ratio_history = c()
+      F_mse_squarel2_ratio_history_2 = c()
       for (id_iteration in 1:length(center_density_array_history)){
         tmp = calculate_F_mse_ratio(N_clus = N_clus, N_component = N_component, 
                                     clusters_list_true = data_generated$clus_true_list,
@@ -352,6 +362,7 @@ main_shapeinvpp = function(### Parameters for generative model
                                     t_unit = t_unit)
         F_mean_sq_err_history[id_iteration] = tmp$F_mean_sq_err
         F_mse_squarel2_ratio_history[id_iteration] = tmp$F_mse_squarel2_ratio
+        F_mse_squarel2_ratio_history_2[id_iteration] = tmp$F_mse_squarel2_ratio_2
       }
       
     } else {
@@ -359,6 +370,9 @@ main_shapeinvpp = function(### Parameters for generative model
       F_mse_squarel2_ratio_mat = dist_mse_mat = NA
       F_mean_sq_err_history = NA
       F_mse_squarel2_ratio_history = NA
+      F_mse_squarel2_ratio_2 = NA
+      F_mse_squarel2_ratio_mat_2 = NA
+      F_mse_squarel2_ratio_history_2 = NA
     }
     
     # Compute errors of clusters, i.e. Z ------------------------------------
@@ -409,6 +423,9 @@ main_shapeinvpp = function(### Parameters for generative model
     ARI_history = NA
     F_mean_sq_err_history = NA
     F_mse_squarel2_ratio_history = NA
+    F_mse_squarel2_ratio_2 = NA
+    F_mse_squarel2_ratio_mat_2 = NA
+    F_mse_squarel2_ratio_history_2 = NA
   }
   
   
@@ -453,6 +470,9 @@ main_shapeinvpp = function(### Parameters for generative model
               ARI_history = ARI_history,
               F_mean_sq_err_history = F_mean_sq_err_history,
               F_mse_squarel2_ratio_history = F_mse_squarel2_ratio_history,
+              F_mse_squarel2_ratio_2 = F_mse_squarel2_ratio_2,
+              F_mse_squarel2_ratio_mat_2 = F_mse_squarel2_ratio_mat_2,
+              F_mse_squarel2_ratio_history_2 = F_mse_squarel2_ratio_history_2,
               # L2 loss and log-likelihood
               log_lik = log_lik,
               log_lik_tmp_1 = log_lik_tmp_1,

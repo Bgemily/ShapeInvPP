@@ -299,7 +299,12 @@ main_kcfc = function(### Parameters for generative model
     })
     F_mse_squarel2_ratio_mat =  dist_mse_mat / F_l2_squared_norm_mat 
     F_mse_squarel2_ratio = sum( rowMeans(F_mse_squarel2_ratio_mat) * weight_vec )
-
+    F_l2_squared_norm_mat_2 = apply(center_density_array_est_permn, 1:2, function(density){
+      sum(density^2 * t_unit)
+    })
+    F_mse_squarel2_ratio_mat_2 =  dist_mse_mat / F_l2_squared_norm_mat_2 
+    F_mse_squarel2_ratio_2 = sum( rowMeans(F_mse_squarel2_ratio_mat_2) * weight_vec )
+    
 
     # Compute errors of clusters, i.e. Z ------------------------------------
     ARI = get_one_ARI(memb_est_vec = clus2mem(clusters_list_est), 
@@ -367,6 +372,8 @@ main_kcfc = function(### Parameters for generative model
               v_mean_sq_err=v_mean_sq_err,
               v_mean_sq_err_vec=v_mean_sq_err_vec,
               v_align_mean_sq_err = v_align_mean_sq_err,
+              F_mse_squarel2_ratio_mat_2 =  F_mse_squarel2_ratio_mat_2, 
+              F_mse_squarel2_ratio_2 = F_mse_squarel2_ratio_2,
               # other
               cand_N_clus_vec=NA,
               N_restart = NA,
