@@ -36,7 +36,7 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus4_v4.3'
+setup = 'Compare_methods_Nclus4_v4.3.1'
 method = 'kmeans_align'
 
 ### Parameters' possible values:

@@ -88,7 +88,7 @@ main_kcfc = function(### Parameters for generative model
       tryCatch({
         # Your original code with kSeed incremented by 1
         kcfcObj <- fdapace::kCFC(y = yList, t = tList, k = N_clus, 
-                                 kSeed = 123 + attempt - 1, maxIter = 20,
+                                 kSeed = 123 + attempt - 1, maxIter = 50,
                                  optnsSW = list(dataType='Dense', maxK=N_component, FVEthreshold = 1), 
                                  optnsCS = list(dataType='Dense', maxK=N_component, FVEthreshold = 1))
         
