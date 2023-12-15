@@ -194,7 +194,6 @@ main_shapeinvpp = function(### Parameters for generative model
     res_list[[ind_N_clus]] = res_best
   }
   
-
   # Select best cluster number using ICL ------------------------------------
   res_select_model = select_model(spks_time_mlist = spks_time_mlist, 
                                   N_component = N_component,
@@ -332,12 +331,19 @@ main_shapeinvpp = function(### Parameters for generative model
                   F_mse_squarel2_ratio_mat_2 = F_mse_squarel2_ratio_mat_2))
     }
     
+    center_density_array_true_rmv_baseline = center_density_array_true
+    for (id_clus in 1:N_clus) {
+      id_component = 1
+      baseline = head(center_density_array_true[id_clus, id_component, ],1)
+      center_density_array_true_rmv_baseline[id_clus, id_component, ] = center_density_array_true[id_clus, id_component, ] - baseline
+    }
+    
     N_component_true = dim(center_density_array_true)[2]
     if (N_component == N_component_true) {
       tmp = calculate_F_mse_ratio(N_clus = N_clus, N_component = N_component, 
                                   clusters_list_true = data_generated$clus_true_list,
                                   clusters_list_est = clusters_list_est,
-                                  center_density_array_true = center_density_array_true, 
+                                  center_density_array_true = center_density_array_true_rmv_baseline, 
                                   center_density_array_est = center_density_array_est, 
                                   t_vec = t_vec, 
                                   t_unit = t_unit)
@@ -356,7 +362,7 @@ main_shapeinvpp = function(### Parameters for generative model
         tmp = calculate_F_mse_ratio(N_clus = N_clus, N_component = N_component, 
                                     clusters_list_true = data_generated$clus_true_list,
                                     clusters_list_est = clusters_history[[id_iteration]],
-                                    center_density_array_true = center_density_array_true, 
+                                    center_density_array_true = center_density_array_true_rmv_baseline, 
                                     center_density_array_est = center_density_array_history[[id_iteration]], 
                                     t_vec = t_vec, 
                                     t_unit = t_unit)
