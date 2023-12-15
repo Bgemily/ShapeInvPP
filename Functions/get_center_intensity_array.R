@@ -111,11 +111,11 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       }
       
       ### Force densities to be zero before their starting time to fix non-identifiability issue due to small variance of time shifts
-      if (FALSE & N_component >= 2) {
-        for (id_component in 1:N_component) {
+      if (N_component >= 2) {
+        for (id_component in 2:N_component) {
           index_before_start = which(t_vec <= key_times_vec[id_component])
           density_q_before_start = density_q_mat[id_component, index_before_start]
-          density_baseline = density_baseline + mean(density_q_before_start)
+          density_q_mat[1, index_before_start] = density_q_mat[1, index_before_start] + density_q_before_start
           density_q_mat[id_component, index_before_start] = 0
         }
       }
