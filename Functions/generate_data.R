@@ -186,7 +186,12 @@ generate_data = function(SEED=NULL,
   
   ### Add baseline intensity for all components
   for (id_clus in 1:N_clus){
-    intensity_baseline = 20
+    if (N_clus==4) {
+      intensity_baseline = 20
+    } else if (N_clus==1){
+      intensity_baseline = 5
+    }
+    
     center_intensity_array_true[id_clus,1, ] = intensity_baseline + center_intensity_array_true[id_clus,1, ] 
     center_N_spks_mat[id_clus,1] = sum(center_intensity_array_true[id_clus,1, ]*t_unit)
     
