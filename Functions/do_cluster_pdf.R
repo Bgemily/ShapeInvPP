@@ -60,12 +60,14 @@ do_cluster_pdf = function(spks_time_mlist,
   center_density_array = res$center_density_array
   center_Nspks_mat = res$center_Nspks_mat
   center_intensity_array = res$center_intensity_array
+  center_intensity_baseline_vec = res$center_intensity_baseline_vec
   v_mat_list = res$v_mat_list
   
   clusters_list_update = clusters_list_current = clusters_list_init
   center_density_array_update = center_density_array_current = center_density_array
   center_Nspks_mat_update = center_Nspks_mat_current = center_Nspks_mat
   center_intensity_array_update = center_intensity_array_current = center_intensity_array
+  center_intensity_baseline_vec_update = center_intensity_baseline_vec_current = center_intensity_baseline_vec
   v_mat_list_update = v_mat_list_current = v_mat_list
   l2_loss_update = l2_loss_current = Inf
   
@@ -84,6 +86,7 @@ do_cluster_pdf = function(spks_time_mlist,
     center_density_array_update -> center_density_array_current 
     center_Nspks_mat_update -> center_Nspks_mat_current
     center_intensity_array_update -> center_intensity_array_current 
+    center_intensity_baseline_vec_update -> center_intensity_baseline_vec_current
     v_mat_list_update -> v_mat_list_current
     l2_loss_update -> l2_loss_current
     
@@ -104,18 +107,30 @@ do_cluster_pdf = function(spks_time_mlist,
     center_Nspks_mat_update = tmp$center_Nspks_mat
     center_intensity_array_update = tmp$center_intensity_array
     v_mat_list_tmp = tmp$v_mat_list
+    center_density_baseline_vec_update = tmp$center_density_baseline_vec
+    center_intensity_baseline_vec_update = tmp$center_intensity_baseline_vec
     
     clusters_history = c(clusters_history, list(clusters_list_current))
     center_density_array_history = c(center_density_array_history, list(center_density_array_update))
     
+    ### Add baseline density to the first density component
+    center_density_array_update_add_baseline = center_density_array_update
+    center_Nspks_mat_update_add_baseline = center_Nspks_mat_update
+    for (id_clus in 1:N_clus) {
+      id_component_tmp = 1
+      baseline_density = center_density_baseline_vec_update[id_clus]
+      center_density_array_update_add_baseline[id_clus, id_component_tmp, ] = baseline_density + center_density_array_update[id_clus, id_component_tmp, ]
+      baseline_intensity = center_intensity_baseline_vec_update[id_clus]
+      center_Nspks_mat_update_add_baseline[id_clus, id_component_tmp] = baseline_intensity + center_Nspks_mat_update[id_clus, id_component_tmp]
+    }
     
     ### Update time shifts and clusters 
     tmp = get_timeshift_and_clusters(subjtrial_density_smooth_array = subjtrial_density_smooth_array,
                                      fft_subjtrial_density_unsmooth_array = fft_subjtrial_density_unsmooth_array,
                                      N_spks_mat = N_spks_mat,
                                      v_trialwise_vec_list = v_trialwise_vec_list,
-                                     center_density_array = center_density_array_update,
-                                     center_Nspks_mat = center_Nspks_mat_update,
+                                     center_density_array = center_density_array_update_add_baseline,
+                                     center_Nspks_mat = center_Nspks_mat_update_add_baseline,
                                      v_mat_list = v_mat_list_tmp,
                                      freq_trun = freq_trun,
                                      bw = bw,
@@ -176,6 +191,7 @@ do_cluster_pdf = function(spks_time_mlist,
   center_density_array = center_density_array_current
   center_Nspks_mat = center_Nspks_mat_current
   center_intensity_array = center_intensity_array_current
+  center_intensity_baseline_vec = center_intensity_baseline_vec_current
   v_mat_list = v_mat_list_current
   v_subjwise_vec_list = list()
   for (id_component in 1:N_component) {
@@ -219,6 +235,7 @@ do_cluster_pdf = function(spks_time_mlist,
               center_density_array = center_density_array,
               center_Nspks_mat = center_Nspks_mat,
               center_intensity_array = center_intensity_array,
+              center_intensity_baseline_vec = center_intensity_baseline_vec,
               v_mat_list = v_mat_list,
               v_subjwise_vec_list = v_subjwise_vec_list,
               t_vec = t_vec,

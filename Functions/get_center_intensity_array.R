@@ -18,6 +18,8 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
   N_subj = dim(subjtrial_density_unsmooth_array)[1]
   N_trial = dim(subjtrial_density_unsmooth_array)[2]
   
+  center_intensity_baseline_vec = rep(NA,N_clus)
+  center_density_baseline_vec = rep(NA,N_clus)
   center_intensity_array = array(0, dim=c(N_clus, N_component, length(t_vec)))
   center_density_array = array(0, dim=c(N_clus, N_component, length(t_vec)))
   center_Nspks_mat = matrix(0, nrow=N_clus, ncol=N_component)
@@ -89,8 +91,8 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       }
       for (id_component in 1:N_component) {
         fft_vec_tmp = sapply(theta_list, "[", id_component)
-        if (id_component == 1) {
-          fft_l_eq_0 = sum(N_spks_subjtrial_vec_q*Y_mat_q[1,]) / (sum(N_spks_subjtrial_vec_q) + .Machine$double.eps)
+        if (TRUE | (id_component == 1)) {
+          fft_l_eq_0 = -sum(fft_vec_tmp[which(abs(l_vec[-1])<=freq_trun)])
           fft_vec_tmp = c(fft_l_eq_0, fft_vec_tmp)
         } else {
           fft_vec_tmp = c(0, fft_vec_tmp)
@@ -99,21 +101,21 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       }
       
       ### Add constants to densities to force the tails to be zero
-      if (N_component >= 2) {
-        for (id_component in 2:N_component) {
+      if (FALSE & N_component >= 2) {
+        for (id_component in 1:N_component) {
           index_tail = which(t_vec >= max(key_times_vec))
           density_q_tail = density_q_mat[id_component, index_tail]
-          density_q_mat[1, ] = density_q_mat[1, ] + mean(density_q_tail)
+          density_baseline = density_baseline + mean(density_q_tail)
           density_q_mat[id_component, ] = density_q_mat[id_component, ] - mean(density_q_tail)
         }
       }
       
-      ### Force densities to be zero before their starting time
-      if (N_component >= 2) {
-        for (id_component in 2:N_component) {
+      ### Force densities to be zero before their starting time to fix non-identifiability issue due to small variance of time shifts
+      if (FALSE & N_component >= 2) {
+        for (id_component in 1:N_component) {
           index_before_start = which(t_vec <= key_times_vec[id_component])
           density_q_before_start = density_q_mat[id_component, index_before_start]
-          density_q_mat[1, index_before_start] = density_q_mat[1, index_before_start] + density_q_before_start
+          density_baseline = density_baseline + mean(density_q_before_start)
           density_q_mat[id_component, index_before_start] = 0
         }
       }
@@ -138,8 +140,10 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       
       
       ### Force the tails of densities to be zero
-      for (id_component in 1:N_component) {
-        density_q_mat[id_component, ] = density_q_mat[id_component, ] * I(t_vec <= max(key_times_vec) )
+      if (FALSE) {
+        for (id_component in 1:N_component) {
+          density_q_mat[id_component, ] = density_q_mat[id_component, ] * I(t_vec <= max(key_times_vec) )
+        }
       }
       
       ### Calculate intensity components
@@ -147,6 +151,9 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       for (id_component in 1:N_component) {
         intensity_q_mat[id_component, ] = density_q_mat[id_component, ] * F_hat_q
       }
+      ### Calculate baseline density and baseline intensity 
+      density_baseline = (1 - sum(density_q_mat*t_unit)) / (max(t_vec)-min(t_vec))
+      intensity_baseline = density_baseline * F_hat_q
       
     } else if (length(clusters_list[[q]])*N_trial==1){
       id_subj_tmp = 1
@@ -157,7 +164,8 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       N_spks_subjtrial_vec_q = N_spks_mat[id_subj,id_trial]
       density = subjtrial_density_unsmooth_array[id_subj, id_trial, ]
       
-      density_q_mat[1, ] = density
+      density_baseline = mean(density[t_vec>=max(key_times_vec)])
+      density_q_mat[1, ] = density - density_baseline
       if (N_component >= 2) {
         density_q_mat[2:N_component, ] = 0
       }
@@ -172,6 +180,7 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       for (id_component in 1:N_component) {
         intensity_q_mat[id_component, ] = density_q_mat[id_component, ] * F_hat_q
       }
+      intensity_baseline = density_baseline * F_hat_q
     }
     
     # Smooth density
@@ -189,8 +198,9 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       }
     }
     
-    
-    
+     
+    center_intensity_baseline_vec[q] = intensity_baseline
+    center_density_baseline_vec[q] = density_baseline
     center_intensity_array[q, , ] = intensity_q_mat
     center_density_array[q, , ] = density_q_mat
     center_Nspks_mat[q, ] = F_hat_q * rowSums(density_q_mat * t_unit)
@@ -198,7 +208,9 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
   
   
   
-  return(list(center_intensity_array=center_intensity_array,
+  return(list(center_intensity_baseline_vec=center_intensity_baseline_vec,
+              center_density_baseline_vec=center_density_baseline_vec,
+              center_intensity_array=center_intensity_array,
               center_density_array=center_density_array,
               center_Nspks_mat=center_Nspks_mat,
               v_mat_list=v_mat_list))
