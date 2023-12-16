@@ -189,7 +189,7 @@ generate_data = function(SEED=NULL,
     if (N_clus==4) {
       intensity_baseline = 20
     } else if (N_clus==1){
-      intensity_baseline = 20
+      intensity_baseline = N_spks_total*0.4
     }
     
     center_intensity_array_true[id_clus,1, ] = intensity_baseline + center_intensity_array_true[id_clus,1, ] 

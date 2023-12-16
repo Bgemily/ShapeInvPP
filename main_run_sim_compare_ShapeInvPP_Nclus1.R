@@ -33,7 +33,7 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus1_v3.2.4'
+setup = 'Compare_methods_Nclus1_v3.2.5'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
