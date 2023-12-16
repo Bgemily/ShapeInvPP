@@ -27,7 +27,8 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
     intensity_q_mat = matrix(0, nrow = N_component, ncol = length(t_vec))
     density_q_mat = matrix(0, nrow = N_component, ncol = length(t_vec))
     F_hat_q = 0
-    
+    intensity_baseline = 0
+    density_baseline = 0
     if (length(clusters_list[[q]])*N_trial>=2) {
       ### Temporarily force the minimum time shift of second component to be zero
       if (!fix_timeshift) {
