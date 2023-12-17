@@ -121,7 +121,7 @@ do_cluster_pdf = function(spks_time_mlist,
       baseline_density = center_density_baseline_vec_update[id_clus]
       center_density_array_update_add_baseline[id_clus, id_component_tmp, ] = baseline_density + center_density_array_update[id_clus, id_component_tmp, ]
       baseline_intensity = center_intensity_baseline_vec_update[id_clus]
-      center_Nspks_mat_update_add_baseline[id_clus, id_component_tmp] = baseline_intensity + center_Nspks_mat_update[id_clus, id_component_tmp]
+      center_Nspks_mat_update_add_baseline[id_clus, id_component_tmp] = baseline_intensity*(max(t_vec)-min(t_vec)) + center_Nspks_mat_update[id_clus, id_component_tmp]
     }
     
     ### Update time shifts and clusters 
