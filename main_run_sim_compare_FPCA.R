@@ -36,7 +36,7 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus1_v3.3'
+setup = 'Compare_methods_Nclus1_v3.3.1'
 method = 'fpca'
 
 ### Parameters' possible values:
@@ -48,7 +48,7 @@ timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*3,
 #                           c(-1,0.21-0.2,1.5), c(-1,0.23-0.2,1.5), c(-1,0.25-0.2,1.5))
 
 if (TRUE){
-  default_setting = 'N_trial=2,use_true_density,N_spks_total=150,N_subj=10,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2'
+  default_setting = 'N_trial=2,use_true_density,N_spks_total=200,N_subj=10,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -65,7 +65,7 @@ if (TRUE){
                            N_subj = 10,
                            N_clus = 1,
                            N_component_true = 2,
-                           N_spks_total = 150,
+                           N_spks_total = 200,
                            timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                            timeshift_trial_max = timeshift_trial_max,
                            t_vec = seq(-1,1.5,0.01),
@@ -97,7 +97,7 @@ if (TRUE){
 
 
 if (TRUE){
-  default_setting = 'N_trial=2,not_use_true_density,N_spks_total=150,N_subj=10,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2'
+  default_setting = 'N_trial=2,not_use_true_density,N_spks_total=200,N_subj=10,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -114,7 +114,7 @@ if (TRUE){
                            N_subj = 10,
                            N_clus = 1,
                            N_component_true = 2,
-                           N_spks_total = 150,
+                           N_spks_total = 200,
                            timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                            timeshift_trial_max = timeshift_trial_max,
                            t_vec = seq(-1,1.5,0.01),
