@@ -33,7 +33,7 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus1_v3.3.1'
+setup = 'Compare_methods_Nclus1_v3.3.2'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
@@ -117,7 +117,7 @@ if (TRUE) {
                                      N_component_true = 2,
                                      N_spks_total = 200,
                                      timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                     timeshift_trial_max = timeshift_trial_max_list[[1]],
+                                     timeshift_trial_max = 0.05,
                                      t_vec = seq(-1,1.5,0.01),
                                      ### params when N_clus==4:
                                      clus_sep = 1.4,
@@ -169,7 +169,7 @@ if (TRUE) {
                                    N_component_true = 2,
                                    N_spks_total = 200,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                   timeshift_trial_max = timeshift_trial_max_list[[1]],
+                                   timeshift_trial_max = 0.05,
                                    t_vec = seq(-1,1.5,0.01),
                                    ### params when N_clus==4:
                                    clus_sep = 1.4,
