@@ -34,12 +34,12 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus4_v4.3.1'
+setup = 'Compare_methods_Nclus4_v4.3.2'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
-timeshift_trial_max_list = list(0, 0.05, 0.1, 0.2)
-N_trial_list = list(1,2,3,4,5,6,7,8,9,10)
+timeshift_trial_max_list = list(0.1, 0.15, 0.2, 0.3)
+N_trial_list = list(2,3,4,5,6,7,8,9,10)
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2 )
 N_subj_list = list(40, 60, 80, 100, 120, 140)
 key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.04-0.2,1.5), c(-1,0.08-0.2,1.5),
@@ -113,13 +113,13 @@ if (TRUE) {
         results <- foreach(j = 1:N_replicate) %dopar% {
           SEED = sample(1:1e7,1)
           tryCatch(main_shapeinvpp(SEED = SEED, 
-                                   N_trial = 1,
+                                   N_trial = 2,
                                    N_subj = N_subj,
                                    N_clus = 4, 
                                    N_component_true = 2,
                                    N_spks_total = 150,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                   timeshift_trial_max = 0,
+                                   timeshift_trial_max = 0.1,
                                    t_vec = seq(-1,1.5,0.01),
                                    ### params when N_clus==4:
                                    clus_sep = 0.5,
@@ -150,7 +150,7 @@ if (TRUE) {
     }
   }
   if (TRUE) {
-    default_setting = paste0('N_trial=2,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
+    default_setting = paste0('N_trial=3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
     for (id_N_split in 1:N_split) {
       if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
@@ -162,13 +162,13 @@ if (TRUE) {
         results <- foreach(j = 1:N_replicate) %dopar% {
           SEED = sample(1:1e7,1)
           tryCatch(main_shapeinvpp(SEED = SEED, 
-                                   N_trial = 2,
+                                   N_trial = 3,
                                    N_subj = N_subj,
                                    N_clus = 4, 
                                    N_component_true = 2,
                                    N_spks_total = 150,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                   timeshift_trial_max = 0.05,
+                                   timeshift_trial_max = 0.1,
                                    t_vec = seq(-1,1.5,0.01),
                                    ### params when N_clus==4:
                                    clus_sep = 0.5,
