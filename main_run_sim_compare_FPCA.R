@@ -36,11 +36,11 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus1_v3.3.2'
+setup = 'Compare_methods_Nclus1_v3.3.3'
 method = 'fpca'
 
 ### Parameters' possible values:
-timeshift_trial_max_list = list(0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2)
+timeshift_trial_max_list = list(0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3)
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*3,
                                    c(1/32/4, 1/32)*4, c(1/32/4, 1/32)*5,
                                    c(1/32/4, 1/32)*6, c(1/32/4, 1/32)*7 )

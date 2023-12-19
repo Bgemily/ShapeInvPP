@@ -33,11 +33,11 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus1_v3.3.2'
+setup = 'Compare_methods_Nclus1_v3.3.3'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
-timeshift_trial_max_list = list(0, 0.05, 0.1, 0.2)
+timeshift_trial_max_list = list(0.1, 0.15, 0.2, 0.3)
 N_trial_list = list(2,3,4,5,6,7,8,9,10)
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2 )
 N_subj_list = list(10,20,30,40,50,60,70,80,90,100)
@@ -117,7 +117,7 @@ if (TRUE) {
                                      N_component_true = 2,
                                      N_spks_total = 200,
                                      timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                     timeshift_trial_max = 0.05,
+                                     timeshift_trial_max = 0.1,
                                      t_vec = seq(-1,1.5,0.01),
                                      ### params when N_clus==4:
                                      clus_sep = 1.4,
@@ -151,7 +151,7 @@ if (TRUE) {
     
   }
   if (TRUE) {
-    default_setting = paste0('N_trial=3,timeshift_trial_max=0.05,N_spks_total=200,N_subj=10,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
+    default_setting = paste0('N_trial=3,timeshift_trial_max=0.1,N_spks_total=200,N_subj=10,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
     for (id_N_split in 1:N_split) {
       if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
@@ -169,7 +169,7 @@ if (TRUE) {
                                    N_component_true = 2,
                                    N_spks_total = 200,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                   timeshift_trial_max = 0.05,
+                                   timeshift_trial_max = 0.1,
                                    t_vec = seq(-1,1.5,0.01),
                                    ### params when N_clus==4:
                                    clus_sep = 1.4,
@@ -202,7 +202,7 @@ if (TRUE) {
 }
 
 if(TRUE){
-  timeshift_trial_max_list = list(0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2)
+  timeshift_trial_max_list = list(0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3)
   timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*3,
                                      c(1/32/4, 1/32)*4, c(1/32/4, 1/32)*5,
                                      c(1/32/4, 1/32)*6, c(1/32/4, 1/32)*7 )
