@@ -18,8 +18,8 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_replicate_total = 200
-N_split = 20
+N_replicate_total = 500
+N_split = 50
 
 N_replicate = N_replicate_total/N_split
 
@@ -37,13 +37,14 @@ setup = 'Compare_methods_Nclus1_v3.3.3'
 method = 'shape_inv_pp'
 
 ### Parameters' possible values:
-timeshift_trial_max_list = list(0.1, 0.15, 0.2, 0.3)
-N_trial_list = list(2,3,4,5,6,7,8,9,10)
+timeshift_trial_max_list = list(0.1, 0.2, 0.3)
+# N_trial_list = list(2,3,4,5,6,7,8,9,10)
+N_trial_list = list(2)
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2 )
 N_subj_list = list(10,20,30,40,50,60,70,80,90,100)
 key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.04-0.2,1.5), c(-1,0.08-0.2,1.5),
                           c(-1,0.12-0.2,1.5), c(-1,0.16-0.2,1.5), c(-1,0.2-0.2,1.5))
-if (FALSE) {
+if (TRUE) {
   for (timeshift_trial_max in timeshift_trial_max_list){
     default_setting = paste0("timeshift_trial_max=",timeshift_trial_max,",", 
                              'N_spks_total=200,N_subj=10,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
@@ -95,7 +96,7 @@ if (FALSE) {
     }
   }
 }
-if (FALSE) {
+if (TRUE) {
   if (TRUE) {
     for (use_true_timeshift in c(FALSE, TRUE)){
       default_setting = paste0("use_true_timeshift_", use_true_timeshift,",", 
