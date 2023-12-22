@@ -33,7 +33,7 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Multi_restart_v1'
+setup = 'Multi_restart_v1.1'
 
 ### Parameters' possible values:
 N_restart_algo_list = list(1, 3, 5)
@@ -45,7 +45,7 @@ key_times_vec_list = list(c(-1,0-0.2,1.5) )
 
 # Test multi restart -----
 if (FALSE) {
-  default_setting = 'timeshift_trial_max=0.1,N_spks_total=200,N_subj=10,N_clus=1,key_time_comp2=-0.2'
+  default_setting = 'timeshift_trial_max=0.3,N_spks_total=200,N_subj=10,N_clus=1,key_time_comp2=-0.2'
   for (id_N_restart in 1:length(N_restart_algo_list)){
     N_restart = N_restart_algo_list[[id_N_restart]]
     method = paste0('shape_inv_pp_', 'Nrestart_', as.character(N_restart) )
@@ -66,7 +66,7 @@ if (FALSE) {
                                    N_component_true = 2,
                                    N_spks_total = 200,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                   timeshift_trial_max = 0.1,
+                                   timeshift_trial_max = 0.3,
                                    t_vec = seq(-1,1.5,0.01),
                                    ### params when N_clus==4:
                                    clus_sep = 0.5,
@@ -102,7 +102,7 @@ if (FALSE) {
 }
 
 if (TRUE) {
-  default_setting = 'timeshift_trial_max=0.1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_restart in 1:length(N_restart_algo_list)){
     N_restart = N_restart_algo_list[[id_N_restart]]
     method = paste0('shape_inv_pp_', 'Nrestart_', as.character(N_restart) )
@@ -123,7 +123,7 @@ if (TRUE) {
                                    N_component_true = 2,
                                    N_spks_total = 150,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                   timeshift_trial_max = 0.1,
+                                   timeshift_trial_max = 0.3,
                                    t_vec = seq(-1,1.5,0.01),
                                    ### params when N_clus==4:
                                    clus_sep = 0.5,
