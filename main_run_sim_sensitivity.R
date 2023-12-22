@@ -33,7 +33,7 @@ registerDoParallel(cores=N_cores)
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'sensitivity_anal_v3.2.2'
+setup = 'sensitivity_anal_v3.2.3'
 method = 'ShapeInvPP'
 
 ### Parameters' possible values:
@@ -41,7 +41,7 @@ freq_trun_vec = c(2,4,6,8,10,12,14,16)
 gamma_vec = 10^c(-2,-1.5,-1,-0.5,0,0.5,1)
 
 if (TRUE) {
-  default_setting = 'N_trial=10,timeshift_trial_max=0.1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'N_trial=10,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -59,7 +59,7 @@ if (TRUE) {
                                  N_component_true = 2,
                                  t_vec = seq(-1, 1.5, by=0.01),
                                  timeshift_subj_max_vec = c(1/32/4, 1/32)*2,
-                                 timeshift_trial_max = 0.1,
+                                 timeshift_trial_max = 0.3,
                                  ### params when N_clus==4:
                                  N_spks_total = 150,
                                  clus_sep = 0.5,
@@ -90,7 +90,7 @@ if (TRUE) {
 }
 
 if (TRUE) {
-  default_setting = 'N_trial=10,timeshift_trial_max=0.1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'N_trial=10,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -108,7 +108,7 @@ if (TRUE) {
                                  N_component_true = 2,
                                  t_vec = seq(-1, 1.5, by=0.01),
                                  timeshift_subj_max_vec = c(1/32/4, 1/32)*2,
-                                 timeshift_trial_max = 0.1,
+                                 timeshift_trial_max = 0.3,
                                  ### params when N_clus==4:
                                  N_spks_total = 150,
                                  clus_sep = 0.5,
