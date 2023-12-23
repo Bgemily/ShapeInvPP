@@ -38,7 +38,7 @@ method = 'ShapeInvPP'
 
 ### Parameters' possible values:
 freq_trun_vec = c(2,4,6,8,10,12,14,16)
-gamma_vec = 10^c(-2,-1.5,-1,-0.5,0,0.5,1)
+gamma_vec = 10^c(-2,-1.5,-1,-0.5,0,0.5,1,1.5,2)
 
 if (TRUE) {
   default_setting = 'N_trial=10,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
