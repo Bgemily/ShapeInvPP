@@ -44,7 +44,7 @@ key_times_vec_list = list(c(-1,0-0.2,1.5) )
 
 
 # Test multi restart -----
-if (FALSE) {
+if (TRUE) {
   default_setting = 'timeshift_trial_max=0.3,N_spks_total=200,N_subj=10,N_clus=1,key_time_comp2=-0.2'
   for (id_N_restart in 1:length(N_restart_algo_list)){
     N_restart = N_restart_algo_list[[id_N_restart]]
