@@ -33,7 +33,7 @@ registerDoParallel(cores=N_cores)
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'sensitivity_anal_v3.2.3'
+setup = 'sensitivity_anal_v3.2.4'
 method = 'ShapeInvPP'
 
 ### Parameters' possible values:
@@ -41,7 +41,7 @@ freq_trun_vec = c(2,4,6,8,10,12,14,16)
 gamma_vec = 10^c(-2,-1.5,-1,-0.5,0,0.5,1,1.5,2)
 
 if (TRUE) {
-  default_setting = 'N_trial=10,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'N_trial=10,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.9,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -62,7 +62,7 @@ if (TRUE) {
                                  timeshift_trial_max = 0.3,
                                  ### params when N_clus==4:
                                  N_spks_total = 150,
-                                 clus_sep = 0.5,
+                                 clus_sep = 0.9,
                                  ### Parameters for algorithms
                                  freq_trun = 10,
                                  gamma = gamma,
@@ -90,7 +90,7 @@ if (TRUE) {
 }
 
 if (TRUE) {
-  default_setting = 'N_trial=10,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'N_trial=10,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.9,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -111,7 +111,7 @@ if (TRUE) {
                                  timeshift_trial_max = 0.3,
                                  ### params when N_clus==4:
                                  N_spks_total = 150,
-                                 clus_sep = 0.5,
+                                 clus_sep = 0.9,
                                  ### Parameters for algorithms
                                  freq_trun = freq_trun,
                                  gamma = 1,
