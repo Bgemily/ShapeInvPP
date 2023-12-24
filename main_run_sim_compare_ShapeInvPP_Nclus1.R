@@ -44,7 +44,7 @@ timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2 )
 N_subj_list = list(10,20,30,40,50,60,70,80,90,100)
 key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.04-0.2,1.5), c(-1,0.08-0.2,1.5),
                           c(-1,0.12-0.2,1.5), c(-1,0.16-0.2,1.5), c(-1,0.2-0.2,1.5))
-if (TRUE) {
+if (FALSE) {
   for (timeshift_trial_max in timeshift_trial_max_list){
     default_setting = paste0("timeshift_trial_max=",timeshift_trial_max,",", 
                              'N_spks_total=200,N_subj=10,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
@@ -98,7 +98,7 @@ if (TRUE) {
 }
 if (TRUE) {
   if (TRUE) {
-    for (use_true_timeshift in c(FALSE, TRUE)){
+    for (use_true_timeshift in c(FALSE)){
       default_setting = paste0("use_true_timeshift_", use_true_timeshift,",", 
                                'N_spks_total=200,N_subj=10,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
       for (id_N_split in 1:N_split) {
@@ -151,7 +151,7 @@ if (TRUE) {
     }
     
   }
-  if (TRUE) {
+  if (FALSE) {
     default_setting = paste0('N_trial=3,timeshift_trial_max=0.1,N_spks_total=200,N_subj=10,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2')
     for (id_N_split in 1:N_split) {
       if (save_res_details & (id_N_split == 1)) {

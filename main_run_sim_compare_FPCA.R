@@ -96,7 +96,7 @@ if (TRUE){
 }
 
 
-if (TRUE){
+if (FALSE){
   default_setting = 'N_trial=2,not_use_true_density,N_spks_total=200,N_subj=10,N_clus=1,clus_sep=1.4,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
