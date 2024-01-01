@@ -35,7 +35,7 @@ save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Compare_methods_Nclus4_v4.3.2'
-method = 'shape_inv_pp'
+method = 'shape_inv_pp_update_obj_func'
 
 ### Parameters' possible values:
 timeshift_trial_max_list = list(0.1, 0.15, 0.2, 0.3)
@@ -73,7 +73,7 @@ if (TRUE) {
                                    clus_sep = 0.5,
                                    ### Parameters for algorithms
                                    freq_trun = 10,
-                                   gamma = 1,
+                                   gamma = 1/100,
                                    N_component = 2,
                                    key_times_vec = key_times_vec_list[[1]],
                                    fix_timeshift = FALSE,
@@ -125,7 +125,7 @@ if (TRUE) {
                                    clus_sep = 0.5,
                                    ### Parameters for algorithms
                                    freq_trun = 10,
-                                   gamma = 1,
+                                   gamma = 1/100,
                                    N_component = 2,
                                    key_times_vec = key_times_vec_list[[1]],
                                    fix_timeshift = use_true_timeshift,
@@ -174,7 +174,7 @@ if (TRUE) {
                                    clus_sep = 0.5,
                                    ### Parameters for algorithms
                                    freq_trun = 10,
-                                   gamma = 1,
+                                   gamma = 1/100,
                                    N_component = 2,
                                    key_times_vec = key_times_vec_list[[1]],
                                    fix_timeshift = FALSE,
@@ -221,7 +221,7 @@ if (TRUE) {
                                  clus_sep = clus_sep,
                                  ### Parameters for algorithms
                                  freq_trun = 10,
-                                 gamma = 1,
+                                 gamma = 1/100,
                                  N_component = 2,
                                  key_times_vec = key_times_vec_list[[1]],
                                  fix_timeshift = FALSE,
