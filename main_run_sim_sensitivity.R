@@ -34,14 +34,14 @@ save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
 setup = 'sensitivity_anal_v3.2.5'
-method = 'ShapeInvPP'
+method = 'ShapeInvPP_update_obj_func'
 
 ### Parameters' possible values:
 freq_trun_vec = c(2,4,6,8,10,12,14,16)
-gamma_vec = 10^c(-2,-1.5,-1,-0.5,0,0.5,1,1.5,2)
+gamma_vec = 10^c(-2,-1.5,-1,-0.5,0,0.5,1,1.5,2)/100
 
 if (TRUE) {
-  default_setting = 'N_trial=2,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'N_trial=3,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -53,7 +53,7 @@ if (TRUE) {
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_shapeinvpp(SEED = SEED,
-                                 N_trial = 2,
+                                 N_trial = 3,
                                  N_subj = 40,
                                  N_clus = 4,
                                  N_component_true = 2,
@@ -90,7 +90,7 @@ if (TRUE) {
 }
 
 if (TRUE) {
-  default_setting = 'N_trial=2,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'N_trial=3,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -102,7 +102,7 @@ if (TRUE) {
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_shapeinvpp(SEED = SEED,
-                                 N_trial = 2,
+                                 N_trial = 3,
                                  N_subj = 40,
                                  N_clus = 4,
                                  N_component_true = 2,
@@ -114,7 +114,7 @@ if (TRUE) {
                                  clus_sep = 0.5,
                                  ### Parameters for algorithms
                                  freq_trun = freq_trun,
-                                 gamma = 1,
+                                 gamma = 1/100,
                                  N_component = 2,
                                  key_times_vec = c(-1,0-0.2,1.5),
                                  fix_timeshift = FALSE,
