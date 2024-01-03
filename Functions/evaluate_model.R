@@ -46,7 +46,7 @@ evaluate_model = function(spks_time_mlist,
   
   # Second term of log likelihood: \sum_{q}{ \sum_{i,r}\sum_{t} \log{lambda_{i,r}(t)} *tau_{i,r,q} }
   # L2_loss_part_1: sum_{i,r} N_{i,r}(T) * T^{-1} * \| y_{i,r}(t)/N_{i,r}(T) - lambda_{i,r}(t)/Lambda_{i,r}(T) \|^2
-  # L2_loss_part_2: sum_{i,r} |Lambda_{i,r}(T)|^{-1} * |N_{i,r}(T)-Lambda_{i,r}(T)|^2
+  # L2_loss_part_2: sum_{i,r} |N_{i,r}(T)-Lambda_{i,r}(T)|^2
   log_lik_tmp_2 = 0
   L2_loss_part_1 = 0
   L2_loss_part_1_smoothdensity = 0
@@ -93,8 +93,8 @@ evaluate_model = function(spks_time_mlist,
         intensity_empirical_smoothdensity = Re(fft(intensity_empirical_fft_trun, inverse = TRUE))
         L2_loss_part_1_tmp_smoothdensity = length(event_time_vec_tmp) * max(t_vec)^{-1} * sum((intensity_empirical_smoothdensity/sum(intensity_empirical*t_unit) - intensity_est/sum(intensity_est*t_unit))^2 * t_unit)
         L2_loss_part_1_smoothdensity = L2_loss_part_1_smoothdensity + L2_loss_part_1_tmp_smoothdensity
-        ### Add L2_loss_part_2_tmp: |Lambda_{i,r}(T)|^{-1} * |N_{i,r}(T)-Lambda_{i,r}(T)|^2
-        L2_loss_part_2_tmp = (sum(intensity_est*t_unit)+.Machine$double.eps)^(-1) * (length(event_time_vec_tmp) - sum(intensity_est*t_unit))^2 
+        ### Add L2_loss_part_2_tmp: |N_{i,r}(T)-Lambda_{i,r}(T)|^2
+        L2_loss_part_2_tmp = (length(event_time_vec_tmp) - sum(intensity_est*t_unit))^2 
         L2_loss_part_2 = L2_loss_part_2 + L2_loss_part_2_tmp
         
       }
