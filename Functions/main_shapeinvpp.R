@@ -237,9 +237,42 @@ main_shapeinvpp = function(### Parameters for generative model
   compl_log_lik = tmp$compl_log_lik
   
   # Compute estimation error ------------------------------------------------
-  if (N_clus_est == N_clus) {
-    # Compute errors of conn patts, i.e. F ---------
+  # Compute errors of clusters, i.e. Z ------------------------------------
+  ARI = get_one_ARI(memb_est_vec = clus2mem(clusters_list_est), 
+                    memb_true_vec = mem_true_vec)
+  ARI_history = sapply(clusters_history, function(clusters_list_tmp)get_one_ARI(memb_est_vec = clus2mem(clusters_list_tmp), 
+                                                                                memb_true_vec = mem_true_vec))
+  
+  # Compute error of time shifts, i.e. v --------------------------------------------
+  if (N_component == N_component_true) {
+    v_mean_sq_err_vec = sapply(1:N_component, function(id_component){
+      mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2) /
+        (ifelse(id_component == 1, yes = (-min(t_vec))/4, no = (max(t_vec) - (-min(t_vec))/2)/2 ) )^2
+    })
+    v_mean_sq_err = mean(v_mean_sq_err_vec)
     
+    v_align_mean_sq_err_vec = c()
+    v_align_mat_list_est = v_mat_list_est
+    for (id_component in 1:N_component) {
+      for (id_clus in 1:N_clus_est) {
+        v_align_mat_list_est[[id_component]][clusters_list_est[[id_clus]], ] = 
+          v_mat_list_est[[id_component]][clusters_list_est[[id_clus]], ] - 
+          mean(v_mat_list_est[[id_component]][clusters_list_est[[id_clus]], ]) + 
+          mean(v_true_mat_list[[id_component]][clusters_list_est[[id_clus]], ])
+      }
+      mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_align_mat_list_est[[id_component]]) )^2) /
+        (ifelse(id_component == 1, yes = (-min(t_vec))/4, no = (max(t_vec) - (-min(t_vec))/2)/2 ) )^2
+      v_align_mean_sq_err_vec[id_component] = mse_tmp
+    }
+    v_align_mean_sq_err = mean(v_align_mean_sq_err_vec)
+    
+  } else {
+    v_mean_sq_err = v_mean_sq_err_vec = NA
+    v_align_mean_sq_err_vec = v_align_mean_sq_err = NA
+  }
+  
+  # Compute errors of conn patts, i.e. F ---------
+  if (N_clus_est == N_clus) {
     ### Match clusters 
     if(N_clus>=2){
       permn = find_permn_clus_label(clusters_list_true = data_generated$clus_true_list, 
@@ -381,52 +414,16 @@ main_shapeinvpp = function(### Parameters for generative model
       F_mse_squarel2_ratio_history_2 = NA
     }
     
-    # Compute errors of clusters, i.e. Z ------------------------------------
-    ARI = get_one_ARI(memb_est_vec = clus2mem(clusters_list_est), 
-                      memb_true_vec = mem_true_vec)
-    ARI_history = sapply(clusters_history, function(clusters_list_tmp)get_one_ARI(memb_est_vec = clus2mem(clusters_list_tmp), 
-                                                                                  memb_true_vec = mem_true_vec))
-
-    # Compute error of time shifts, i.e. w, v --------------------------------------------
-    if (N_component == N_component_true) {
-      v_mean_sq_err_vec = sapply(1:N_component, function(id_component){
-        mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2) /
-          (ifelse(id_component == 1, yes = (-min(t_vec))/4, no = (max(t_vec) - (-min(t_vec))/2)/2 ) )^2
-      })
-      v_mean_sq_err = mean(v_mean_sq_err_vec)
-      
-      v_align_mean_sq_err_vec = c()
-      v_align_mat_list_est = v_mat_list_est
-      for (id_component in 1:N_component) {
-        for (id_clus in 1:N_clus) {
-          v_align_mat_list_est[[id_component]][clusters_list_est_permn[[id_clus]], ] = v_mat_list_est[[id_component]][clusters_list_est_permn[[id_clus]], ] - 
-            mean(v_mat_list_est[[id_component]][clusters_list_est_permn[[id_clus]], ]) + 
-            mean(v_true_mat_list[[id_component]][clusters_list_est_permn[[id_clus]], ])
-        }
-        mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_align_mat_list_est[[id_component]]) )^2) /
-          (ifelse(id_component == 1, yes = (-min(t_vec))/4, no = (max(t_vec) - (-min(t_vec))/2)/2 ) )^2
-        v_align_mean_sq_err_vec[id_component] = mse_tmp
-      }
-      v_align_mean_sq_err = mean(v_align_mean_sq_err_vec)
-      
-    } else {
-      v_mean_sq_err = v_mean_sq_err_vec = NA
-      v_align_mean_sq_err_vec = v_align_mean_sq_err = NA
-    }
     
     
   }
   else{
-    ARI=NA 
     F_mean_sq_err=F_mean_sq_err_vec=F_mse_squarel2_ratio=NA
     F_mse_squarel2_ratio_mat = dist_mse_mat = NA
-    v_mean_sq_err=v_mean_sq_err_vec=NA
-    v_align_mean_sq_err_vec = v_align_mean_sq_err = NA
     clusters_list_est_permn=NA
     center_density_array_est_permn=NA
     center_intensity_array_est_permn=NA
     center_Nspks_mat_est_permn=NA
-    ARI_history = NA
     F_mean_sq_err_history = NA
     F_mse_squarel2_ratio_history = NA
     F_mse_squarel2_ratio_2 = NA
