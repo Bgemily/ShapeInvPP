@@ -33,7 +33,7 @@ registerDoParallel(cores=N_cores)
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'heuristic_gamma_v1'
+setup = 'heuristic_gamma_v1.2'
 method = 'ShapeInvPP'
 
 ### Parameters' possible values:
