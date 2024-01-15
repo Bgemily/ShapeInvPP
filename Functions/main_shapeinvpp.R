@@ -246,8 +246,7 @@ main_shapeinvpp = function(### Parameters for generative model
   # Compute error of time shifts, i.e. v --------------------------------------------
   if (N_component == N_component_true) {
     v_mean_sq_err_vec = sapply(1:N_component, function(id_component){
-      mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2) /
-        (ifelse(id_component == 1, yes = (-min(t_vec))/4, no = (max(t_vec) - (-min(t_vec))/2)/2 ) )^2
+      mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2) 
     })
     v_mean_sq_err = mean(v_mean_sq_err_vec)
     
@@ -260,8 +259,7 @@ main_shapeinvpp = function(### Parameters for generative model
           mean(v_mat_list_est[[id_component]][clusters_list_est[[id_clus]], ]) + 
           mean(v_true_mat_list[[id_component]][clusters_list_est[[id_clus]], ])
       }
-      mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_align_mat_list_est[[id_component]]) )^2) /
-        (ifelse(id_component == 1, yes = (-min(t_vec))/4, no = (max(t_vec) - (-min(t_vec))/2)/2 ) )^2
+      mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_align_mat_list_est[[id_component]]) )^2) 
       v_align_mean_sq_err_vec[id_component] = mse_tmp
     }
     v_align_mean_sq_err = mean(v_align_mean_sq_err_vec)
