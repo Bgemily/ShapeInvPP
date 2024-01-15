@@ -5,6 +5,7 @@ main_kcfc = function(### Parameters for generative model
   SEED, 
   N_subj = 100,
   N_trial = 1,
+  timeshift_trial_max = 0.1,
   N_clus=2, 
   N_component_true = 2,
   t_vec = seq(-1,1,by=0.01),
@@ -40,6 +41,7 @@ main_kcfc = function(### Parameters for generative model
                     key_times_vec = key_times_vec,
                     N_spks_total = N_spks_total,
                     timeshift_subj_max_vec = timeshift_subj_max_vec,
+                    timeshift_trial_max = timeshift_trial_max,
                     clus_sep = clus_sep,
                     N_spks_ratio = N_spks_ratio,
                     sd_shrinkage = sd_shrinkage,
@@ -67,7 +69,7 @@ main_kcfc = function(### Parameters for generative model
   yList = list()
   tList = list()
   for (id_subj in 1:N_subj){
-    res_smooth = density(spks_time_mlist[[id_subj]], bw = bw, n = 256, from = min(t_vec), to = max(t_vec))
+    res_smooth = density(unlist(spks_time_mlist[id_subj, ]), bw = bw, n = 256, from = min(t_vec), to = max(t_vec))
     yList[[id_subj]] = res_smooth$y
     tList[[id_subj]] = res_smooth$x
   }
