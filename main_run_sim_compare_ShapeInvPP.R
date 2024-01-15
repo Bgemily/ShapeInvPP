@@ -34,7 +34,7 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus4_v4.3.2'
+setup = 'Compare_methods_Nclus4_v4.3.3'
 method = 'shape_inv_pp_update_obj_func'
 
 ### Parameters' possible values:
@@ -46,7 +46,7 @@ key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.04-0.2,1.5), c(-1,0.08-0.2,1.5
                           c(-1,0.12-0.2,1.5), c(-1,0.16-0.2,1.5), c(-1,0.2-0.2,1.5))
 clus_sep_list = list(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9)
 
-if (TRUE) {
+if (FALSE) {
   for (timeshift_trial_max in timeshift_trial_max_list) {
     default_setting = paste0("timeshift_trial_max=",timeshift_trial_max,",", 
                              'N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
@@ -98,7 +98,7 @@ if (TRUE) {
   }
 }
 
-if (TRUE) {
+if (FALSE) {
   for (use_true_timeshift in c(FALSE, TRUE)){
     default_setting = paste0("use_true_timeshift_", use_true_timeshift,",", 
                              'N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
@@ -200,7 +200,7 @@ if (TRUE) {
 }
 
 if (TRUE) {
-  default_setting = 'N_trial=1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+  default_setting = 'N_trial=2,timeshift_trial_max=0.1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
       save_center_pdf_array = TRUE
@@ -212,6 +212,7 @@ if (TRUE) {
       results <- foreach(j = 1:N_replicate) %dopar% {
         SEED = sample(1:1e7,1)
         tryCatch(main_shapeinvpp(SEED = SEED, 
+                                 N_trial = 2, timeshift_trial_max = 0.1,
                                  N_subj = N_subj_list[[1]],
                                  N_clus = 4, 
                                  N_component_true = 2,
