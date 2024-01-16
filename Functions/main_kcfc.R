@@ -70,9 +70,17 @@ main_kcfc = function(### Parameters for generative model
   yList = list()
   tList = list()
   for (id_subj in 1:N_subj){
-    res_smooth = density(unlist(spks_time_mlist[id_subj, ]), bw = bw, n = 256, from = min(t_vec), to = max(t_vec))
-    yList[[id_subj]] = res_smooth$y
-    tList[[id_subj]] = res_smooth$x
+    if (FALSE) {
+      res_smooth = density(unlist(spks_time_mlist[id_subj, ]), bw = bw, n = 256, from = min(t_vec), to = max(t_vec))
+      yList[[id_subj]] = res_smooth$y
+      tList[[id_subj]] = res_smooth$x
+    } else {
+      breaks = c(t_vec[1]-t_unit,t_vec)+t_unit/2
+      emp_density_vec = hist(unlist(spks_time_mlist[id_subj, ]), breaks=breaks, plot=FALSE)$counts / t_unit / length(unlist(spks_time_mlist[id_subj, ]))
+      yList[[id_subj]] = emp_density_vec
+      tList[[id_subj]] = t_vec
+    }
+    
     if (use_intensity) {
       N_spks_curr_subj = mean(sapply(spks_time_mlist[id_subj, ], function(list_tmp)length(unlist(list_tmp))))
       yList[[id_subj]] = N_spks_curr_subj * yList[[id_subj]]
