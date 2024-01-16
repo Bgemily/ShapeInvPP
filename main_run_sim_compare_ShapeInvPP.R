@@ -38,7 +38,7 @@ setup = 'Compare_methods_Nclus4_v4.3.3'
 method = 'shape_inv_pp_update_obj_func'
 
 ### Parameters' possible values:
-timeshift_trial_max_list = list(0.1, 0.15, 0.2, 0.3)
+timeshift_trial_max_list = list(0.1, 0.2, 0.3)
 N_trial_list = list(2,3,4,5,6,7,8,9,10)
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2 )
 N_subj_list = list(40, 60, 80, 100, 120, 140)
@@ -46,7 +46,7 @@ key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.04-0.2,1.5), c(-1,0.08-0.2,1.5
                           c(-1,0.12-0.2,1.5), c(-1,0.16-0.2,1.5), c(-1,0.2-0.2,1.5))
 clus_sep_list = list(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9)
 
-if (FALSE) {
+if (TRUE) {
   for (timeshift_trial_max in timeshift_trial_max_list) {
     default_setting = paste0("timeshift_trial_max=",timeshift_trial_max,",", 
                              'N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
@@ -98,7 +98,7 @@ if (FALSE) {
   }
 }
 
-if (FALSE) {
+if (TRUE) {
   for (use_true_timeshift in c(FALSE, TRUE)){
     default_setting = paste0("use_true_timeshift_", use_true_timeshift,",", 
                              'N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
@@ -149,7 +149,7 @@ if (FALSE) {
       }
     }
   }
-  if (TRUE) {
+  if (FALSE) {
     default_setting = paste0('N_trial=3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
     for (id_N_split in 1:N_split) {
       if (save_res_details & (id_N_split == 1)) {
