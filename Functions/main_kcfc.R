@@ -25,6 +25,7 @@ main_kcfc = function(### Parameters for generative model
   ### params when N_clus==2:
   clus_mixture = 0,
   ### Parameters for algorithms
+  use_intensity = FALSE,
   bw = 0,
   N_component = 2,
   save_center_pdf_array = FALSE)
@@ -72,6 +73,10 @@ main_kcfc = function(### Parameters for generative model
     res_smooth = density(unlist(spks_time_mlist[id_subj, ]), bw = bw, n = 256, from = min(t_vec), to = max(t_vec))
     yList[[id_subj]] = res_smooth$y
     tList[[id_subj]] = res_smooth$x
+    if (use_intensity) {
+      N_spks_curr_subj = mean(sapply(spks_time_mlist[id_subj, ], function(list_tmp)length(unlist(list_tmp))))
+      yList[[id_subj]] = N_spks_curr_subj * yList[[id_subj]]
+    }
   }
   
   
@@ -178,6 +183,10 @@ main_kcfc = function(### Parameters for generative model
         N_timegrid = round(abs(timeshift_density)/t_unit)
         density_vec = c(rep(0, N_timegrid),
                         head(density_shifted_vec, length(density_shifted_vec) - N_timegrid))
+      }
+      if (use_intensity){
+        N_spks_expectation = sum(mean_density_vec*t_unit)
+        density_vec = density_vec / N_spks_expectation
       }
       center_density_fpca_array_permn[id_clus, id_component, ] = density_vec
       
