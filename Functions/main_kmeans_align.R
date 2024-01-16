@@ -11,6 +11,7 @@ main_kmeans_align = function(### Parameters for generative model
   t_vec_extend = t_vec,
   N_spks_total = 1000,
   timeshift_subj_max_vec = c(1/8, 1/32),
+  timeshift_trial_max = 1/8,
   ### params when N_clus==4:
   clus_sep = 2,
   ### params when N_clus==1:
@@ -23,6 +24,7 @@ main_kmeans_align = function(### Parameters for generative model
   ### params when N_clus==2:
   clus_mixture = 0,
   ### Parameters for algorithms
+  use_intensity = FALSE,
   bw = 0,
   N_component = 2,
   key_times_vec = c(min(t_vec),0,max(t_vec)),
@@ -37,9 +39,10 @@ main_kmeans_align = function(### Parameters for generative model
                     N_clus=N_clus, 
                     t_vec=t_vec,
                     t_vec_extend=t_vec_extend,
-                    key_times_vec=key_times_vec,
+                    key_times_vec = key_times_vec,
                     N_spks_total = N_spks_total,
                     timeshift_subj_max_vec = timeshift_subj_max_vec,
+                    timeshift_trial_max = timeshift_trial_max,
                     clus_sep = clus_sep,
                     N_spks_ratio = N_spks_ratio,
                     sd_shrinkage = sd_shrinkage,
@@ -67,9 +70,16 @@ main_kmeans_align = function(### Parameters for generative model
   f_mat = c()
   time_vec = c()
   for (id_subj in 1:N_subj){
-    res_smooth = density(spks_time_mlist[[id_subj]], bw = bw, n = length(t_vec), from = min(t_vec), to = max(t_vec))
-    f_mat = cbind(f_mat, res_smooth$y)
+    res_smooth = density(unlist(spks_time_mlist[id_subj, ]), bw = bw, n = length(t_vec), from = min(t_vec), to = max(t_vec))
+    y_curr_subj = res_smooth$y
+    if (use_intensity) {
+      N_spks_curr_subj = mean(sapply(spks_time_mlist[id_subj, ], function(list_tmp)length(unlist(list_tmp))))
+      y_curr_subj = N_spks_curr_subj * y_curr_subj
+    }
+    
+    f_mat = cbind(f_mat, y_curr_subj)
     time_vec = res_smooth$x
+    
   }
   
   
@@ -97,6 +107,11 @@ main_kmeans_align = function(### Parameters for generative model
   # Extract center densities 
   center_density_mat_est = t(fdakma_obj$templates[1, , ])
   center_density_mat_est_permn = center_density_mat_est[the_permn, , drop = FALSE]
+  if (use_intensity) {
+    for (id_clus in 1:N_clus) {
+      center_density_mat_est_permn[id_clus, ] = center_density_mat_est_permn[id_clus, ] / sum(center_density_mat_est_permn[id_clus, ]*t_unit)
+    }
+  }
   center_density_array_est_permn = array(dim = c(N_clus, 1, length(t_vec)))
   center_density_array_est_permn[ , 1, ] = center_density_mat_est_permn
   
