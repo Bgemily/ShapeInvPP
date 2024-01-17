@@ -37,7 +37,7 @@ save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Compare_methods_Nclus4_v4.3.3'
-method = 'kcfc_use_intensity'
+method = 'kcfc_use_intensity_no_smth_not_specific_FVE'
 
 ### Parameters' possible values:
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2 )
@@ -70,7 +70,6 @@ if (TRUE) {
                            key_times_vec = key_times_vec_list[[1]],
                            ### Parameters for algorithms
                            use_intensity = TRUE,
-                           bw = 'SJ',
                            N_component = 2,
                            save_center_pdf_array = save_center_pdf_array),
                  error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
