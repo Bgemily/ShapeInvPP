@@ -37,7 +37,7 @@ save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Compare_methods_Nclus4_v4.3.3'
-method = 'kmeans_align_use_intensity_no_smth'
+method = 'kmeans_align_use_intensity_internal_smth'
 
 ### Parameters' possible values:
 N_trial_list = list(2,3,4,5,6,7,8,9,10)
@@ -73,6 +73,7 @@ if (TRUE) {
                                    key_times_vec = key_times_vec_list[[1]],
                                    ### Parameters for algorithms
                                    use_intensity = TRUE,
+                                   smooth_data = TRUE,
                                    N_component = 1,
                                    save_center_pdf_array = save_center_pdf_array),
                  error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
@@ -118,7 +119,8 @@ if (TRUE) {
                                    clus_sep = 0.5,
                                    key_times_vec = key_times_vec_list[[1]],
                                    ### Parameters for algorithms
-                                   use_intensity = TRUE,
+                                   use_intensity = TRUE, 
+                                   smooth_data = TRUE,
                                    N_component = 1,
                                    save_center_pdf_array = save_center_pdf_array),
                  error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )

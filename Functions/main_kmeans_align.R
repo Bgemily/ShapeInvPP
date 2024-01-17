@@ -25,6 +25,7 @@ main_kmeans_align = function(### Parameters for generative model
   clus_mixture = 0,
   ### Parameters for algorithms
   use_intensity = FALSE,
+  smooth_data = FALSE,
   bw = 0,
   N_component = 2,
   key_times_vec = c(min(t_vec),0,max(t_vec)),
@@ -96,6 +97,7 @@ main_kmeans_align = function(### Parameters for generative model
   fdakma_obj = fdasrvf::kmeans_align(f = f_mat,
                                      time = time_vec,
                                      K = N_clus,
+                                     smooth_data = smooth_data,
                                      alignment = TRUE, 
                                     nonempty = 2, 
                                     max_iter = 50,
