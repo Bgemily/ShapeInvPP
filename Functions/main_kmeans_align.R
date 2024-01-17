@@ -73,9 +73,11 @@ main_kmeans_align = function(### Parameters for generative model
     if (FALSE) {
       res_smooth = density(unlist(spks_time_mlist[id_subj, ]), bw = bw, n = length(t_vec), from = min(t_vec), to = max(t_vec))
       y_curr_subj = res_smooth$y
+      time_vec = res_smooth$x
     } else {
       breaks = c(t_vec[1]-t_unit,t_vec)+t_unit/2
       y_curr_subj = hist(unlist(spks_time_mlist[id_subj, ]), breaks=breaks, plot=FALSE)$counts / t_unit / length(unlist(spks_time_mlist[id_subj, ]))
+      time_vec = t_vec
     }
    
     if (use_intensity) {
@@ -84,10 +86,9 @@ main_kmeans_align = function(### Parameters for generative model
     }
     
     f_mat = cbind(f_mat, y_curr_subj)
-    time_vec = res_smooth$x
+    
     
   }
-  
   
   ### Apply kmeans_align() --------------------------------
   set.seed(SEED)
