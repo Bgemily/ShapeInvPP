@@ -36,7 +36,7 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus4_v4.3.3'
+setup = 'Compare_methods_Nclus4_v4.3.4'
 method = 'kmeans_align_use_intensity_internal_smth'
 
 ### Parameters' possible values:
@@ -47,7 +47,7 @@ timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2, c(1/32/4, 1/32)*3,
 N_subj_list = list(40, 60, 80, 100, 120, 140)
 key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.02-0.2,1.5), c(-1,0.04-0.2,1.5), 
                           c(-1,0.06-0.2,1.5), c(-1,0.08-0.2,1.5), c(-1,0.1-0.2,1.5))
-clus_sep_list = list(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9)
+clus_sep_list = list(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95)
 
 if (TRUE) {
   default_setting = 'N_trial=2,timeshift_trial_max=0.1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
@@ -96,7 +96,7 @@ if (TRUE) {
   
 }
 
-if (TRUE) {
+if (FALSE) {
   default_setting = 'N_trial=2,timeshift_trial_max=0.1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
