@@ -105,7 +105,7 @@ for (id_session in c(13)) {
   # gamma = 0.007
   
   set.seed(1)
-  for (gamma in c(0.01, 0.003, 0.001, 0.0003, 0.0001, 0.03, 0.1, 0.3, 1, 3, 10)) {
+  for (gamma in 10^c(-4.5,-5,-5.5,-6)) {
   res_list = list()
   compl_log_lik_vec = c()
   log_lik_vec = c()
