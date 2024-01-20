@@ -66,8 +66,8 @@ generate_data = function(SEED=NULL,
   } else if (N_clus==4){
     center_N_spks_mat[1,1] = N_spks_total*0.7*(0.5)
     center_N_spks_mat[1,2] = N_spks_total*0.7*(0.5)
-    center_N_spks_mat[2,1] = N_spks_total*0.8*(0.5-max(0,(2*clus_sep-1)*0.5))
-    center_N_spks_mat[2,2] = N_spks_total*0.8*(0.5+max(0,(2*clus_sep-1)*0.5))
+    center_N_spks_mat[2,1] = N_spks_total*0.8*(0.5-max(0,sqrt(clus_sep-0.5)/(2*sqrt(0.5))))
+    center_N_spks_mat[2,2] = N_spks_total*0.8*(0.5+max(0,sqrt(clus_sep-0.5)/(2*sqrt(0.5))))
     if (TRUE){
       center_N_spks_mat[3,1] = N_spks_total*0.9*(0.5+(clus_sep)/4)
       center_N_spks_mat[3,2] = N_spks_total*0.9*(0.5-(clus_sep)/4)
