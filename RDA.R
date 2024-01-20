@@ -11,6 +11,8 @@ library(mclust)
 library(combinat)
 library(fdapace)
 
+args <- commandArgs(trailingOnly = TRUE)
+gamma <- args[1]
 
 
 for (id_session in c(13)) {
@@ -105,7 +107,7 @@ for (id_session in c(13)) {
   # gamma = 0.007
   
   set.seed(1)
-  for (gamma in 10^c(-4.5,-5,-5.5,-6)) {
+  # for (gamma in 10^c(-4.5,-5,-5.5,-6)) {
   res_list = list()
   compl_log_lik_vec = c()
   log_lik_vec = c()
@@ -228,7 +230,7 @@ for (id_session in c(13)) {
   now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
   save(results, file = paste0(folder_path, '/', 'res', '_', now_replicate, '.Rdata'))
   
-  }
+  # }
 }
 
 
