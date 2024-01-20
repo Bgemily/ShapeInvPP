@@ -30,7 +30,19 @@ for (id_session in c(13)) {
   N_neuron = length(id_neuron_selected)
   N_trial = length(id_trial_selected)
   
-  trial_length = max(dat$trial_intervals[id_trial_selected,2] - dat$stim_onset[id_trial_selected]) + 0.2
+  if (FALSE) {
+    trial_length = max(dat$trial_intervals[id_trial_selected,2] - dat$stim_onset[id_trial_selected]) + 0.2
+  } else {
+    trial_length = 2.5
+    if (FALSE) {
+      # Reason for setting trial start as 0.4s prior to stim onset: 
+      # 97.5% trials have more than 0.4s from trial start to stim onset
+      quantile(dat$stim_onset[id_trial_selected]-dat$trial_intervals[id_trial_selected,1],0.025) 
+      # Reason for setting trial end as 2.1s post stim onset:
+      # 97.5% trials have more than 2.1s from stim onset in current trial to stim onset in next trial
+      quantile(dat$stim_onset[id_trial_selected+1]-dat$stim_onset[id_trial_selected],0.025)
+    }
+  }
   if (identical(feedback_type, 1)) {
     t_vec = seq(0, trial_length, length.out=200)
   } else {
@@ -38,11 +50,12 @@ for (id_session in c(13)) {
   }
 
   ### Select neuron-trial pairs
-  trial_start_vec = dat$trial_intervals[,2] - trial_length
+  trial_start_vec = dat$stim_onset - 0.4
   stim_onset_time_vec = (dat$stim_onset - trial_start_vec)[id_trial_selected]
   gocue_time_vec = (dat$gocue - trial_start_vec)[id_trial_selected]
   reaction_time_vec = (dat$reaction_time - trial_start_vec)[id_trial_selected]
   feedback_time_vec = (dat$feedback_time - trial_start_vec)[id_trial_selected]
+  
   spks_time_mlist = matrix(list(), nrow = N_neuron, ncol = N_trial)
   for (i in 1:N_neuron) {
     for (j in 1:N_trial) {
@@ -52,10 +65,12 @@ for (id_session in c(13)) {
       spks_vec = dat$spks_pp[id_neuron, id_trial][[1]]
       spks_shifted_vec = spks_vec - trial_start_vec[id_trial]
 
-      stim_onset_time_shifted = dat$stim_onset[id_trial] - trial_start_vec[id_trial]
-      feedback_time_shifted = dat$feedback_time[id_trial] - trial_start_vec[id_trial]
-      spks_shifted_vec = spks_shifted_vec[which( (spks_shifted_vec <= min(max(t_vec), Inf+feedback_time_shifted)) &
-                                                   (spks_shifted_vec >= max(min(t_vec), -Inf+stim_onset_time_shifted) ) )]
+      stim_onset_nexttrial = dat$stim_onset[id_trial+1] - trial_start_vec[id_trial]
+      trial_start_currtrial = dat$trial_intervals[id_trial,1] - trial_start_vec[id_trial]
+      trial_end_time = min(max(t_vec), stim_onset_nexttrial)
+      trial_start_time = max(min(t_vec), trial_start_currtrial)
+      spks_shifted_vec = spks_shifted_vec[which( (spks_shifted_vec <= trial_end_time) &
+                                                   (spks_shifted_vec >= trial_start_time ) )]
 
       spks_time_mlist[i, j] = list(spks_shifted_vec)
     }
@@ -90,7 +105,7 @@ for (id_session in c(13)) {
   # gamma = 0.007
   
   set.seed(1)
-  for (gamma in c(0.005, 0.007, 0.01, 0.003, 0.001, 0, 0.02, 0.03, 0.015, 0.025)) {
+  for (gamma in c(0.01, 0.003, 0.001, 0.0003, 0.0001, 0.03, 0.1, 0.3, 1, 3, 10)) {
   res_list = list()
   compl_log_lik_vec = c()
   log_lik_vec = c()
@@ -198,8 +213,8 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v2'
-  method = paste0('shape_inv_pp_v6.2.4_gamma',gamma)
+  setup = 'RDA_v3'
+  method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
                            ', scenario_num = ', paste0(scenario_num, collapse = '_'),
