@@ -12,8 +12,9 @@ library(combinat)
 library(fdapace)
 
 args <- commandArgs(trailingOnly = TRUE)
-gamma <- args[1]
-
+gamma <- as.numeric(args[1])
+print(gamma)
+print(class(gamma))
 
 for (id_session in c(13)) {
   # Prepare data ------------------------------------------------------------
@@ -65,12 +66,20 @@ for (id_session in c(13)) {
       id_trial = id_trial_selected[j]
 
       spks_vec = dat$spks_pp[id_neuron, id_trial][[1]]
+      if ((id_trial+1) <= N_trial) {
+        spks_vec_nexttrial = dat$spks_pp[id_neuron, id_trial+1][[1]]
+        spks_vec = c(spks_vec, spks_vec_nexttrial)
+      }
+      if ((id_trial-1) >= 1) {
+        spks_vec_prevtrial = dat$spks_pp[id_neuron, id_trial-1][[1]]
+        spks_vec = c(spks_vec_prevtrial, spks_vec)
+      }
       spks_shifted_vec = spks_vec - trial_start_vec[id_trial]
 
       stim_onset_nexttrial = dat$stim_onset[id_trial+1] - trial_start_vec[id_trial]
       trial_start_currtrial = dat$trial_intervals[id_trial,1] - trial_start_vec[id_trial]
-      trial_end_time = min(max(t_vec), stim_onset_nexttrial)
-      trial_start_time = max(min(t_vec), trial_start_currtrial)
+      trial_end_time = max(t_vec)
+      trial_start_time = min(t_vec)
       spks_shifted_vec = spks_shifted_vec[which( (spks_shifted_vec <= trial_end_time) &
                                                    (spks_shifted_vec >= trial_start_time ) )]
 
@@ -215,7 +224,7 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v3'
+  setup = 'RDA_v3.1.1'
   method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
