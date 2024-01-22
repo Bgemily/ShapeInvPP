@@ -66,7 +66,7 @@ for (id_session in c(13)) {
       id_trial = id_trial_selected[j]
 
       spks_vec = dat$spks_pp[id_neuron, id_trial][[1]]
-      if ((id_trial+1) <= N_trial) {
+      if ((id_trial+1) <= ncol(dat$spks_pp)) {
         spks_vec_nexttrial = dat$spks_pp[id_neuron, id_trial+1][[1]]
         spks_vec = c(spks_vec, spks_vec_nexttrial)
       }
@@ -92,6 +92,7 @@ for (id_session in c(13)) {
   N_neuron = length(id_neuron_selected)
   spks_time_mlist = spks_time_mlist[id_neuron_active, ]
 
+  
   # Fit model for various cluster number ------------------------------------
   N_clus_min = 2
   N_clus_max = 6
@@ -224,7 +225,7 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v3.1.1'
+  setup = 'RDA_v3.1.2'
   method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
