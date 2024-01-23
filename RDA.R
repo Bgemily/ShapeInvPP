@@ -30,20 +30,21 @@ for (id_session in c(13)) {
     id_trial_selected = sample(id_trial_selected, 3)
     id_neuron_selected = sample(id_neuron_selected, 30)
   }
-  N_neuron = length(id_neuron_selected)
-  N_trial = length(id_trial_selected)
   
   if (FALSE) {
     trial_length = max(dat$trial_intervals[id_trial_selected,2] - dat$stim_onset[id_trial_selected]) + 0.2
   } else {
     trial_length = 2.5
     if (FALSE) {
-      # Reason for setting trial start as 0.4s prior to stim onset: 
+      # Maximum duration from stimuli onset to trial end is 2.361:
+      summary(dat$trial_intervals[id_trial_selected,2]-dat$stim_onset[id_trial_selected])
       # 97.5% trials have more than 0.4s from trial start to stim onset
       quantile(dat$stim_onset[id_trial_selected]-dat$trial_intervals[id_trial_selected,1],0.025) 
       # Reason for setting trial end as 2.1s post stim onset:
       # 97.5% trials have more than 2.1s from stim onset in current trial to stim onset in next trial
       quantile(dat$stim_onset[id_trial_selected+1]-dat$stim_onset[id_trial_selected],0.025)
+      # 97.5% trials have more than 0.4s from end of current trial to stim onset in next trial
+      quantile(dat$stim_onset[id_trial_selected+1]-dat$trial_intervals[id_trial_selected,2],0.0)
     }
   }
   if (identical(feedback_type, 1)) {
@@ -53,15 +54,28 @@ for (id_session in c(13)) {
   }
 
   ### Select neuron-trial pairs
-  trial_start_vec = dat$stim_onset - 0.4
+  if (FALSE) {
+    trial_start_vec = dat$stim_onset - 0.4
+  } else {
+    trial_start_vec = (dat$stim_onset+dat$trial_intervals[,2])/2 - trial_length/2
+  }
+  
+  # Remove trials which cannot cover desired trial length
+  if (TRUE) {
+    id_trial_drop_1 = which(trial_start_vec[id_trial_selected]-dat$trial_intervals[id_trial_selected,1] <= -(t_vec[2]-t_vec[1]))
+    id_trial_drop_2 = which(dat$stim_onset[id_trial_selected+1]-(trial_start_vec[id_trial_selected]+trial_length) <= -(t_vec[2]-t_vec[1]))
+    id_trial_selected = id_trial_selected[-c(id_trial_drop_1, id_trial_drop_2)]
+  }
+  
   stim_onset_time_vec = (dat$stim_onset - trial_start_vec)[id_trial_selected]
   gocue_time_vec = (dat$gocue - trial_start_vec)[id_trial_selected]
   reaction_time_vec = (dat$reaction_time - trial_start_vec)[id_trial_selected]
   feedback_time_vec = (dat$feedback_time - trial_start_vec)[id_trial_selected]
   
-  spks_time_mlist = matrix(list(), nrow = N_neuron, ncol = N_trial)
-  for (i in 1:N_neuron) {
-    for (j in 1:N_trial) {
+  
+  spks_time_mlist = matrix(list(), nrow = length(id_neuron_selected), ncol = length(id_trial_selected))
+  for (i in 1:length(id_neuron_selected)) {
+    for (j in 1:length(id_trial_selected)) {
       id_neuron = id_neuron_selected[i]
       id_trial = id_trial_selected[j]
 
@@ -87,11 +101,13 @@ for (id_session in c(13)) {
     }
   }
   N_spks_subjwise = rowSums(apply(spks_time_mlist, c(1,2), function(ls)length(unlist(ls))))
-  id_neuron_active = which(N_spks_subjwise/N_trial >= 1)
+  id_neuron_active = which(N_spks_subjwise/length(id_trial_selected) >= 1)
   id_neuron_selected = id_neuron_selected[id_neuron_active]
   N_neuron = length(id_neuron_selected)
   spks_time_mlist = spks_time_mlist[id_neuron_active, ]
 
+  N_neuron = length(id_neuron_selected)
+  N_trial = length(id_trial_selected)
   
   # Fit model for various cluster number ------------------------------------
   N_clus_min = 2
@@ -225,7 +241,7 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v3.1.2'
+  setup = 'RDA_v3.1.3'
   method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
