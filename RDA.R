@@ -56,8 +56,10 @@ for (id_session in c(13)) {
   ### Select neuron-trial pairs
   if (FALSE) {
     trial_start_vec = dat$stim_onset - 0.4
-  } else {
+  } else if (FALSE) {
     trial_start_vec = (dat$stim_onset+dat$trial_intervals[,2])/2 - trial_length/2
+  } else {
+    trial_start_vec = dat$trial_intervals[,2] - trial_length
   }
   
   # Remove trials which cannot cover desired trial length
@@ -241,7 +243,7 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v3.1.3'
+  setup = 'RDA_v3.1.4_align_fb'
   method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
