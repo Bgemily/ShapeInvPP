@@ -117,7 +117,7 @@ for (id_session in c(13)) {
   cand_N_clus_vec = N_clus_min:N_clus_max
   N_component = 2
   if (identical(feedback_type, 1)) {
-    key_times_vec = c(min(stim_onset_time_vec), min(feedback_time_vec), trial_length)
+    key_times_vec = c(min(stim_onset_time_vec), min(gocue_time_vec), trial_length)
   } else {
     key_times_vec = c(-1.7, 0, 2.5)
   }
@@ -128,7 +128,7 @@ for (id_session in c(13)) {
   fix_comp1_timeshift_only = FALSE
   v_true_mat_list = NULL
   v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
-                              feedback_time_vec - min(feedback_time_vec))
+                              gocue_time_vec - min(gocue_time_vec))
   N_restart = 1
   MaxIter = 10 
   conv_thres = 5e-6 
@@ -243,7 +243,7 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v3.1.5_align_midpoint_comp2_fb'
+  setup = 'RDA_v3.1.6'
   method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
