@@ -14,7 +14,8 @@ get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
                                       fix_timeshift,
                                       rand_init,
                                       fix_comp1_timeshift_only,
-                                      gamma)
+                                      gamma,
+                                      v_subjwise_max=NULL)
 {
   t_unit = t_vec[2]-t_vec[1]
   N_subj = dim(subjtrial_density_smooth_array)[1]
@@ -42,6 +43,7 @@ get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
                       freq_trun = freq_trun, 
                       bw = bw,
                       t_vec = t_vec,
+                      v_subjwise_max = v_subjwise_max,
                       key_times_vec = key_times_vec,
                       fix_timeshift = fix_timeshift,
                       rand_init = rand_init,
