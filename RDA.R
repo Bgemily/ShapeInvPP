@@ -181,6 +181,7 @@ for (id_session in c(13)) {
                                freq_trun = freq_trun,
                                gamma = gamma,
                                t_vec=t_vec, 
+                               v_subjwise_max = 0.5,
                                key_times_vec = key_times_vec,
                                fix_timeshift = fix_timeshift, 
                                MaxIter = MaxIter, 
@@ -243,7 +244,7 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v3.1.7_change_v_subjwise_max'
+  setup = 'RDA_v3.1.8_v_subjwise_max_0.5'
   method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
