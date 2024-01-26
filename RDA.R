@@ -63,11 +63,11 @@ for (id_session in c(13)) {
   }
   
   # Remove trials which cannot cover desired trial length
-  if (TRUE) {
+  if (FALSE) {
     id_trial_drop_1 = which(trial_start_vec[id_trial_selected]-dat$trial_intervals[id_trial_selected,1] <= -(t_vec[2]-t_vec[1]))
     id_trial_drop_2 = which(dat$stim_onset[id_trial_selected+1]-(trial_start_vec[id_trial_selected]+trial_length) <= -(t_vec[2]-t_vec[1]))
     id_trial_selected = id_trial_selected[-c(id_trial_drop_1, id_trial_drop_2)]
-  }
+  } 
   
   stim_onset_time_vec = (dat$stim_onset - trial_start_vec)[id_trial_selected]
   gocue_time_vec = (dat$gocue - trial_start_vec)[id_trial_selected]
@@ -84,21 +84,45 @@ for (id_session in c(13)) {
       spks_vec = dat$spks_pp[id_neuron, id_trial][[1]]
       if ((id_trial+1) <= ncol(dat$spks_pp)) {
         spks_vec_nexttrial = dat$spks_pp[id_neuron, id_trial+1][[1]]
+        stim_onset_nexttrial = dat$stim_onset[id_trial+1] 
+        spks_vec_nexttrial = spks_vec_nexttrial[spks_vec_nexttrial <= stim_onset_nexttrial]
         spks_vec = c(spks_vec, spks_vec_nexttrial)
-      }
-      if ((id_trial-1) >= 1) {
-        spks_vec_prevtrial = dat$spks_pp[id_neuron, id_trial-1][[1]]
-        spks_vec = c(spks_vec_prevtrial, spks_vec)
       }
       spks_shifted_vec = spks_vec - trial_start_vec[id_trial]
 
-      stim_onset_nexttrial = dat$stim_onset[id_trial+1] - trial_start_vec[id_trial]
-      trial_start_currtrial = dat$trial_intervals[id_trial,1] - trial_start_vec[id_trial]
+      # Augment spikes if the trial cannot cover desired trial length
+      if ( dat$trial_intervals[id_trial,1] > trial_start_vec[id_trial] ) {
+        spks_shifted_vec_augmented = spks_shifted_vec
+        stim_onset_currtrial = dat$stim_onset[id_trial] - trial_start_vec[id_trial] 
+        spks_for_fill = spks_shifted_vec[spks_shifted_vec < stim_onset_currtrial]
+        length_for_fill = dat$stim_onset[id_trial] - dat$trial_intervals[id_trial,1]
+        length_to_be_fill =  dat$trial_intervals[id_trial,1] - trial_start_vec[id_trial] 
+        N_fill = ceiling(length_to_be_fill / length_for_fill )
+        for (id_fill in 1:N_fill) {
+          spks_shifted_vec_augmented = c(spks_for_fill - id_fill * length_for_fill, spks_shifted_vec_augmented)
+        }
+        spks_shifted_vec_augmented = spks_shifted_vec_augmented[spks_shifted_vec_augmented>0]
+        spks_shifted_vec = spks_shifted_vec_augmented
+      }
+      if ( dat$stim_onset[id_trial+1] < (trial_start_vec[id_trial]+trial_length)  ) {
+        spks_shifted_vec_augmented = spks_shifted_vec
+        conclusion_currtrial = dat$trial_intervals[id_trial,2] - trial_start_vec[id_trial] 
+        spks_for_fill = spks_shifted_vec[spks_shifted_vec > conclusion_currtrial]
+        length_for_fill = (dat$stim_onset[id_trial+1]) - dat$trial_intervals[id_trial,2]
+        length_to_be_fill = (trial_start_vec[id_trial]+trial_length) - (dat$stim_onset[id_trial+1])
+        N_fill = ceiling(length_to_be_fill / length_for_fill )
+        for (id_fill in 1:N_fill) {
+          spks_shifted_vec_augmented = c(spks_shifted_vec_augmented, spks_for_fill + id_fill * length_for_fill)
+        }
+        spks_shifted_vec_augmented = spks_shifted_vec_augmented[spks_shifted_vec_augmented < trial_length]
+        spks_shifted_vec = spks_shifted_vec_augmented
+      }
+      
       trial_end_time = max(t_vec)
       trial_start_time = min(t_vec)
       spks_shifted_vec = spks_shifted_vec[which( (spks_shifted_vec <= trial_end_time) &
                                                    (spks_shifted_vec >= trial_start_time ) )]
-
+      
       spks_time_mlist[i, j] = list(spks_shifted_vec)
     }
   }
@@ -244,7 +268,7 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v3.1.9_v_subjwise_max_0.3'
+  setup = 'RDA_v3.2.0_fill_spks'
   method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
