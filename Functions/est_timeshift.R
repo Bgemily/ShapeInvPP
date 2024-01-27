@@ -58,7 +58,7 @@ est_timeshift = function(subjtrial_density_smooth_array,
     } else {
       if (is.null(v_subjwise_max)) {
         v_trialwise_max = max(sapply(1:N_component, function(id_component)key_times_vec[id_component]+v_trialwise_vec_list[[id_component]]-min(t_vec)) )
-        v_subjwise_max = (max(t_vec)-min(t_vec) - v_trialwise_max)
+        v_subjwise_max = (max(t_vec)-min(t_vec) - v_trialwise_max)/2
       }
       n0_max_vec = rep(round( v_subjwise_max / t_unit), N_component)
       n0_min_vec = rep(0, N_component)

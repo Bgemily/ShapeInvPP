@@ -153,7 +153,7 @@ for (id_session in c(13)) {
   v_true_mat_list = NULL
   v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
                               gocue_time_vec - min(gocue_time_vec))
-  N_restart = 5
+  N_restart = 1
   MaxIter = 10 
   conv_thres = 5e-6 
   # gamma = 0.007
@@ -267,8 +267,8 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v3.2.1_fill_spks'
-  method = paste0('shape_inv_pp_v2_Nrestart5_gamma',gamma)
+  setup = 'RDA_v3.2.2_fill_spks_maxv_half_T_maxw'
+  method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
                            ', scenario_num = ', paste0(scenario_num, collapse = '_'),
