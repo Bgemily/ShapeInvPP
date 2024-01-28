@@ -127,7 +127,7 @@ for (id_session in c(13)) {
     }
   }
   N_spks_subjwise = rowSums(apply(spks_time_mlist, c(1,2), function(ls)length(unlist(ls))))
-  id_neuron_active = which(N_spks_subjwise/length(id_trial_selected) >= 1)
+  id_neuron_active = which(N_spks_subjwise/length(id_trial_selected) >= 10)
   id_neuron_selected = id_neuron_selected[id_neuron_active]
   N_neuron = length(id_neuron_selected)
   spks_time_mlist = spks_time_mlist[id_neuron_active, ]
@@ -267,7 +267,7 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v3.2.2_fill_spks_maxv_half_T_maxw'
+  setup = 'RDA_v3.2.3_Nspks_geq10_fill_spks'
   method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
