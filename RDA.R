@@ -34,18 +34,7 @@ for (id_session in c(13)) {
   if (FALSE) {
     trial_length = max(dat$trial_intervals[id_trial_selected,2] - dat$stim_onset[id_trial_selected]) + 0.2
   } else {
-    trial_length = 2.5
-    if (FALSE) {
-      # Maximum duration from stimuli onset to trial end is 2.361:
-      summary(dat$trial_intervals[id_trial_selected,2]-dat$stim_onset[id_trial_selected])
-      # 97.5% trials have more than 0.4s from trial start to stim onset
-      quantile(dat$stim_onset[id_trial_selected]-dat$trial_intervals[id_trial_selected,1],0.025) 
-      # Reason for setting trial end as 2.1s post stim onset:
-      # 97.5% trials have more than 2.1s from stim onset in current trial to stim onset in next trial
-      quantile(dat$stim_onset[id_trial_selected+1]-dat$stim_onset[id_trial_selected],0.025)
-      # 97.5% trials have more than 0.4s from end of current trial to stim onset in next trial
-      quantile(dat$stim_onset[id_trial_selected+1]-dat$trial_intervals[id_trial_selected,2],0.0)
-    }
+    trial_length = 3.5
   }
   if (identical(feedback_type, 1)) {
     t_vec = seq(0, trial_length, length.out=200)
@@ -57,7 +46,7 @@ for (id_session in c(13)) {
   if (FALSE) {
     trial_start_vec = dat$stim_onset - 0.4
   } else if (TRUE) {
-    trial_start_vec = (dat$stim_onset+dat$trial_intervals[,2])/2 - trial_length/2
+    trial_start_vec = ((dat$stim_onset-0.1)+(dat$feedback_time+2))/2 - trial_length/2
   } else {
     trial_start_vec = dat$trial_intervals[,2] - trial_length
   }
@@ -90,12 +79,11 @@ for (id_session in c(13)) {
       }
       spks_shifted_vec = spks_vec - trial_start_vec[id_trial]
 
-      # Augment spikes if the trial cannot cover desired trial length
+      # Augment spikes if previous trial conclusion occurs after desired observation start time
       if ( dat$trial_intervals[id_trial,1] > trial_start_vec[id_trial] ) {
         spks_shifted_vec_augmented = spks_shifted_vec
-        stim_onset_currtrial = dat$stim_onset[id_trial] - trial_start_vec[id_trial] 
-        spks_for_fill = spks_shifted_vec[spks_shifted_vec < stim_onset_currtrial]
-        length_for_fill = dat$stim_onset[id_trial] - dat$trial_intervals[id_trial,1]
+        length_for_fill = 0.4
+        spks_for_fill = spks_shifted_vec[spks_shifted_vec < (dat$trial_intervals[id_trial,1] - trial_start_vec[id_trial] +length_for_fill)]
         length_to_be_fill =  dat$trial_intervals[id_trial,1] - trial_start_vec[id_trial] 
         N_fill = ceiling(length_to_be_fill / length_for_fill )
         for (id_fill in 1:N_fill) {
@@ -104,11 +92,11 @@ for (id_session in c(13)) {
         spks_shifted_vec_augmented = spks_shifted_vec_augmented[spks_shifted_vec_augmented>0]
         spks_shifted_vec = spks_shifted_vec_augmented
       }
+      # Augment spikes if next trial's stimuli onset occurs before desired observation end time
       if ( dat$stim_onset[id_trial+1] < (trial_start_vec[id_trial]+trial_length)  ) {
         spks_shifted_vec_augmented = spks_shifted_vec
-        conclusion_currtrial = dat$trial_intervals[id_trial,2] - trial_start_vec[id_trial] 
-        spks_for_fill = spks_shifted_vec[spks_shifted_vec > conclusion_currtrial]
-        length_for_fill = (dat$stim_onset[id_trial+1]) - dat$trial_intervals[id_trial,2]
+        length_for_fill = 0.4
+        spks_for_fill = spks_shifted_vec[spks_shifted_vec > (dat$stim_onset[id_trial+1]-trial_start_vec[id_trial]-length_for_fill)]
         length_to_be_fill = (trial_start_vec[id_trial]+trial_length) - (dat$stim_onset[id_trial+1])
         N_fill = ceiling(length_to_be_fill / length_for_fill )
         for (id_fill in 1:N_fill) {
@@ -122,12 +110,11 @@ for (id_session in c(13)) {
       trial_start_time = min(t_vec)
       spks_shifted_vec = spks_shifted_vec[which( (spks_shifted_vec <= trial_end_time) &
                                                    (spks_shifted_vec >= trial_start_time ) )]
-      
       spks_time_mlist[i, j] = list(spks_shifted_vec)
     }
   }
   N_spks_subjwise = rowSums(apply(spks_time_mlist, c(1,2), function(ls)length(unlist(ls))))
-  id_neuron_active = which(N_spks_subjwise/length(id_trial_selected) >= 10)
+  id_neuron_active = which(N_spks_subjwise/length(id_trial_selected) >= 1)
   id_neuron_selected = id_neuron_selected[id_neuron_active]
   N_neuron = length(id_neuron_selected)
   spks_time_mlist = spks_time_mlist[id_neuron_active, ]
@@ -153,7 +140,7 @@ for (id_session in c(13)) {
   v_true_mat_list = NULL
   v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
                               gocue_time_vec - min(gocue_time_vec))
-  N_restart = 5
+  N_restart = 1
   MaxIter = 10 
   conv_thres = 5e-6 
   # gamma = 0.007
@@ -205,6 +192,7 @@ for (id_session in c(13)) {
                                freq_trun = freq_trun,
                                gamma = gamma,
                                t_vec=t_vec, 
+                               v_subjwise_max = 1.0,
                                key_times_vec = key_times_vec,
                                fix_timeshift = fix_timeshift, 
                                MaxIter = MaxIter, 
@@ -267,7 +255,7 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v3.2.3_Nspks_geq10_fill_spks_Nrestart=5'
+  setup = 'RDA_v3.2.4_Nspks_geq1_fill_spks_Nrestart=1_v_subjwise_max=1'
   method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
