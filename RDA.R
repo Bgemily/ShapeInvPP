@@ -52,7 +52,7 @@ for (id_session in c(13)) {
   }
   
   # Remove trials which cannot cover desired trial length
-  if (FALSE) {
+  if (TRUE) {
     id_trial_drop_1 = which(trial_start_vec[id_trial_selected]-dat$trial_intervals[id_trial_selected,1] <= 0)
     id_trial_drop_2 = which(dat$stim_onset[id_trial_selected+1]-(trial_start_vec[id_trial_selected]+trial_length) <= 0)
     id_trial_selected = id_trial_selected[-c(id_trial_drop_1, id_trial_drop_2)]
@@ -255,7 +255,7 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v3.2.4_Nspks_geq1_fill_spks_Nrestart=1_v_subjwise_max=1'
+  setup = 'RDA_v3.2.4_Nspks_geq1_remove_short_trials_Nrestart=1_v_subjwise_max=1'
   method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
