@@ -20,6 +20,7 @@ do_cluster_pdf = function(spks_time_mlist,
                           rand_init = FALSE,
                           fix_comp1_timeshift_only=FALSE,
                           gamma=0.06,
+                          alpha=0,
                           ...)
 {
   
@@ -57,7 +58,8 @@ do_cluster_pdf = function(spks_time_mlist,
                                    fix_timeshift = fix_timeshift,
                                    freq_trun = freq_trun,
                                    bw = bw,
-                                   t_vec = t_vec)
+                                   t_vec = t_vec, 
+                                   alpha = alpha)
   center_density_array = res$center_density_array
   center_Nspks_mat = res$center_Nspks_mat
   center_intensity_array = res$center_intensity_array
@@ -103,7 +105,8 @@ do_cluster_pdf = function(spks_time_mlist,
                                      bw = bw,
                                      t_vec = t_vec,
                                      key_times_vec = key_times_vec,
-                                     fix_timeshift = fix_timeshift )
+                                     fix_timeshift = fix_timeshift, 
+                                     alpha = alpha )
     center_density_array_update = tmp$center_density_array
     center_Nspks_mat_update = tmp$center_Nspks_mat
     center_intensity_array_update = tmp$center_intensity_array
@@ -145,6 +148,16 @@ do_cluster_pdf = function(spks_time_mlist,
     clusters_list_update = tmp$clusters_list
     v_mat_list_update = tmp$v_mat_list
     l2_loss = tmp$l2_loss
+    for (id_clus in 1:N_clus) {
+      for (id_component in 1:N_component) {
+        deviance_from_constant = mean((center_density_array_update[id_clus,id_component,])^2)
+        regularization = alpha * deviance_from_constant
+        l2_loss = l2_loss + regularization
+        print(paste("Original loss:",l2_loss))
+        print(paste("Regularization:",regularization))
+      }
+    }
+    
     dist_to_centr_vec = tmp$dist_to_centr_vec
     loss_history = c(loss_history, l2_loss)
     
@@ -178,7 +191,8 @@ do_cluster_pdf = function(spks_time_mlist,
                                      bw = bw,
                                      t_vec = t_vec,
                                      key_times_vec = key_times_vec,
-                                     fix_timeshift = fix_timeshift )
+                                     fix_timeshift = fix_timeshift,
+                                     alpha = alpha)
     center_density_array_current = tmp$center_density_array
     center_Nspks_mat_current = tmp$center_Nspks_mat
     center_intensity_array_current = tmp$center_intensity_array

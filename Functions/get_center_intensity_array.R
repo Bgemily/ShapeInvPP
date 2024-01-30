@@ -11,7 +11,8 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
                                       t_vec=seq(0, 1, by=0.01),
                                       key_times_vec = c(min(t_vec), 0, max(t_vec)),
                                       bw=0,
-                                      fix_timeshift=FALSE)
+                                      fix_timeshift=FALSE,
+                                      alpha=0)
 {  
   t_unit = t_vec[2]-t_vec[1]
   N_clus = length(clusters_list)
@@ -69,6 +70,7 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
         for (l in 2:length(l_vec)) {
           W_X = matrix(diag(W_mat_q), nrow = nrow(W_mat_q), ncol = N_component) * as.matrix(X_array_q[l, , ])
           Xt_W_X = t(Conj(as.matrix(X_array_q[l, , ]))) %*% W_X
+          Xt_W_X = Xt_W_X + alpha * (1+2*freq_trun) * diag(x = 1, nrow = nrow(Xt_W_X), ncol = nrow(Xt_W_X))
           inv_Xt_W_X = tryCatch(solve(Xt_W_X), error=function(Xt_W_X){return(NULL)})
           W_Y = as.matrix(diag(W_mat_q) * Y_mat_q[l, ])
           if(is.null(inv_Xt_W_X)){
