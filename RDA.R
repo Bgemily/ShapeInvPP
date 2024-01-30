@@ -140,9 +140,9 @@ for (id_session in c(13)) {
   v_true_mat_list = NULL
   v_trialwise_vec_list = list(stim_onset_time_vec - min(stim_onset_time_vec), 
                               gocue_time_vec - min(gocue_time_vec))
-  N_restart = 5
+  N_restart = 1
   MaxIter = 10 
-  conv_thres = 5e-3
+  conv_thres = 0.01
   # gamma = 0.007
   
   set.seed(1)
@@ -257,7 +257,7 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v3.2.5_Nspks_geq1_fill_spks_trials_Nrestart=5_v_subjwise_max=1'
+  setup = 'RDA_v3.2.6_Nspks_geq1_fill_spks_trials_Nrestart=1_v_subjwise_max=1'
   method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
