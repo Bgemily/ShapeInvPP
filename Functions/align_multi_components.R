@@ -83,9 +83,11 @@ align_multi_components = function(f_target_array,
       id_subj = which(!converge_vec)[i]
       inv_hessian_mat_tmp = try(solve(hessian_array[i, , ]), silent = TRUE)
       if (identical(class(inv_hessian_mat_tmp), "try-error")) {
-        n0_mat[id_subj, ] = n0_mat[id_subj, ] - (diag(as.matrix(hessian_array[i, , ])) + .Machine$double.eps)^(-1) * gd_mat[i, ]
+        delta_n0 = pmax(-round(N_timetick/10), pmin(round(N_timetick/10), (diag(as.matrix(hessian_array[i, , ])) + .Machine$double.eps)^(-1) * gd_mat[i, ] ) )
+        n0_mat[id_subj, ] = n0_mat[id_subj, ] - delta_n0
       } else {
-        n0_mat[id_subj, ] = n0_mat[id_subj, ] - inv_hessian_mat_tmp %*% gd_mat[i, ]
+        delta_n0 = pmax(-round(N_timetick/10), pmin(round(N_timetick/10), inv_hessian_mat_tmp %*% gd_mat[i, ] ))
+        n0_mat[id_subj, ] = n0_mat[id_subj, ] - delta_n0
       }
     }
     n0_mat[which(n0_mat<n0_min_mat)] = n0_min_mat[which(n0_mat<n0_min_mat)]
