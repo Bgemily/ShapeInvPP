@@ -79,6 +79,15 @@ do_cluster_pdf = function(spks_time_mlist,
   clusters_history = c(clusters_history, list(clusters_list_init))
   center_density_array_history = c(center_density_array_history, list(center_density_array))
   
+  v_subjwise_vec_list_current = list()
+  for (id_component in 1:N_component) {
+    id_trial_tmp = 1
+    v_subjwise_vec_list_current[[id_component]] = v_mat_list[[id_component]][ ,id_trial_tmp] - v_trialwise_vec_list[[id_component]][id_trial_tmp]
+  }
+  v_subjwise_vec_list_history = list()
+  v_subjwise_vec_list_history = c(v_subjwise_vec_list_history, list(v_subjwise_vec_list_current))
+  
+
   n_iter = 1
   stopping = FALSE
   loss_history = c()
@@ -113,6 +122,13 @@ do_cluster_pdf = function(spks_time_mlist,
     v_mat_list_tmp = tmp$v_mat_list
     center_density_baseline_vec_update = tmp$center_density_baseline_vec
     center_intensity_baseline_vec_update = tmp$center_intensity_baseline_vec
+    
+    v_subjwise_vec_list_current = list()
+    for (id_component in 1:N_component) {
+      id_trial_tmp = 1
+      v_subjwise_vec_list_current[[id_component]] = v_mat_list_tmp[[id_component]][ ,id_trial_tmp] - v_trialwise_vec_list[[id_component]][id_trial_tmp]
+    }
+    v_subjwise_vec_list_history = c(v_subjwise_vec_list_history, list(v_subjwise_vec_list_current))
     
     clusters_history = c(clusters_history, list(clusters_list_current))
     center_density_array_history = c(center_density_array_history, list(center_density_array_update))
@@ -153,8 +169,6 @@ do_cluster_pdf = function(spks_time_mlist,
         deviance_from_constant = mean((center_density_array_update[id_clus,id_component,])^2)
         regularization = alpha * deviance_from_constant
         l2_loss = l2_loss + regularization
-        print(paste("Original loss:",l2_loss))
-        print(paste("Regularization:",regularization))
       }
     }
     
@@ -254,6 +268,7 @@ do_cluster_pdf = function(spks_time_mlist,
               center_intensity_baseline_vec = center_intensity_baseline_vec,
               v_mat_list = v_mat_list,
               v_subjwise_vec_list = v_subjwise_vec_list,
+              v_subjwise_vec_list_history = v_subjwise_vec_list_history,
               t_vec = t_vec,
               t_vec_extend = t_vec_extend,
               N_iteration = N_iteration))
