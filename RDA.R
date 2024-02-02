@@ -124,7 +124,7 @@ for (id_session in c(13)) {
   
   # Fit model for various cluster number ------------------------------------
   N_clus_min = 2
-  N_clus_max = 6
+  N_clus_max = 8
   cand_N_clus_vec = N_clus_min:N_clus_max
   N_component = 2
   if (identical(feedback_type, 1)) {
@@ -257,7 +257,7 @@ for (id_session in c(13)) {
   
   # Save results ------------------------------------------------------------
   top_level_folder = "../Results/Rdata"
-  setup = 'RDA_v3.2.7_Nspks_geq1_fill_spks_trials_Nrestart=1_v_subjwise_max=1'
+  setup = 'RDA_v3.2.8_Nspks_geq1_fill_spks_trials_Nrestart=1_v_subjwise_max=1'
   method = paste0('shape_inv_pp_v1_gamma',gamma)
   default_setting = paste0('Session ', id_session, 
                            ', ', brain_region, 
