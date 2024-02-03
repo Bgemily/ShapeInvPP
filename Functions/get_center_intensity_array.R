@@ -65,29 +65,54 @@ get_center_intensity_array = function(subjtrial_density_unsmooth_array,
       
       ### Get the least-squares estimator
       if(length(N_spks_subjtrial_vec_q)>1){
-        W_mat_q = diag(N_spks_subjtrial_vec_q)
-        theta_list = list()
-        for (l in 2:length(l_vec)) {
-          W_X = matrix(diag(W_mat_q), nrow = nrow(W_mat_q), ncol = N_component) * as.matrix(X_array_q[l, , ])
-          Xt_W_X = t(Conj(as.matrix(X_array_q[l, , ]))) %*% W_X
-          Xt_W_X = Xt_W_X + alpha * (1+2*freq_trun) * diag(x = 1, nrow = nrow(Xt_W_X), ncol = nrow(Xt_W_X))
-          inv_Xt_W_X = tryCatch(solve(Xt_W_X), error=function(Xt_W_X){return(NULL)})
-          W_Y = as.matrix(diag(W_mat_q) * Y_mat_q[l, ])
-          if(is.null(inv_Xt_W_X)){
-            tmp_2 = 0
-            if (abs((t(Conj(X_array_q[l, , ])) %*% W_X)[1,1]) == 0) {
-              tmp_1 = 0
+        if (alpha==0) {
+          W_mat_q = diag(N_spks_subjtrial_vec_q)
+          theta_list = list()
+          for (l in 2:length(l_vec)) {
+            W_X = matrix(diag(W_mat_q), nrow = nrow(W_mat_q), ncol = N_component) * as.matrix(X_array_q[l, , ])
+            Xt_W_X = t(Conj(as.matrix(X_array_q[l, , ]))) %*% W_X
+            inv_Xt_W_X = tryCatch(solve(Xt_W_X), error=function(Xt_W_X){return(NULL)})
+            W_Y = as.matrix(diag(W_mat_q) * Y_mat_q[l, ])
+            if(is.null(inv_Xt_W_X)){
+              tmp_2 = 0
+              if (abs((t(Conj(X_array_q[l, , ])) %*% W_X)[1,1]) == 0) {
+                tmp_1 = 0
+              } else {
+                tmp_1 = (t(Conj(X_array_q[l, , ])) %*% W_X)[1,1]^(-1) *
+                  (t(Conj(X_array_q[l, , ])) %*% W_Y)[1]
+              }
+              res = c(tmp_1, rep(0,N_component-1))
+              theta_list = c(theta_list, list(res))
             } else {
-              tmp_1 = (t(Conj(X_array_q[l, , ])) %*% W_X)[1,1]^(-1) *
-                (t(Conj(X_array_q[l, , ])) %*% W_Y)[1]
+              res =  inv_Xt_W_X %*% (t(Conj(X_array_q[l, , ])) %*% W_Y) 
+              theta_list = c(theta_list, list(res))
             }
-            res = c(tmp_1, rep(0,N_component-1))
-            theta_list = c(theta_list, list(res))
-          } else {
-            res =  inv_Xt_W_X %*% (t(Conj(X_array_q[l, , ])) %*% W_Y) 
-            theta_list = c(theta_list, list(res))
           }
+        } else if (alpha>0) {
+          W_mat_q = diag(N_spks_subjtrial_vec_q)
+          Ct_Xt_W_X_C_sum = 0
+          Ct_Xt_W_Y_sum = 0
+          for (l in 2:length(l_vec)) {
+            W_X = matrix(diag(W_mat_q), nrow = nrow(W_mat_q), ncol = N_component) * as.matrix(X_array_q[l, , ])
+            Xt_W_X = t(Conj(as.matrix(X_array_q[l, , ]))) %*% W_X
+            W_Y = as.matrix(diag(W_mat_q) * Y_mat_q[l, ])
+            Xt_W_Y = t(Conj(X_array_q[l, , ])) %*% W_Y
+            C_l = kronecker(matrix(1*((2:length(l_vec)==l)), nrow = 1), diag(x = 1, nrow = N_component) )
+            Ct_Xt_W_X_C_sum = Ct_Xt_W_X_C_sum + t(Conj(C_l)) %*% Xt_W_X %*% C_l
+            Ct_Xt_W_Y_sum = Ct_Xt_W_Y_sum + t(Conj(C_l)) %*% Xt_W_Y
+          }
+          D_Dt_sum = 0
+          for (id_component in 1:N_component) {
+            D_m = kronecker( rep(1, length(l_vec)-1), 1*((1:N_component)==id_component) )
+            D_Dt_sum = D_Dt_sum + D_m %*% t(D_m)
+          }
+          res = solve(Ct_Xt_W_X_C_sum + alpha*(diag(x = 1, nrow = nrow(D_Dt_sum)) + D_Dt_sum) ) %*% Ct_Xt_W_Y_sum
+          theta_list = lapply( 2:length(l_vec), function(l){ res[((l-2)*N_component+1):((l-1)*N_component)] } )
+          
+        } else {
+          stop("The value of alpha should be non-negative.")
         }
+        
       } else{
         W_mat_q = N_spks_subjtrial_vec_q
         theta_list = lapply( 2:length(l_vec), function(l){ c((X_array_q[l, , 1])^(-1)*Y_mat_q[l, ], rep(0, N_component-1)) } )
