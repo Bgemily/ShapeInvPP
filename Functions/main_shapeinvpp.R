@@ -26,6 +26,7 @@ main_shapeinvpp = function(### Parameters for generative model
                         freq_trun = 5,
                         bw = 0,
                         N_component = 2,
+                        v_subjwise_max = NULL,
                         key_times_vec = c(min(t_vec),0,max(t_vec)),
                         gamma = 0,
                         MaxIter = 10,
@@ -168,6 +169,7 @@ main_shapeinvpp = function(### Parameters for generative model
                                gamma=gamma,
                                t_vec=t_vec, 
                                t_vec_extend=t_vec_extend,
+                               v_subjwise_max = v_subjwise_max,
                                key_times_vec = key_times_vec,
                                fix_timeshift = fix_timeshift, 
                                rand_init = rand_init,
@@ -192,10 +194,8 @@ main_shapeinvpp = function(### Parameters for generative model
     
     # Save results of N_clus_tmp ----------------------------------------------
     res_list[[ind_N_clus]] = res_best
-    
   }
   
-
   # Select best cluster number using ICL ------------------------------------
   res_select_model = select_model(spks_time_mlist = spks_time_mlist, 
                                   N_component = N_component,
@@ -222,12 +222,57 @@ main_shapeinvpp = function(### Parameters for generative model
   res$loss_history -> loss_history
   res$N_iteration -> N_iteration
   
-  
+  # Evaluate L2 loss and log-likelihood for the results of the best cluster number -----
+  tmp = evaluate_model(spks_time_mlist = spks_time_mlist, 
+                       v_trialwise_vec_list = v_trialwise_vec_list, 
+                       N_component = N_component, 
+                       key_times_vec = key_times_vec, 
+                       model_fitted_list = res,
+                       freq_trun = freq_trun)
+  log_lik = tmp$log_lik
+  log_lik_tmp_1 = tmp$log_lik_tmp_1
+  log_lik_tmp_2 = tmp$log_lik_tmp_2
+  clus_entropy = tmp$clus_entropy
+  L2_loss_part_1 = tmp$L2_loss_part_1
+  L2_loss_part_2 = tmp$L2_loss_part_2
+  L2_loss_part_1_smoothdensity = tmp$L2_loss_part_1_smoothdensity
+  compl_log_lik = tmp$compl_log_lik
   
   # Compute estimation error ------------------------------------------------
-  if (N_clus_est == N_clus) {
-    # Compute errors of conn patts, i.e. F ---------
+  # Compute errors of clusters, i.e. Z ------------------------------------
+  ARI = get_one_ARI(memb_est_vec = clus2mem(clusters_list_est), 
+                    memb_true_vec = mem_true_vec)
+  ARI_history = sapply(clusters_history, function(clusters_list_tmp)get_one_ARI(memb_est_vec = clus2mem(clusters_list_tmp), 
+                                                                                memb_true_vec = mem_true_vec))
+  
+  # Compute error of time shifts, i.e. v --------------------------------------------
+  if (N_component == N_component_true) {
+    v_mean_sq_err_vec = sapply(1:N_component, function(id_component){
+      mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2) 
+    })
+    v_mean_sq_err = mean(v_mean_sq_err_vec)
     
+    v_align_mean_sq_err_vec = c()
+    v_align_mat_list_est = v_mat_list_est
+    for (id_component in 1:N_component) {
+      for (id_clus in 1:N_clus_est) {
+        v_align_mat_list_est[[id_component]][clusters_list_est[[id_clus]], ] = 
+          v_mat_list_est[[id_component]][clusters_list_est[[id_clus]], ] - 
+          mean(v_mat_list_est[[id_component]][clusters_list_est[[id_clus]], ]) + 
+          mean(v_true_mat_list[[id_component]][clusters_list_est[[id_clus]], ])
+      }
+      mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_align_mat_list_est[[id_component]]) )^2) 
+      v_align_mean_sq_err_vec[id_component] = mse_tmp
+    }
+    v_align_mean_sq_err = mean(v_align_mean_sq_err_vec)
+    
+  } else {
+    v_mean_sq_err = v_mean_sq_err_vec = NA
+    v_align_mean_sq_err_vec = v_align_mean_sq_err = NA
+  }
+  
+  # Compute errors of conn patts, i.e. F ---------
+  if (N_clus_est == N_clus) {
     ### Match clusters 
     if(N_clus>=2){
       permn = find_permn_clus_label(clusters_list_true = data_generated$clus_true_list, 
@@ -273,11 +318,21 @@ main_shapeinvpp = function(### Parameters for generative model
                                       t_unit = t_unit, 
                                       n0_min_vec = -length(f_target) %/% 2,
                                       n0_max_vec = length(f_target) %/% 2 )$n0_mat
-          n0 = round(n0)
+          n0 = round(n0) 
           if (n0 > 0) {
-            density_est_shift = c(rep(0, n0), head(density_est, length(density_est) - n0) )
+            if (FALSE) {
+              density_est_shift = c(rep(0, n0), head(density_est, length(density_est) - n0) )
+            } else {
+              density_est_shift = c(rep(head(density_est,1), n0), head(density_est, length(density_est) - n0) )
+            }
+            
           } else if (n0 < 0) {
-            density_est_shift = c(tail(density_est, length(density_est) - abs(n0)), rep(0, abs(n0)) )
+            if (FALSE) {
+              density_est_shift = c(tail(density_est, length(density_est) - abs(n0)), rep(0, abs(n0)) )
+            } else {
+              density_est_shift = c(tail(density_est, length(density_est) - abs(n0)), rep(tail(density_est,1), abs(n0)) )
+            }
+            
           } else if (n0 == 0) {
             density_est_shift = density_est
           }
@@ -294,12 +349,26 @@ main_shapeinvpp = function(### Parameters for generative model
       })
       F_mse_squarel2_ratio_mat =  dist_mse_mat / F_l2_squared_norm_mat 
       F_mse_squarel2_ratio = sum( rowMeans(F_mse_squarel2_ratio_mat) * weight_vec )
+      F_l2_squared_norm_mat_2 = apply(center_density_array_est_permn, 1:2, function(density){
+        sum(density^2 * t_unit)
+      })
+      F_mse_squarel2_ratio_mat_2 =  dist_mse_mat / F_l2_squared_norm_mat_2 
+      F_mse_squarel2_ratio_2 = sum( rowMeans(F_mse_squarel2_ratio_mat_2) * weight_vec )
       
       return(list(dist_mse_mat = dist_mse_mat,
                   F_mean_sq_err = F_mean_sq_err,
                   F_mean_sq_err_vec = F_mean_sq_err_vec,
                   F_mse_squarel2_ratio = F_mse_squarel2_ratio,
-                  F_mse_squarel2_ratio_mat = F_mse_squarel2_ratio_mat))
+                  F_mse_squarel2_ratio_mat = F_mse_squarel2_ratio_mat,
+                  F_mse_squarel2_ratio_2 = F_mse_squarel2_ratio_2,
+                  F_mse_squarel2_ratio_mat_2 = F_mse_squarel2_ratio_mat_2))
+    }
+    
+    center_density_array_true_rmv_baseline = center_density_array_true
+    for (id_clus in 1:N_clus) {
+      id_component = 1
+      baseline = head(center_density_array_true[id_clus, id_component, ],1)
+      center_density_array_true_rmv_baseline[id_clus, id_component, ] = center_density_array_true[id_clus, id_component, ] - baseline
     }
     
     N_component_true = dim(center_density_array_true)[2]
@@ -307,7 +376,7 @@ main_shapeinvpp = function(### Parameters for generative model
       tmp = calculate_F_mse_ratio(N_clus = N_clus, N_component = N_component, 
                                   clusters_list_true = data_generated$clus_true_list,
                                   clusters_list_est = clusters_list_est,
-                                  center_density_array_true = center_density_array_true, 
+                                  center_density_array_true = center_density_array_true_rmv_baseline, 
                                   center_density_array_est = center_density_array_est, 
                                   t_vec = t_vec, 
                                   t_unit = t_unit)
@@ -316,19 +385,23 @@ main_shapeinvpp = function(### Parameters for generative model
       F_mean_sq_err_vec = tmp$F_mean_sq_err_vec
       F_mse_squarel2_ratio = tmp$F_mse_squarel2_ratio
       F_mse_squarel2_ratio_mat = tmp$F_mse_squarel2_ratio_mat
+      F_mse_squarel2_ratio_2 = tmp$F_mse_squarel2_ratio_2
+      F_mse_squarel2_ratio_mat_2 = tmp$F_mse_squarel2_ratio_mat_2
       
       F_mean_sq_err_history = c()
       F_mse_squarel2_ratio_history = c()
+      F_mse_squarel2_ratio_history_2 = c()
       for (id_iteration in 1:length(center_density_array_history)){
         tmp = calculate_F_mse_ratio(N_clus = N_clus, N_component = N_component, 
                                     clusters_list_true = data_generated$clus_true_list,
                                     clusters_list_est = clusters_history[[id_iteration]],
-                                    center_density_array_true = center_density_array_true, 
+                                    center_density_array_true = center_density_array_true_rmv_baseline, 
                                     center_density_array_est = center_density_array_history[[id_iteration]], 
                                     t_vec = t_vec, 
                                     t_unit = t_unit)
         F_mean_sq_err_history[id_iteration] = tmp$F_mean_sq_err
         F_mse_squarel2_ratio_history[id_iteration] = tmp$F_mse_squarel2_ratio
+        F_mse_squarel2_ratio_history_2[id_iteration] = tmp$F_mse_squarel2_ratio_2
       }
       
     } else {
@@ -336,56 +409,26 @@ main_shapeinvpp = function(### Parameters for generative model
       F_mse_squarel2_ratio_mat = dist_mse_mat = NA
       F_mean_sq_err_history = NA
       F_mse_squarel2_ratio_history = NA
+      F_mse_squarel2_ratio_2 = NA
+      F_mse_squarel2_ratio_mat_2 = NA
+      F_mse_squarel2_ratio_history_2 = NA
     }
     
-    # Compute errors of clusters, i.e. Z ------------------------------------
-    ARI = get_one_ARI(memb_est_vec = clus2mem(clusters_list_est), 
-                      memb_true_vec = mem_true_vec)
-    ARI_history = sapply(clusters_history, function(clusters_list_tmp)get_one_ARI(memb_est_vec = clus2mem(clusters_list_tmp), 
-                                                                                  memb_true_vec = mem_true_vec))
-
-    # Compute error of time shifts, i.e. w, v --------------------------------------------
-    if (N_component == N_component_true) {
-      v_mean_sq_err_vec = sapply(1:N_component, function(id_component){
-        mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2) /
-          (ifelse(id_component == 1, yes = (-min(t_vec))/4, no = (max(t_vec) - (-min(t_vec))/2)/2 ) )^2
-      })
-      v_mean_sq_err = mean(v_mean_sq_err_vec)
-      
-      v_align_mean_sq_err_vec = c()
-      v_align_mat_list_est = v_mat_list_est
-      for (id_component in 1:N_component) {
-        for (id_clus in 1:N_clus) {
-          v_align_mat_list_est[[id_component]][clusters_list_est_permn[[id_clus]], ] = v_mat_list_est[[id_component]][clusters_list_est_permn[[id_clus]], ] - 
-            mean(v_mat_list_est[[id_component]][clusters_list_est_permn[[id_clus]], ]) + 
-            mean(v_true_mat_list[[id_component]][clusters_list_est_permn[[id_clus]], ])
-        }
-        mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_align_mat_list_est[[id_component]]) )^2) /
-          (ifelse(id_component == 1, yes = (-min(t_vec))/4, no = (max(t_vec) - (-min(t_vec))/2)/2 ) )^2
-        v_align_mean_sq_err_vec[id_component] = mse_tmp
-      }
-      v_align_mean_sq_err = mean(v_align_mean_sq_err_vec)
-      
-    } else {
-      v_mean_sq_err = v_mean_sq_err_vec = NA
-      v_align_mean_sq_err_vec = v_align_mean_sq_err = NA
-    }
     
     
   }
   else{
-    ARI=NA 
     F_mean_sq_err=F_mean_sq_err_vec=F_mse_squarel2_ratio=NA
     F_mse_squarel2_ratio_mat = dist_mse_mat = NA
-    v_mean_sq_err=v_mean_sq_err_vec=NA
-    v_align_mean_sq_err_vec = v_align_mean_sq_err = NA
     clusters_list_est_permn=NA
     center_density_array_est_permn=NA
     center_intensity_array_est_permn=NA
     center_Nspks_mat_est_permn=NA
-    ARI_history = NA
     F_mean_sq_err_history = NA
     F_mse_squarel2_ratio_history = NA
+    F_mse_squarel2_ratio_2 = NA
+    F_mse_squarel2_ratio_mat_2 = NA
+    F_mse_squarel2_ratio_history_2 = NA
   }
   
   
@@ -430,6 +473,18 @@ main_shapeinvpp = function(### Parameters for generative model
               ARI_history = ARI_history,
               F_mean_sq_err_history = F_mean_sq_err_history,
               F_mse_squarel2_ratio_history = F_mse_squarel2_ratio_history,
+              F_mse_squarel2_ratio_2 = F_mse_squarel2_ratio_2,
+              F_mse_squarel2_ratio_mat_2 = F_mse_squarel2_ratio_mat_2,
+              F_mse_squarel2_ratio_history_2 = F_mse_squarel2_ratio_history_2,
+              # L2 loss and log-likelihood
+              log_lik = log_lik,
+              log_lik_tmp_1 = log_lik_tmp_1,
+              log_lik_tmp_2 = log_lik_tmp_2,
+              clus_entropy = clus_entropy,
+              L2_loss_part_1 = L2_loss_part_1,
+              L2_loss_part_2 = L2_loss_part_2,
+              L2_loss_part_1_smoothdensity = L2_loss_part_1_smoothdensity,
+              compl_log_lik = compl_log_lik,
               # other
               cand_N_clus_vec=cand_N_clus_vec,
               N_restart = N_restart,

@@ -14,7 +14,8 @@ get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
                                       fix_timeshift,
                                       rand_init,
                                       fix_comp1_timeshift_only,
-                                      gamma)
+                                      gamma,
+                                      v_subjwise_max=NULL)
 {
   t_unit = t_vec[2]-t_vec[1]
   N_subj = dim(subjtrial_density_smooth_array)[1]
@@ -42,6 +43,7 @@ get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
                       freq_trun = freq_trun, 
                       bw = bw,
                       t_vec = t_vec,
+                      v_subjwise_max = v_subjwise_max,
                       key_times_vec = key_times_vec,
                       fix_timeshift = fix_timeshift,
                       rand_init = rand_init,
@@ -57,8 +59,12 @@ get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
   for (id_clus in 1:N_clus) {
     dist_1_vec = dist_mat_tmp[, id_clus]
     center_Nspks_q_scalar = sum(center_Nspks_mat[id_clus,1:N_component])
-    dist_2_vec = gamma * rowSums( (center_Nspks_q_scalar+.Machine$double.eps)^(-1) * 
-                                    (N_spks_mat - center_Nspks_q_scalar)^2 )
+    if (FALSE) {
+      dist_2_vec = gamma * rowSums( (center_Nspks_q_scalar+.Machine$double.eps)^(-1) * 
+                                      (N_spks_mat - center_Nspks_q_scalar)^2 )
+    } else {
+      dist_2_vec = gamma * rowSums( (N_spks_mat - center_Nspks_q_scalar)^2 )
+    }
     dist_vec = dist_1_vec + dist_2_vec
     dist_mat[,id_clus] = dist_vec
     l2_loss_mat_1[,id_clus] = dist_1_vec

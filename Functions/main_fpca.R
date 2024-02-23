@@ -27,6 +27,7 @@ main_fpca = function(### Parameters for generative model
                       ### Parameters for algorithms
                       bw = 0,
                       N_component = 2,
+                      use_true_density = FALSE,
                       save_center_pdf_array = FALSE)
 {
   t_unit = t_vec[2]-t_vec[1]
@@ -71,7 +72,7 @@ main_fpca = function(### Parameters for generative model
   id_pp = 1
   for (id_subj in 1:N_subj){
     for (id_trial in 1:N_trial) {
-      if (FALSE) {
+      if (!use_true_density) {
         res_smooth = density(unlist(spks_time_mlist[id_subj, id_trial]), bw = bw, from = min(t_vec), to = max(t_vec))
         yList[[id_pp]] = res_smooth$y
         tList[[id_pp]] = res_smooth$x
@@ -229,12 +230,19 @@ main_fpca = function(### Parameters for generative model
     center_Nspks_mat_est_permn = NA
     clusters_list_est_permn = clusters_list_est[permn]
     
+    ### Remove baseline density from first true density component
+    center_density_array_true_rmv_baseline = center_density_array_true
+    for (id_clus in 1:N_clus) {
+      id_component = 1
+      baseline = head(center_density_array_true[id_clus, id_component, ],1)
+      center_density_array_true_rmv_baseline[id_clus, id_component, ] = center_density_array_true[id_clus, id_component, ] - baseline
+    }
     
     ### Calculate distance 
     dist_mse_mat = matrix(nrow=N_clus, ncol=N_component)
     for (id_clus in 1:N_clus) {
       for (id_component in 1:N_component) {
-        f_target = center_density_array_true[id_clus,id_component,]
+        f_target = center_density_array_true_rmv_baseline[id_clus,id_component,]
         density_est = center_density_array_est_permn[id_clus,id_component,]
         res_ccf = ccf(y = density_est, x = f_target, plot = FALSE, lag.max = length(t_vec)%/%2)
         n0_init = res_ccf$lag[which.max(res_ccf$acf)]
@@ -260,14 +268,14 @@ main_fpca = function(### Parameters for generative model
           density_est_shift = density_est
         }
         dist_mse_mat[id_clus,id_component] = sum( (density_est_shift - 
-                                                     center_density_array_true[id_clus,id_component,])^2 * 
+                                                     center_density_array_true_rmv_baseline[id_clus,id_component,])^2 * 
                                                     t_unit )
       }
     }
     weight_vec = sapply(clusters_list_est_permn, length) / length(unlist(clusters_list_est_permn))
     F_mean_sq_err = sum( rowMeans(dist_mse_mat) * weight_vec )
     F_mean_sq_err_vec = colMeans(dist_mse_mat)
-    F_l2_squared_norm_mat = apply(center_density_array_true, 1:2, function(density){
+    F_l2_squared_norm_mat = apply(center_density_array_true_rmv_baseline, 1:2, function(density){
       sum(density^2 * t_unit)
     })
     F_mse_squarel2_ratio_mat =  dist_mse_mat / F_l2_squared_norm_mat 

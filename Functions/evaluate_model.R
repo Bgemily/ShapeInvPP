@@ -23,6 +23,7 @@ evaluate_model = function(spks_time_mlist,
     v_mat_list[[id_component]] = matrix(v_subjwise_vec, nrow = N_subj, ncol = N_trial) + matrix(v_trialwise_vec, byrow = TRUE, nrow = N_subj, ncol = N_trial)
   }
   center_intensity_array = model_fitted_list$center_intensity_array
+  center_intensity_baseline_vec = model_fitted_list$center_intensity_baseline_vec
   center_Nspks_mat = model_fitted_list$center_Nspks_mat
   center_density_array = model_fitted_list$center_density_array
   pi_vec = clus_size_vec / sum(clus_size_vec)
@@ -39,12 +40,13 @@ evaluate_model = function(spks_time_mlist,
   
   # First term of log likelihood: \sum_{i,r} ( -\sum_{q} (Lambda_{q}(T))*tau_{i,r,q} )
   F_q_T = rowSums(center_Nspks_mat)
+  F_q_T = F_q_T + center_intensity_baseline_vec
   tau_F = tau_mat %*% F_q_T 
   log_lik_tmp_1 = sum(-tau_F)
   
   # Second term of log likelihood: \sum_{q}{ \sum_{i,r}\sum_{t} \log{lambda_{i,r}(t)} *tau_{i,r,q} }
   # L2_loss_part_1: sum_{i,r} N_{i,r}(T) * T^{-1} * \| y_{i,r}(t)/N_{i,r}(T) - lambda_{i,r}(t)/Lambda_{i,r}(T) \|^2
-  # L2_loss_part_2: sum_{i,r} |Lambda_{i,r}(T)|^{-1} * |N_{i,r}(T)-Lambda_{i,r}(T)|^2
+  # L2_loss_part_2: sum_{i,r} |N_{i,r}(T)-Lambda_{i,r}(T)|^2
   log_lik_tmp_2 = 0
   L2_loss_part_1 = 0
   L2_loss_part_1_smoothdensity = 0
@@ -65,6 +67,7 @@ evaluate_model = function(spks_time_mlist,
                                           head(intensity_tmp, length(t_vec) - max(0, n0_shift_tmp)) )
           intensity_est = intensity_est + intensity_shifted_curr_comp
         }
+        intensity_est = intensity_est + center_intensity_baseline_vec[id_clus]
         log_intensity_est = rep(0, length(t_vec))
         log_intensity_est[which(intensity_est>0)] = log(intensity_est[which(intensity_est>0)])
         log_intensity_est[which(intensity_est<=0)] = log(min(intensity_est[which(intensity_est>0)])) 
@@ -90,8 +93,8 @@ evaluate_model = function(spks_time_mlist,
         intensity_empirical_smoothdensity = Re(fft(intensity_empirical_fft_trun, inverse = TRUE))
         L2_loss_part_1_tmp_smoothdensity = length(event_time_vec_tmp) * max(t_vec)^{-1} * sum((intensity_empirical_smoothdensity/sum(intensity_empirical*t_unit) - intensity_est/sum(intensity_est*t_unit))^2 * t_unit)
         L2_loss_part_1_smoothdensity = L2_loss_part_1_smoothdensity + L2_loss_part_1_tmp_smoothdensity
-        ### Add L2_loss_part_2_tmp: |Lambda_{i,r}(T)|^{-1} * |N_{i,r}(T)-Lambda_{i,r}(T)|^2
-        L2_loss_part_2_tmp = (sum(intensity_est*t_unit)+.Machine$double.eps)^(-1) * (length(event_time_vec_tmp) - sum(intensity_est*t_unit))^2 
+        ### Add L2_loss_part_2_tmp: |N_{i,r}(T)-Lambda_{i,r}(T)|^2
+        L2_loss_part_2_tmp = (length(event_time_vec_tmp) - sum(intensity_est*t_unit))^2 
         L2_loss_part_2 = L2_loss_part_2 + L2_loss_part_2_tmp
         
       }

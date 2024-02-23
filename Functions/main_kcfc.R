@@ -5,6 +5,7 @@ main_kcfc = function(### Parameters for generative model
   SEED, 
   N_subj = 100,
   N_trial = 1,
+  timeshift_trial_max = 0.1,
   N_clus=2, 
   N_component_true = 2,
   t_vec = seq(-1,1,by=0.01),
@@ -24,6 +25,7 @@ main_kcfc = function(### Parameters for generative model
   ### params when N_clus==2:
   clus_mixture = 0,
   ### Parameters for algorithms
+  use_intensity = FALSE,
   bw = 0,
   N_component = 2,
   save_center_pdf_array = FALSE)
@@ -40,6 +42,7 @@ main_kcfc = function(### Parameters for generative model
                     key_times_vec = key_times_vec,
                     N_spks_total = N_spks_total,
                     timeshift_subj_max_vec = timeshift_subj_max_vec,
+                    timeshift_trial_max = timeshift_trial_max,
                     clus_sep = clus_sep,
                     N_spks_ratio = N_spks_ratio,
                     sd_shrinkage = sd_shrinkage,
@@ -67,18 +70,59 @@ main_kcfc = function(### Parameters for generative model
   yList = list()
   tList = list()
   for (id_subj in 1:N_subj){
-    res_smooth = density(spks_time_mlist[[id_subj]], bw = bw, n = 256, from = min(t_vec), to = max(t_vec))
-    yList[[id_subj]] = res_smooth$y
-    tList[[id_subj]] = res_smooth$x
+    if (FALSE) {
+      res_smooth = density(unlist(spks_time_mlist[id_subj, ]), bw = bw, n = 256, from = min(t_vec), to = max(t_vec))
+      yList[[id_subj]] = res_smooth$y
+      tList[[id_subj]] = res_smooth$x
+    } else {
+      breaks = c(t_vec[1]-t_unit,t_vec)+t_unit/2
+      emp_density_vec = hist(unlist(spks_time_mlist[id_subj, ]), breaks=breaks, plot=FALSE)$counts / t_unit / length(unlist(spks_time_mlist[id_subj, ]))
+      yList[[id_subj]] = emp_density_vec
+      tList[[id_subj]] = t_vec
+    }
+    
+    if (use_intensity) {
+      N_spks_curr_subj = mean(sapply(spks_time_mlist[id_subj, ], function(list_tmp)length(unlist(list_tmp))))
+      yList[[id_subj]] = N_spks_curr_subj * yList[[id_subj]]
+    }
   }
   
   
   ### Apply kCFC --------------------------------
   time_start = Sys.time()
-  kcfcObj = fdapace::kCFC(y = yList, t = tList, k = N_clus, 
-                 kSeed = 123, maxIter = 20,
-                 optnsSW = list(dataType='Dense', maxK=N_component, FVEthreshold = 1), 
-                 optnsCS = list(dataType='Dense', maxK=N_component, FVEthreshold = 1))
+  if (FALSE) {
+    kcfcObj = fdapace::kCFC(y = yList, t = tList, k = N_clus, 
+                            kSeed = 123, maxIter = 50,
+                            optnsSW = list(dataType='Dense', maxK=N_component, FVEthreshold = 1), 
+                            optnsCS = list(dataType='Dense', maxK=N_component, FVEthreshold = 1))
+    
+  } else {
+    max_attempts <- 5  # You can adjust the number of maximum attempts as needed
+    
+    for (attempt in 1:max_attempts) {
+      tryCatch({
+        # Your original code with kSeed incremented by 1
+        kcfcObj <- fdapace::kCFC(y = yList, t = tList, k = N_clus, 
+                                 kSeed = 123 + attempt - 1, maxIter = 50,
+                                 optnsSW = list(dataType='Dense', maxK=N_component), 
+                                 optnsCS = list(dataType='Dense', maxK=N_component))
+        
+        # If no error, break out of the loop
+        break
+      }, error = function(e) {
+        # Print the error (you can customize this part)
+        cat(sprintf("Attempt %d failed with error: %s\n", attempt, conditionMessage(e)))
+        
+        if (attempt == max_attempts) {
+          stop("Maximum number of attempts reached. Exiting.")
+        }
+        
+        # Increment the kSeed for the next attempt
+        cat("Retrying with a different kSeed...\n")
+      })
+    }
+    
+  }
   time_end = Sys.time()
   time_estimation = time_end - time_start
   time_estimation = as.numeric(time_estimation, units='secs')
@@ -147,6 +191,10 @@ main_kcfc = function(### Parameters for generative model
         N_timegrid = round(abs(timeshift_density)/t_unit)
         density_vec = c(rep(0, N_timegrid),
                         head(density_shifted_vec, length(density_shifted_vec) - N_timegrid))
+      }
+      if (use_intensity){
+        N_spks_expectation = sum(mean_density_vec*t_unit)
+        density_vec = density_vec / N_spks_expectation
       }
       center_density_fpca_array_permn[id_clus, id_component, ] = density_vec
       
@@ -270,7 +318,12 @@ main_kcfc = function(### Parameters for generative model
     })
     F_mse_squarel2_ratio_mat =  dist_mse_mat / F_l2_squared_norm_mat 
     F_mse_squarel2_ratio = sum( rowMeans(F_mse_squarel2_ratio_mat) * weight_vec )
-
+    F_l2_squared_norm_mat_2 = apply(center_density_array_est_permn, 1:2, function(density){
+      sum(density^2 * t_unit)
+    })
+    F_mse_squarel2_ratio_mat_2 =  dist_mse_mat / F_l2_squared_norm_mat_2 
+    F_mse_squarel2_ratio_2 = sum( rowMeans(F_mse_squarel2_ratio_mat_2) * weight_vec )
+    
 
     # Compute errors of clusters, i.e. Z ------------------------------------
     ARI = get_one_ARI(memb_est_vec = clus2mem(clusters_list_est), 
@@ -279,8 +332,7 @@ main_kcfc = function(### Parameters for generative model
     
     # Compute error of time shifts, i.e. w, v --------------------------------------------
     v_mean_sq_err_vec = sapply(1:N_component, function(id_component){
-      mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2) /
-        ( 2*timeshift_subj_max_vec[id_component] )^2
+      mean((unlist(v_true_mat_list[[id_component]])-unlist(v_mat_list_est[[id_component]]))^2)
     })
     v_mean_sq_err = mean(v_mean_sq_err_vec)
     
@@ -292,8 +344,7 @@ main_kcfc = function(### Parameters for generative model
           mean(v_mat_list_est[[id_component]][clusters_list_est_permn[[id_clus]], ]) + 
           mean(v_true_mat_list[[id_component]][clusters_list_est_permn[[id_clus]], ])
       }
-      mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_align_mat_list_est[[id_component]]) )^2) /
-        (ifelse(id_component == 1, yes = (-min(t_vec))/4, no = (max(t_vec) - (-min(t_vec))/2)/2 ) )^2
+      mse_tmp = mean(( unlist(v_true_mat_list[[id_component]])-unlist(v_align_mat_list_est[[id_component]]) )^2) 
       v_align_mean_sq_err_vec[id_component] = mse_tmp
     }
     v_align_mean_sq_err = mean(v_align_mean_sq_err_vec)
@@ -338,6 +389,8 @@ main_kcfc = function(### Parameters for generative model
               v_mean_sq_err=v_mean_sq_err,
               v_mean_sq_err_vec=v_mean_sq_err_vec,
               v_align_mean_sq_err = v_align_mean_sq_err,
+              F_mse_squarel2_ratio_mat_2 =  F_mse_squarel2_ratio_mat_2, 
+              F_mse_squarel2_ratio_2 = F_mse_squarel2_ratio_2,
               # other
               cand_N_clus_vec=NA,
               N_restart = NA,

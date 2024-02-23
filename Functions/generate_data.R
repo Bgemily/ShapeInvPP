@@ -11,7 +11,7 @@ generate_data = function(SEED=NULL,
                          timeshift_subj_max_vec = c(1/8, 1/32),
                          timeshift_trial_max = 1/8,
                          ### params when N_clus==4:
-                         clus_sep = 2,
+                         clus_sep = 2-1,
                          ### params when N_clus==1:
                          N_spks_ratio = 3/2,
                          sd_shrinkage = 1,
@@ -64,19 +64,19 @@ generate_data = function(SEED=NULL,
     center_N_spks_mat[1,1] = N_spks_total*0.7*0.5
     center_N_spks_mat[1,2] = N_spks_total*0.7*0.5
   } else if (N_clus==4){
-    center_N_spks_mat[1,1] = N_spks_total*0.7*0.5
-    center_N_spks_mat[1,2] = N_spks_total*0.7*0.5
-    center_N_spks_mat[2,1] = N_spks_total*0.8*0.2
-    center_N_spks_mat[2,2] = N_spks_total*0.8*0.8
+    center_N_spks_mat[1,1] = N_spks_total*0.7*(0.5)
+    center_N_spks_mat[1,2] = N_spks_total*0.7*(0.5)
+    center_N_spks_mat[2,1] = N_spks_total*0.8*(0.5-max(0,sqrt(clus_sep-0.5)/(2*sqrt(0.5))))
+    center_N_spks_mat[2,2] = N_spks_total*0.8*(0.5+max(0,sqrt(clus_sep-0.5)/(2*sqrt(0.5))))
     if (TRUE){
-      center_N_spks_mat[3,1] = N_spks_total*0.9*0.6
-      center_N_spks_mat[3,2] = N_spks_total*0.9*0.4
+      center_N_spks_mat[3,1] = N_spks_total*0.9*(0.5+(clus_sep)/4)
+      center_N_spks_mat[3,2] = N_spks_total*0.9*(0.5-(clus_sep)/4)
     } else {
       center_N_spks_mat[3,1] = N_spks_total*0.9*0.5
       center_N_spks_mat[3,2] = N_spks_total*0.9*0.5
     }
-    center_N_spks_mat[4,1] = N_spks_total*0.5
-    center_N_spks_mat[4,2] = N_spks_total*0.5
+    center_N_spks_mat[4,1] = N_spks_total*(0.5+clus_sep/2)
+    center_N_spks_mat[4,2] = N_spks_total*(0.5-clus_sep/2)
   } 
   
   
@@ -97,7 +97,7 @@ generate_data = function(SEED=NULL,
     
   } else if (N_clus==4) {
     ## Clus 1
-    s_tmp = 1*(1/4)*(1); mu_tmp = -1*(1/2); 
+    s_tmp = 1*(1/4)*(1); mu_tmp = -0.35; 
     center_density_array_true[1,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
     s_tmp = sqrt(1)*(1/2/sqrt(2))*(1); mu_tmp = s_tmp
@@ -105,15 +105,15 @@ generate_data = function(SEED=NULL,
     center_density_array_true[1,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
     
     ## Clus 2
-    s_tmp = 1*(1/4)*(clus_sep); mu_tmp = -1*(1/2); 
+    s_tmp = 1*(1/4)*(clus_sep*0+1); mu_tmp = -0.35; 
     center_density_array_true[2,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
-    s_tmp = sqrt(1)*(1/2/sqrt(2))*(sqrt(clus_sep)); mu_tmp = s_tmp
+    s_tmp = sqrt(1)*(1/2/sqrt(2))*(sqrt(clus_sep*0+1)); mu_tmp = s_tmp
     t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
     center_density_array_true[2,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
-
+    
     ## Clus 3
-    if (TRUE) {
+    if (FALSE) {
       t_vec_extend_shift = t_vec_extend - (-0.2-0)
       center_density_22_shift = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
       index_1 = min(which(cumsum(center_density_22_shift)/sum(center_density_22_shift)>=0.3))
@@ -135,27 +135,45 @@ generate_data = function(SEED=NULL,
       center_density_22_shift_half_support_2 = 2*center_density_array_true[2,2, ] - center_density_22_shift_half_support
       center_density_array_true[3,2, ] = center_density_22_shift_half_support_2
     } else {
-      s_tmp = 1*(1/4)*(clus_sep^2); mu_tmp = -1*(1/2) 
+      s_tmp = 1*(1/4)*(clus_sep^2*0+1); mu_tmp = -0.35
       center_density_array_true[3,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
       
-      s_tmp = sqrt(1)*(1/2/sqrt(2))*(clus_sep); mu_tmp = s_tmp
+      s_tmp = sqrt(1)*(1/2/sqrt(2))*(clus_sep*0+1); mu_tmp = s_tmp
       t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
       center_density_array_true[3,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
     }
     
     ## Clus 4
-    s_tmp = 1*(1/4)*(1/sqrt(2)); mu_tmp = -1*(1/2); 
+    s_tmp = 1*(1/4); mu_tmp = -0.35; 
     center_density_array_true[4,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
     
-    s_tmp = sqrt(1)*(1/2/sqrt(2))*(clus_sep); mu_tmp = s_tmp
+    s_tmp = sqrt(1)*(1/2/sqrt(2))*(clus_sep*0+1); mu_tmp = s_tmp
     t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
     center_density_array_true[4,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
+    
     
     ### Add weights (prop to N_spks) for two components
     for (id_clus in 1:N_clus){
       center_density_array_true[id_clus,1,] = center_density_array_true[id_clus,1,]*center_N_spks_mat[id_clus,1]/sum(center_N_spks_mat[id_clus,1:2])
       center_density_array_true[id_clus,2,] = center_density_array_true[id_clus,2,]*center_N_spks_mat[id_clus,2]/sum(center_N_spks_mat[id_clus,1:2])
     }
+    ### Adjust Cluster 2 intensity components                        
+    if (TRUE){
+      s_tmp = 1*(0.25); mu_tmp = s_tmp; 
+      t_vec_extend_shift = t_vec_extend - (-0.2-0)
+      tmp_density = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
+      center_density_array_true[2,1, ] = center_density_array_true[2,1, ] + 0.4*tmp_density*min(clus_sep,0.5)
+      
+      s_tmp = 1*(0.25); mu_tmp = s_tmp; 
+      t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
+      tmp_density = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) + mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
+      center_density_array_true[2,2, ] = center_density_array_true[2,2, ] - 0.4*tmp_density*min(clus_sep,0.5)
+      
+      N_spks_current_clus_total = sum(center_N_spks_mat[2,1:2])
+      center_N_spks_mat[2,1] = sum(center_density_array_true[2,1, ]*t_unit) * N_spks_current_clus_total
+      center_N_spks_mat[2,2] = sum(center_density_array_true[2,2, ]*t_unit) * N_spks_current_clus_total
+    }
+    
     
   } 
   
@@ -166,6 +184,20 @@ generate_data = function(SEED=NULL,
     center_intensity_array_true[id_clus,2, ] = center_density_array_true[id_clus,2,]*sum(center_N_spks_mat[id_clus,1:2])    
   }
   
+  ### Add baseline intensity for all components
+  for (id_clus in 1:N_clus){
+    if (N_clus==4) {
+      intensity_baseline = 20
+    } else if (N_clus==1){
+      intensity_baseline = 20
+    }
+    
+    center_intensity_array_true[id_clus,1, ] = intensity_baseline + center_intensity_array_true[id_clus,1, ] 
+    center_N_spks_mat[id_clus,1] = sum(center_intensity_array_true[id_clus,1, ]*t_unit)
+    
+    center_density_array_true[id_clus,1,] = center_intensity_array_true[id_clus,1, ] / sum(center_N_spks_mat[id_clus,1:2])
+    center_density_array_true[id_clus,2,] = center_intensity_array_true[id_clus,2, ] / sum(center_N_spks_mat[id_clus,1:2])
+  }
   
   # Generate spike times ---------------------------------------------
   rejection_sampling = function(density_vec, t_vec, N_sample){
@@ -187,19 +219,19 @@ generate_data = function(SEED=NULL,
         v_tmp_1 = v_mat_list[[1]][id_subj, id_trial]
         v_tmp_2 = v_mat_list[[2]][id_subj, id_trial]
         spks_time_mlist[id_subj, id_trial] = list(c( rejection_sampling(density_vec = center_density_array_true[id_clus,1,], 
-                                                                            t_vec = t_vec_extend, 
-                                                                            N_sample = 0*center_N_spks_mat[id_clus,1]+
-                                                                              1*rpois(n=1, lambda=center_N_spks_mat[id_clus,1]) )+
-                                                           stim_onset_vec[id_trial]+v_tmp_1,
-                                                         rejection_sampling(density_vec = center_density_array_true[id_clus,2,], 
-                                                                            t_vec = t_vec_extend, 
-                                                                            N_sample = 0*center_N_spks_mat[id_clus,2]+
-                                                                              1*rpois(n=1, lambda=center_N_spks_mat[id_clus,2]) )+
-                                                           stim_onset_vec[id_trial]+v_tmp_2 ))
+                                                                        t_vec = t_vec_extend, 
+                                                                        N_sample = 0*center_N_spks_mat[id_clus,1]+
+                                                                          1*rpois(n=1, lambda=center_N_spks_mat[id_clus,1]) )+
+                                                       stim_onset_vec[id_trial]+v_tmp_1,
+                                                     rejection_sampling(density_vec = center_density_array_true[id_clus,2,], 
+                                                                        t_vec = t_vec_extend, 
+                                                                        N_sample = 0*center_N_spks_mat[id_clus,2]+
+                                                                          1*rpois(n=1, lambda=center_N_spks_mat[id_clus,2]) )+
+                                                       stim_onset_vec[id_trial]+v_tmp_2 ))
         ### Only keep spike times during [min(t_vec), max(t_vec)] 
         spks_time_vec = spks_time_mlist[id_subj,id_trial][[1]]
         spks_time_mlist[id_subj,id_trial][[1]] = spks_time_vec[which(spks_time_vec >= min(t_vec) & 
-                                                                           spks_time_vec <= max(t_vec))]
+                                                                       spks_time_vec <= max(t_vec))]
       }
     }
   }
@@ -224,4 +256,5 @@ generate_data = function(SEED=NULL,
   ))
   
 }
+
 

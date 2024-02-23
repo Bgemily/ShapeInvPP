@@ -24,6 +24,7 @@ select_model = function(spks_time_mlist,
     clus_size_vec = sapply(clusters_list_tmp, length)
     v_mat_list_tmp = res_tmp$v_mat_list
     center_intensity_array_tmp = res_tmp$center_intensity_array
+    center_intensity_baseline_vec_tmp = res_tmp$center_intensity_baseline_vec
     center_Nspks_mat_tmp = res_tmp$center_Nspks_mat
     center_density_array_tmp = res_tmp$center_density_array
     pi_vec = clus_size_vec / sum(clus_size_vec)
@@ -40,6 +41,7 @@ select_model = function(spks_time_mlist,
     
     # First term of log likelihood: \sum_{i,r} ( -\sum_{q} (F_{q}(T)+G_{q}(T))*tau_{i,r,q} )
     F_q_T = rowSums(center_Nspks_mat_tmp)
+    F_q_T = F_q_T + center_intensity_baseline_vec_tmp
     tau_F = tau_mat %*% F_q_T 
     log_lik_tmp_1 = sum(-tau_F)
     if (mode == "density") {
@@ -70,6 +72,12 @@ select_model = function(spks_time_mlist,
             intensity_shifted_curr_comp = c(tail(intensity_tmp, max(0, n0_shift_tmp)),
                                       head(intensity_tmp, length(t_vec) - max(0, n0_shift_tmp)) )
             intensity_est = intensity_est + intensity_shifted_curr_comp
+          }
+          if (mode == "intensity") {
+            intensity_est = intensity_est + center_intensity_baseline_vec_tmp[id_clus]
+          } else if (mode == "density"){
+            density_baseline = (1 - sum(intensity_est*t_unit)) / (max(t_vec)-min(t_vec))
+            intensity_est = intensity_est + density_baseline
           }
           log_intensity_est = rep(0, length(t_vec))
           log_intensity_est[which(intensity_est>0)] = log(intensity_est[which(intensity_est>0)])
