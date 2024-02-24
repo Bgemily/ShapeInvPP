@@ -84,12 +84,22 @@ generate_data = function(SEED=NULL,
   center_density_array_true = array(dim = c(N_clus, 2, length(t_vec_extend)))
   if(N_clus==1){
     ## Clus 1
-    s_tmp = 1*(1/4)*(1); mu_tmp = -0.35; 
-    center_density_array_true[1,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
+    if (TRUE) {
+      center_density_array_true[1,1, ] = (2 - 2*cos(4*pi*(t_vec_extend-0.4))) * I(0.4<=t_vec_extend & t_vec_extend<=0.9)
+    } else {
+      s_tmp = 1*(1/4)*(1); mu_tmp = -0.35; 
+      center_density_array_true[1,1, ] = 1/(2*s_tmp)*( 1 + cos(((t_vec_extend - mu_tmp)/s_tmp)*pi) ) * I(mu_tmp-s_tmp<=t_vec_extend & t_vec_extend<=mu_tmp+s_tmp) 
+    }
     
-    s_tmp = sqrt(1)*(1/2/sqrt(2))*(1); mu_tmp = s_tmp
-    t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
-    center_density_array_true[1,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
+    if (TRUE) {
+      t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
+      center_density_array_true[1,2, ] = (2 - 2*cos(2*pi*sqrt(abs(2*t_vec_extend_shift)))) * I(0<=t_vec_extend_shift & t_vec_extend_shift<=0.5)
+    } else {
+      s_tmp = sqrt(1)*(1/2/sqrt(2))*(1); mu_tmp = s_tmp
+      t_vec_extend_shift = t_vec_extend - (key_times_vec[2]-0)
+      center_density_array_true[1,2, ] = 1/(2*s_tmp*2*mu_tmp)*( 1 + cos(((sqrt(abs(t_vec_extend_shift)) - mu_tmp)/s_tmp)*pi) ) * I((mu_tmp-s_tmp)^2<=t_vec_extend_shift & t_vec_extend_shift<=(mu_tmp+s_tmp)^2) 
+      
+    }
     
     ### Add weights for two components
     center_density_array_true[1,1,] = center_density_array_true[1,1,]*center_N_spks_mat[1,1]/sum(center_N_spks_mat[1,1:2])
