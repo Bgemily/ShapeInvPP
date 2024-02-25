@@ -18,8 +18,8 @@ library(parallel)
 
 # User input setup --------------------------------------------------------
 
-N_replicate_total = 200
-N_split = 20
+N_replicate_total = 500
+N_split = 50
 
 N_replicate = N_replicate_total/N_split
 
@@ -34,7 +34,7 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Compare_methods_Nclus4_v4.3.3'
+setup = 'Compare_methods_Nclus4_v5'
 method = 'shape_inv_pp_update_obj_func'
 
 ### Parameters' possible values:
@@ -47,6 +47,7 @@ key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.04-0.2,1.5), c(-1,0.08-0.2,1.5
 clus_sep_list = list(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9)
 
 if (TRUE) {
+  # ARI vs tau vs R
   for (timeshift_trial_max in timeshift_trial_max_list) {
     default_setting = paste0("timeshift_trial_max=",timeshift_trial_max,",", 
                              'N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
@@ -68,14 +69,14 @@ if (TRUE) {
                                    N_spks_total = 150,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                                    timeshift_trial_max = timeshift_trial_max,
-                                   t_vec = seq(-1,1.5,0.01),
+                                   t_vec = seq(-1,1.5,0.01)+1,
                                    ### params when N_clus==4:
                                    clus_sep = 0.5,
                                    ### Parameters for algorithms
                                    freq_trun = 10,
                                    gamma = 1/100,
                                    N_component = 2,
-                                   key_times_vec = key_times_vec_list[[1]],
+                                   key_times_vec = key_times_vec_list[[1]]+1,
                                    fix_timeshift = FALSE,
                                    fix_membership = FALSE,
                                    save_center_pdf_array = save_center_pdf_array),
@@ -99,6 +100,7 @@ if (TRUE) {
 }
 
 if (TRUE) {
+  # ARI vs n, Unknown v or Known v
   for (use_true_timeshift in c(FALSE, TRUE)){
     default_setting = paste0("use_true_timeshift_", use_true_timeshift,",", 
                              'N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
@@ -120,14 +122,14 @@ if (TRUE) {
                                    N_spks_total = 150,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                                    timeshift_trial_max = 0.1,
-                                   t_vec = seq(-1,1.5,0.01),
+                                   t_vec = seq(-1,1.5,0.01)+1,
                                    ### params when N_clus==4:
                                    clus_sep = 0.5,
                                    ### Parameters for algorithms
                                    freq_trun = 10,
                                    gamma = 1/100,
                                    N_component = 2,
-                                   key_times_vec = key_times_vec_list[[1]],
+                                   key_times_vec = key_times_vec_list[[1]]+1,
                                    fix_timeshift = use_true_timeshift,
                                    use_true_timeshift = use_true_timeshift,
                                    fix_membership = FALSE,
@@ -149,6 +151,7 @@ if (TRUE) {
       }
     }
   }
+  # ARI vs n, Unknown v, N_trial = 3
   if (FALSE) {
     default_setting = paste0('N_trial=3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
     for (id_N_split in 1:N_split) {
@@ -200,6 +203,7 @@ if (TRUE) {
 }
 
 if (TRUE) {
+  # ARI vs rho
   default_setting = 'N_trial=2,timeshift_trial_max=0.1,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
     if (save_res_details & (id_N_split == 1)) {
@@ -218,13 +222,13 @@ if (TRUE) {
                                  N_component_true = 2,
                                  N_spks_total = 150,
                                  timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                 t_vec = seq(-1,1.5,0.01),
+                                 t_vec = seq(-1,1.5,0.01)+1,
                                  clus_sep = clus_sep,
                                  ### Parameters for algorithms
                                  freq_trun = 10,
                                  gamma = 1/100,
                                  N_component = 2,
-                                 key_times_vec = key_times_vec_list[[1]],
+                                 key_times_vec = key_times_vec_list[[1]]+1,
                                  fix_timeshift = FALSE,
                                  fix_membership = FALSE,
                                  save_center_pdf_array = save_center_pdf_array),
