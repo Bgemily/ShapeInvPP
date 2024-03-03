@@ -33,11 +33,11 @@ doParallel::registerDoParallel(cores = N_cores)
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Init_compr_v4.3.2'
+setup = 'Init_compr_v5.0'
 default_setting = 'timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
 
 ### Parameters' possible values:
-N_restart_algo_list = list(1, 3, 5)
+N_restart_algo_list = list(0+1, 3+1, 5+1)
 N_trial_list = list(2,3,4,5,6,7,8,9,10)
 timeshift_subj_max_vec_list = list(c(1/32/4, 1/32)*2 )
 N_subj_list = list(40 )
@@ -66,7 +66,7 @@ if (TRUE) {
                                  N_spks_total = 150,
                                  timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                                  timeshift_trial_max = 0.3,
-                                 t_vec = seq(-1,1.5,0.01),
+                                 t_vec = seq(-1,1.5,0.01)+1,
                                  ### params when N_clus==4:
                                  clus_sep = 0.5,
                                  ### Parameters for algorithms
@@ -74,9 +74,9 @@ if (TRUE) {
                                  N_restart = N_restart,
                                  N_start_kmean = 5,
                                  freq_trun = 10,
-                                 gamma = 1,
+                                 gamma = 1/100,
                                  N_component = 2,
-                                 key_times_vec = key_times_vec_list[[1]],
+                                 key_times_vec = key_times_vec_list[[1]]+1,
                                  fix_timeshift = FALSE,
                                  fix_membership = FALSE,
                                  save_center_pdf_array = save_center_pdf_array),
@@ -123,7 +123,7 @@ if (TRUE) {
                                    N_spks_total = 150,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
                                    timeshift_trial_max = 0.3,
-                                   t_vec = seq(-1,1.5,0.01),
+                                   t_vec = seq(-1,1.5,0.01)+1,
                                    ### params when N_clus==4:
                                    clus_sep = 0.5,
                                    ### Parameters for algorithms
@@ -131,9 +131,9 @@ if (TRUE) {
                                    N_restart = N_restart,
                                    N_start_kmean = 5,
                                    freq_trun = 10,
-                                   gamma = 1,
+                                   gamma = 1/100,
                                    N_component = 2,
-                                   key_times_vec = key_times_vec_list[[1]],
+                                   key_times_vec = key_times_vec_list[[1]]+1,
                                    fix_timeshift = FALSE,
                                    fix_membership = FALSE,
                                    save_center_pdf_array = save_center_pdf_array),
