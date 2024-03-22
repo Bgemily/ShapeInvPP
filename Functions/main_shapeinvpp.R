@@ -20,7 +20,7 @@ main_shapeinvpp = function(### Parameters for generative model
                         key_times_vec = c(min(t_vec),0,max(t_vec)),
                         gamma = 0,
                         MaxIter = 10,
-                        N_clus_min = N_clus, N_clus_max = N_clus,
+                        N_clus_est = N_clus,
                         fix_timeshift = FALSE,
                         use_true_timeshift = FALSE,
                         save_center_pdf_array = FALSE,
@@ -70,9 +70,9 @@ main_shapeinvpp = function(### Parameters for generative model
   # Fit model for various cluster number ------------------------------------
   
   res_list = list()
-  for (ind_N_clus in 1:length(N_clus_min:N_clus_max)) {
+  for (ind_N_clus in 1:1) {
     res_list[[ind_N_clus]] = list()
-    N_clus_tmp = c(N_clus_min:N_clus_max)[ind_N_clus]
+    N_clus_tmp = N_clus_est
     
     # Restart -----------------------------------------------------------------
     res_best = NA
@@ -160,7 +160,7 @@ main_shapeinvpp = function(### Parameters for generative model
   }
   
   # Retrieve estimation results of the best cluster number ------------------
-  res = res_list[[res_select_model$id_best_res]]
+  res = res_list[[1]]
   
   res$clusters_list -> clusters_list_est
   res$clusters_history -> clusters_history
@@ -385,14 +385,8 @@ main_shapeinvpp = function(### Parameters for generative model
   # Output ------------------------------------------------------------------
   
   return(list(data_param=data_param, 
-              # model selection result
               N_clus_est=N_clus_est, 
               correct_N_clus=I(N_clus_est==N_clus)*1, 
-              ICL_vec=ICL_vec, 
-              compl_log_lik_vec=compl_log_lik_vec, 
-              log_lik_vec=log_lik_vec,
-              penalty_vec=penalty_vec,
-              # parameter estimates of best cluster number
               clusters_list_est=clusters_list_est,
               v_mat_list_est=v_mat_list_est,
               clusters_list_est_permn=clusters_list_est_permn,
@@ -436,7 +430,6 @@ main_shapeinvpp = function(### Parameters for generative model
               L2_loss_part_1_smoothdensity = L2_loss_part_1_smoothdensity,
               compl_log_lik = compl_log_lik,
               # other
-              cand_N_clus_vec=cand_N_clus_vec,
               N_restart = N_restart,
               t_vec=t_vec, 
               time_estimation=time_estimation,
