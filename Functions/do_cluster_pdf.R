@@ -4,7 +4,6 @@ do_cluster_pdf = function(# Observables
                           v_trialwise_vec_list = NULL,
                           # Initial values
                           clusters_list_init,
-                          v_vec_init=NULL,
                           v_mat_list_init=NULL,
                           # Tuning parameter
                           N_clus=length(clusters_list_init), 
