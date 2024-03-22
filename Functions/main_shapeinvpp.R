@@ -12,15 +12,6 @@ main_shapeinvpp = function(### Parameters for generative model
                         timeshift_trial_max = 1/8,
                         ### params when N_clus==4:
                         clus_sep = 2,
-                        ### params when N_clus==1:
-                        N_spks_ratio = 3/2,
-                        sd_shrinkage = 1,
-                        c_1 = 0, delta_1 = 0,
-                        c_2 = 0, delta_2 = 0,
-                        c_3 = 0, delta_3 = 0,
-                        identical_components = FALSE,
-                        ### params when N_clus==2:
-                        clus_mixture = 0,
                         ### Parameters for algorithms
                         freq_trun = 5,
                         bw = 0,
@@ -55,14 +46,7 @@ main_shapeinvpp = function(### Parameters for generative model
                     N_spks_total = N_spks_total,
                     timeshift_subj_max_vec = timeshift_subj_max_vec,
                     timeshift_trial_max = timeshift_trial_max,
-                    clus_sep = clus_sep,
-                    N_spks_ratio = N_spks_ratio,
-                    sd_shrinkage = sd_shrinkage,
-                    c_1 = c_1, delta_1 = delta_1,
-                    c_2 = c_2, delta_2 = delta_2,
-                    c_3 = c_3, delta_3 = delta_3,
-                    identical_components = identical_components,
-                    clus_mixture = clus_mixture)
+                    clus_sep = clus_sep )
   
   if (N_component_true == 1) {
     data_generated = do.call(what = generate_data_Ncomp_1, args = data_param)

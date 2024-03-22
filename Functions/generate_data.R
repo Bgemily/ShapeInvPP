@@ -10,16 +10,7 @@ generate_data = function(SEED=NULL,
                          timeshift_subj_max_vec = c(1/8, 1/32),
                          timeshift_trial_max = 1/8,
                          ### params when N_clus==4:
-                         clus_sep = 2-1,
-                         ### params when N_clus==1:
-                         N_spks_ratio = 3/2,
-                         sd_shrinkage = 1,
-                         c_1 = 0, delta_1 = 0,
-                         c_2 = 0, delta_2 = 0,
-                         c_3 = 0, delta_3 = 0,
-                         identical_components = FALSE,
-                         ### params when N_clus==2:
-                         clus_mixture = 0)
+                         clus_sep = 2-1)
 {
   if(!is.null(SEED)) set.seed(SEED)
   t_unit = t_vec[2]-t_vec[1]
