@@ -175,7 +175,6 @@ for (id_session in c(13)) {
                      fix_timeshift = fix_timeshift, 
                      add_rand_to_init_timeshift = ifelse(id_restart>1, TRUE, FALSE),
                      v_trialwise_vec_list = v_trialwise_vec_list,
-                     fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                      v_true_mat_list = v_true_mat_list,
                      rmv_conn_prob = TRUE)
       clusters_list_init = res$clusters_list
@@ -184,7 +183,7 @@ for (id_session in c(13)) {
       
       # Apply algorithm ---------
       time_start = Sys.time()
-      res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
+      res_new = apply_asimm(spks_time_mlist = spks_time_mlist,
                                v_trialwise_vec_list = v_trialwise_vec_list,
                                clusters_list_init = clusters_list_init,
                                v_mat_list_init = v_mat_list_init,
@@ -196,8 +195,7 @@ for (id_session in c(13)) {
                                key_times_vec = key_times_vec,
                                fix_timeshift = fix_timeshift, 
                                MaxIter = MaxIter, 
-                               conv_thres = conv_thres, 
-                               fix_comp1_timeshift_only = fix_comp1_timeshift_only )
+                               conv_thres = conv_thres )
       time_end = Sys.time()
       time_estimation = time_end - time_start
       time_estimation = as.numeric(time_estimation, units='secs')
