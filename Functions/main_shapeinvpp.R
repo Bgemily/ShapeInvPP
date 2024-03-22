@@ -124,7 +124,7 @@ main_shapeinvpp = function(### Parameters for generative model
       # Apply algorithm ---------
       time_start = Sys.time()
       ### Estimation z,v,f based on pdf
-      res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
+      res_new = apply_asimm(spks_time_mlist = spks_time_mlist,
                                v_trialwise_vec_list = v_trialwise_vec_list,
                                clusters_list_init = clusters_list_init,
                                v_mat_list_init = v_mat_list_init,

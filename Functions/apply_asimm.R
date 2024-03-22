@@ -1,5 +1,5 @@
 ### Implement algorithm 
-do_cluster_pdf = function(# Observables
+apply_asimm = function(# Observables
                           spks_time_mlist, 
                           v_trialwise_vec_list = NULL,
                           key_times_vec = c(min(t_vec), 0, max(t_vec)),
@@ -183,7 +183,7 @@ do_cluster_pdf = function(# Observables
   }
   
   if (n_iter>MaxIter) {
-    message("[do_cluster_pdf]: Reached maximum iteration number.")
+    message("Reached maximum iteration number.")
   }
   N_iteration = n_iter
   
