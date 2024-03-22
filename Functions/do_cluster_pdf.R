@@ -2,17 +2,17 @@
 do_cluster_pdf = function(# Observables
                           spks_time_mlist, 
                           v_trialwise_vec_list = NULL,
+                          key_times_vec = c(min(t_vec), 0, max(t_vec)),
+                          N_component=1,
                           # Initial values
                           clusters_list_init,
                           v_mat_list_init=NULL,
                           # Tuning parameter
                           N_clus=length(clusters_list_init), 
-                          N_component=1,
                           freq_trun=5, 
                           bw = 0,
                           t_vec=seq(0, 1, length.out=200),
                           v_subjwise_max=NULL,
-                          key_times_vec = c(min(t_vec), 0, max(t_vec)),
                           MaxIter=10, conv_thres=5e-3, 
                           fix_timeshift=FALSE,
                           rand_init = FALSE,

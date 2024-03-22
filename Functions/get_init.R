@@ -1,18 +1,18 @@
 ### Initialize of cluster memberships and time shifts
 ### Initialize time shifts by earliest edge time.
 get_init = function(spks_time_mlist, 
+                    v_trialwise_vec_list = NULL,
+                    key_times_vec = c(min(t_vec),0,max(t_vec)),
                     N_clus,
                     N_component=1,
                     freq_trun=5, 
                     bw=0,
                     t_vec=seq(0, 1, by=0.01),
-                    key_times_vec = c(min(t_vec),0,max(t_vec)),
                     N_start_kmean = 5,
                     fix_timeshift=FALSE,
                     use_true_timeshift=FALSE, 
                     add_rand_to_init_timeshift=TRUE,
                     v_true_mat_list = NULL,
-                    v_trialwise_vec_list = NULL,
                     rmv_conn_prob=FALSE,
                     default_timeshift=0
 )

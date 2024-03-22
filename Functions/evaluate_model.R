@@ -2,10 +2,10 @@
 # and evaluate metrics including: log likelihood, l2 loss of distribution, l2 loss of N_spks, etc.
 evaluate_model = function(spks_time_mlist, 
                           v_trialwise_vec_list,
-                        N_component,
-                        key_times_vec,
-                        model_fitted_list,
-                        freq_trun = 10)
+                          key_times_vec,
+                          N_component,
+                          model_fitted_list,
+                          freq_trun = 10)
 {
   N_subj = nrow(spks_time_mlist)
   N_trial = ncol(spks_time_mlist)
