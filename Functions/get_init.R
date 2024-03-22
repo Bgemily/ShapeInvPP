@@ -67,7 +67,7 @@ get_init = function(spks_time_mlist,
         if (length(spks_time_shifted_vec) > 0) {
           v_subjwise_vec_list[[id_component]][id_subj] = quantile(spks_time_shifted_vec, 0.0) 
           if (add_rand_to_init_timeshift){
-            v_subjwise_vec_list[[id_component]][id_subj] = runif(n = 1, min = -0.05, max = 0.05) + v_subjwise_vec_list[[id_component]][id_subj]
+            v_subjwise_vec_list[[id_component]][id_subj] = runif(n = 1, min = -(max(t_vec)-min(t_vec))/50, max = (max(t_vec)-min(t_vec))/50) + v_subjwise_vec_list[[id_component]][id_subj]
           }
           v_subjwise_vec_list[[id_component]][id_subj] = v_subjwise_vec_list[[id_component]][id_subj] - key_times_vec[id_component] 
           if (v_subjwise_vec_list[[id_component]][id_subj] < 0) {

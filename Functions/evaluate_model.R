@@ -83,7 +83,7 @@ evaluate_model = function(spks_time_mlist,
         log_lik_tmp_2 = log_lik_tmp_2 + sum(log_intensity_est*counts_tmp)
         ### Add L2_loss_part_1_tmp: N_{i,r}(T) * T^{-1} * \| y_{i,r}(t)/N_{i,r}(T) - lambda_{i,r}(t)/Lambda_{i,r}(T) \|^2
         intensity_empirical = counts_tmp / t_unit
-        L2_loss_part_1_tmp = length(event_time_vec_tmp) * max(t_vec)^{-1} * sum((intensity_empirical/sum(intensity_empirical*t_unit) - intensity_est/sum(intensity_est*t_unit))^2 * t_unit)
+        L2_loss_part_1_tmp = length(event_time_vec_tmp) * (max(t_vec)-min(t_vec))^{-1} * sum((intensity_empirical/sum(intensity_empirical*t_unit) - intensity_est/sum(intensity_est*t_unit))^2 * t_unit)
         L2_loss_part_1 = L2_loss_part_1 + L2_loss_part_1_tmp
         ### Add L2_loss_part_1_tmp_smoothdensity: N_{i,r}(T) * T^{-1} * \| \tilde{y}_{i,r}(t)/N_{i,r}(T) - lambda_{i,r}(t)/Lambda_{i,r}(T) \|^2
         intensity_empirical_fft = fft(intensity_empirical) / length(intensity_empirical)

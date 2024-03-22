@@ -17,8 +17,8 @@ library(doParallel)
 
 # User input setup --------------------------------------------------------
 
-N_replicate_total = 20
-N_split = 2
+N_replicate_total = 200
+N_split = 20
 
 N_replicate = N_replicate_total/N_split
 
@@ -33,12 +33,14 @@ registerDoParallel(cores=N_cores)
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'heuristic_gamma_v1.3'
+setup = 'heuristic_gamma_v2.0'
 method = 'ShapeInvPP'
 
 ### Parameters' possible values:
 gamma_vec = 10^c(-2,-1.5,-1,-0.5,0,0.5,1,1.5,2)/100
 SEED_0 = (as.numeric(format(Sys.time(), "%OS4"))*10^4)*1000
+
+# L1/L2/ARI vs gamma, N_clus_est=4
 if (TRUE) {
   default_setting = 'N_clus_est=4,N_trial=3,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
@@ -56,7 +58,7 @@ if (TRUE) {
                                  N_subj = 40,
                                  N_clus = 4,
                                  N_component_true = 2,
-                                 t_vec = seq(-1, 1.5, by=0.01),
+                                 t_vec = seq(-1, 1.5, by=0.01)+1,
                                  timeshift_subj_max_vec = c(1/32/4, 1/32)*2,
                                  timeshift_trial_max = 0.3,
                                  ### params when N_clus==4:
@@ -66,7 +68,7 @@ if (TRUE) {
                                  freq_trun = 10,
                                  gamma = gamma,
                                  N_component = 2,
-                                 key_times_vec = c(-1,0-0.2,1.5),
+                                 key_times_vec = c(-1,0-0.2,1.5)+1,
                                  fix_timeshift = FALSE,
                                  fix_membership = FALSE,
                                  save_center_pdf_array = save_center_pdf_array ),
@@ -87,6 +89,7 @@ if (TRUE) {
     }
   }
 }
+# L1/L2/ARI vs gamma, N_clus_est=3
 if (TRUE) {
   default_setting = 'N_clus_est=3,N_trial=3,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
@@ -104,7 +107,7 @@ if (TRUE) {
                                  N_subj = 40,
                                  N_clus = 4,
                                  N_component_true = 2,
-                                 t_vec = seq(-1, 1.5, by=0.01),
+                                 t_vec = seq(-1, 1.5, by=0.01)+1,
                                  timeshift_subj_max_vec = c(1/32/4, 1/32)*2,
                                  timeshift_trial_max = 0.3,
                                  ### params when N_clus==4:
@@ -115,7 +118,7 @@ if (TRUE) {
                                  freq_trun = 10,
                                  gamma = gamma,
                                  N_component = 2,
-                                 key_times_vec = c(-1,0-0.2,1.5),
+                                 key_times_vec = c(-1,0-0.2,1.5)+1,
                                  fix_timeshift = FALSE,
                                  fix_membership = FALSE,
                                  save_center_pdf_array = save_center_pdf_array ),
@@ -136,6 +139,7 @@ if (TRUE) {
     }
   }
 }
+# L1/L2/ARI vs gamma, N_clus_est=5
 if (TRUE) {
   default_setting = 'N_clus_est=5,N_trial=3,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
@@ -153,7 +157,7 @@ if (TRUE) {
                                  N_subj = 40,
                                  N_clus = 4,
                                  N_component_true = 2,
-                                 t_vec = seq(-1, 1.5, by=0.01),
+                                 t_vec = seq(-1, 1.5, by=0.01)+1,
                                  timeshift_subj_max_vec = c(1/32/4, 1/32)*2,
                                  timeshift_trial_max = 0.3,
                                  ### params when N_clus==4:
@@ -164,7 +168,7 @@ if (TRUE) {
                                  freq_trun = 10,
                                  gamma = gamma,
                                  N_component = 2,
-                                 key_times_vec = c(-1,0-0.2,1.5),
+                                 key_times_vec = c(-1,0-0.2,1.5)+1,
                                  fix_timeshift = FALSE,
                                  fix_membership = FALSE,
                                  save_center_pdf_array = save_center_pdf_array ),
@@ -185,6 +189,7 @@ if (TRUE) {
     }
   }
 }
+# L1/L2/ARI vs gamma, N_clus_est=6
 if (TRUE) {
   default_setting = 'N_clus_est=6,N_trial=3,timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
   for (id_N_split in 1:N_split) {
@@ -202,7 +207,7 @@ if (TRUE) {
                                  N_subj = 40,
                                  N_clus = 4,
                                  N_component_true = 2,
-                                 t_vec = seq(-1, 1.5, by=0.01),
+                                 t_vec = seq(-1, 1.5, by=0.01)+1,
                                  timeshift_subj_max_vec = c(1/32/4, 1/32)*2,
                                  timeshift_trial_max = 0.3,
                                  ### params when N_clus==4:
@@ -213,7 +218,7 @@ if (TRUE) {
                                  freq_trun = 10,
                                  gamma = gamma,
                                  N_component = 2,
-                                 key_times_vec = c(-1,0-0.2,1.5),
+                                 key_times_vec = c(-1,0-0.2,1.5)+1,
                                  fix_timeshift = FALSE,
                                  fix_membership = FALSE,
                                  save_center_pdf_array = save_center_pdf_array ),
