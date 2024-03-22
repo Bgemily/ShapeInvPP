@@ -230,7 +230,6 @@ do_cluster_pdf = function(# Observables
               loss_history = loss_history,
               l2_loss_part_1 = l2_loss_part_1,
               l2_loss_part_2 = l2_loss_part_2,
-              dist_to_centr_vec = dist_to_centr_vec,
               clusters_history = clusters_history, 
               center_density_array_history = center_density_array_history,
               center_density_array = center_density_array,
