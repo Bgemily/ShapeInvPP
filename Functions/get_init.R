@@ -1,7 +1,6 @@
 ### Initialize of cluster memberships and time shifts
 ### Initialize time shifts by earliest edge time.
 get_init = function(spks_time_mlist, 
-                    reaction_time_vec=NULL, 
                     N_clus,
                     N_component=1,
                     freq_trun=5, 
@@ -10,12 +9,10 @@ get_init = function(spks_time_mlist,
                     key_times_vec = c(min(t_vec),0,max(t_vec)),
                     N_start_kmean = 5,
                     fix_timeshift=FALSE,
-                    fix_comp1_timeshift_only=FALSE,
                     use_true_timeshift=FALSE, 
                     add_rand_to_init_timeshift=TRUE,
                     v_true_mat_list = NULL,
                     v_trialwise_vec_list = NULL,
-                    jitter_prop_true_timeshift=0,
                     rmv_conn_prob=FALSE,
                     default_timeshift=0
 )
@@ -31,12 +28,6 @@ get_init = function(spks_time_mlist,
   if (fix_timeshift) {
     if (use_true_timeshift) {
       v_mat_list = v_true_mat_list
-      ### Jitter true time shift
-      if(jitter_prop_true_timeshift>0){
-        for (id_component in 1:N_component) {
-          v_mat_list[[id_component]] = jitter(v_mat_list[[id_component]], amount = jitter_prop_true_timeshift*((-min(t_vec))/2-0))
-        }
-      }
     } else{
       v_vec = matrix(default_timeshift, nrow = N_subj, ncol = N_trial)
       v_mat_list = rep(list(v_vec), N_component)
@@ -89,10 +80,7 @@ get_init = function(spks_time_mlist,
       v_mat_list[[id_component]] = round(v_mat_list[[id_component]]/t_unit)*t_unit
     }
     
-    ### Force time shifts of first component to be truth
-    if( (!fix_timeshift) & fix_comp1_timeshift_only ){
-      v_mat_list[[1]] = v_true_mat_list[[1]]
-    }
+    
   }
   
   # Initialize clusters -------------
@@ -183,10 +171,7 @@ get_init = function(spks_time_mlist,
         v_mat_list[[id_component]] = round(v_mat_list[[id_component]]/t_unit)*t_unit
       }
     }
-    ### Force time shifts of first component to be truth
-    if( (!fix_timeshift) & fix_comp1_timeshift_only ){
-      v_mat_list[[1]] = v_true_mat_list[[1]]
-    }
+    
   }
   
   return(list(v_vec=v_vec,

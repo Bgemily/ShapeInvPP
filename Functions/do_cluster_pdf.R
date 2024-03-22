@@ -1,6 +1,6 @@
-### Input: spks_time_mlist: N_subj * N_trial with each element being a list of spike times
-### Perform algorithm based on intensities 
-do_cluster_pdf = function(spks_time_mlist, 
+### Implement algorithm 
+do_cluster_pdf = function(# Observables
+                          spks_time_mlist, 
                           v_trialwise_vec_list = NULL,
                           # Initial values
                           clusters_list_init,
@@ -18,7 +18,6 @@ do_cluster_pdf = function(spks_time_mlist,
                           MaxIter=10, conv_thres=5e-3, 
                           fix_timeshift=FALSE,
                           rand_init = FALSE,
-                          fix_comp1_timeshift_only=FALSE,
                           gamma=0.06,
                           alpha=0,
                           ...)
@@ -158,7 +157,6 @@ do_cluster_pdf = function(spks_time_mlist,
                                      v_subjwise_max = v_subjwise_max,
                                      key_times_vec = key_times_vec,
                                      fix_timeshift = fix_timeshift,
-                                     fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                                      rand_init = FALSE,
                                      gamma = gamma)
     clusters_list_update = tmp$clusters_list
