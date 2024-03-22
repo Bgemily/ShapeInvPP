@@ -23,15 +23,12 @@ main_shapeinvpp = function(### Parameters for generative model
                         N_clus_min = N_clus, N_clus_max = N_clus,
                         fix_timeshift = FALSE,
                         use_true_timeshift = FALSE,
-                        jitter_level = 0,
                         save_center_pdf_array = FALSE,
                         rand_init = FALSE,
                         N_restart = 1,
                         N_start_kmean = 5,
                         ### Unused
-                        jitter_time_rad = 10, max_iter = 50,
                         conv_thres = 5e-3, 
-                        opt_radius = total_time/2,
                         ...)
 {
   t_unit = t_vec[2]-t_vec[1]
@@ -129,8 +126,6 @@ main_shapeinvpp = function(### Parameters for generative model
       ### Estimation z,v,f based on pdf
       res_new = do_cluster_pdf(spks_time_mlist = spks_time_mlist,
                                v_trialwise_vec_list = v_trialwise_vec_list,
-                               center_density_array_init = center_density_array_init,
-                               center_Nspks_mat_init = center_Nspks_mat_init, 
                                clusters_list_init = clusters_list_init,
                                v_mat_list_init = v_mat_list_init,
                                N_component = N_component, 
@@ -143,9 +138,7 @@ main_shapeinvpp = function(### Parameters for generative model
                                key_times_vec = key_times_vec,
                                fix_timeshift = fix_timeshift, 
                                rand_init = rand_init,
-                               fix_comp1_timeshift_only = fix_comp1_timeshift_only,
-                               conv_thres = conv_thres,
-                               ...)
+                               conv_thres = conv_thres )
       time_end = Sys.time()
       time_estimation = time_end - time_start
       time_estimation = as.numeric(time_estimation, units='secs')

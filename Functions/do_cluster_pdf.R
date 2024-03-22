@@ -18,8 +18,7 @@ do_cluster_pdf = function(# Observables
                           fix_timeshift=FALSE,
                           rand_init = FALSE,
                           gamma=0.06,
-                          alpha=0,
-                          ...)
+                          alpha=0 )
 {
   
   t_unit = t_vec[2] - t_vec[1]
