@@ -159,19 +159,6 @@ main_shapeinvpp = function(### Parameters for generative model
     res_list[[ind_N_clus]] = res_best
   }
   
-  # Select best cluster number using ICL ------------------------------------
-  res_select_model = select_model(spks_time_mlist = spks_time_mlist, 
-                                  N_component = N_component,
-                                  key_times_vec = key_times_vec,
-                                  result_list = res_list)
-  cand_N_clus_vec = N_clus_min:N_clus_max
-  N_clus_est = cand_N_clus_vec[res_select_model$id_best_res]
-  ICL_vec = res_select_model$ICL_vec 
-  compl_log_lik_vec = res_select_model$compl_log_lik_vec 
-  log_lik_vec = res_select_model$log_lik_vec
-  penalty_vec = res_select_model$penalty_vec
-  
-  
   # Retrieve estimation results of the best cluster number ------------------
   res = res_list[[res_select_model$id_best_res]]
   
