@@ -47,12 +47,7 @@ main_shapeinvpp = function(### Parameters for generative model
                     timeshift_subj_max_vec = timeshift_subj_max_vec,
                     timeshift_trial_max = timeshift_trial_max,
                     clus_sep = clus_sep )
-  
-  if (N_component_true == 1) {
-    data_generated = do.call(what = generate_data_Ncomp_1, args = data_param)
-  } else if (N_component_true == 2) {
-    data_generated = do.call(what = generate_data, args = data_param)
-  }
+  data_generated = do.call(what = generate_data, args = data_param)
   
   
   spks_time_mlist = data_generated$spks_time_mlist
