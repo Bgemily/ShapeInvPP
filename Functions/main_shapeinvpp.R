@@ -7,7 +7,6 @@ main_shapeinvpp = function(### Parameters for generative model
                         N_clus=2, 
                         N_component_true = 2,
                         t_vec = seq(-1,1,by=0.01),
-                        t_vec_extend = t_vec,
                         N_spks_total = 1000,
                         timeshift_subj_max_vec = c(1/8, 1/32),
                         timeshift_trial_max = 1/8,
@@ -52,7 +51,6 @@ main_shapeinvpp = function(### Parameters for generative model
                     N_trial=N_trial,
                     N_clus=N_clus, 
                     t_vec=t_vec,
-                    t_vec_extend=t_vec_extend,
                     key_times_vec = key_times_vec,
                     N_spks_total = N_spks_total,
                     timeshift_subj_max_vec = timeshift_subj_max_vec,
@@ -162,7 +160,6 @@ main_shapeinvpp = function(### Parameters for generative model
                                MaxIter = MaxIter, 
                                gamma=gamma,
                                t_vec=t_vec, 
-                               t_vec_extend=t_vec_extend,
                                v_subjwise_max = v_subjwise_max,
                                key_times_vec = key_times_vec,
                                fix_timeshift = fix_timeshift, 
@@ -482,7 +479,7 @@ main_shapeinvpp = function(### Parameters for generative model
               # other
               cand_N_clus_vec=cand_N_clus_vec,
               N_restart = N_restart,
-              t_vec=t_vec, t_vec_extend=t_vec_extend,
+              t_vec=t_vec, 
               time_estimation=time_estimation,
               N_iteration=N_iteration,
               loss_history=loss_history

@@ -36,7 +36,7 @@ select_model = function(spks_time_mlist,
         tau_mat[id_subj_vec_tmp, q] = 1
       }
     } 
-    t_vec = res_tmp$t_vec_extend
+    t_vec = res_tmp$t_vec
     t_unit = t_vec[2]-t_vec[1]
     
     # First term of log likelihood: \sum_{i,r} ( -\sum_{q} (F_{q}(T)+G_{q}(T))*tau_{i,r,q} )

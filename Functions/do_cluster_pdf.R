@@ -12,7 +12,6 @@ do_cluster_pdf = function(# Observables
                           freq_trun=5, 
                           bw = 0,
                           t_vec=seq(0, 1, length.out=200),
-                          t_vec_extend=t_vec,
                           v_subjwise_max=NULL,
                           key_times_vec = c(min(t_vec), 0, max(t_vec)),
                           MaxIter=10, conv_thres=5e-3, 
@@ -227,30 +226,6 @@ do_cluster_pdf = function(# Observables
     v_subjwise_vec_list[[id_component]] = v_mat_list[[id_component]][ ,id_trial_tmp] - v_trialwise_vec_list[[id_component]][id_trial_tmp]
   }
   
-  ### Extend estimated densities and intensities to t_vec_extend
-  if (length(t_vec)<length(t_vec_extend)){
-    center_intensity_array_extend = array(dim=c(N_clus, N_component, length(t_vec_extend)))
-    center_density_array_extend = array(dim=c(N_clus, N_component, length(t_vec_extend)))
-    center_Nspks_mat_extend = matrix(nrow=N_clus, ncol=N_component)
-    for (id_clus in 1:N_clus) {
-      for (id_component in 1:N_component) {
-        intensity_q_curr_comp = center_intensity_array[id_clus, id_component, ]
-        intensity_q_curr_comp = c(rep(0, length(t_vec_extend) - length(t_vec)),
-                                  intensity_q_curr_comp )
-        N_spks_q_curr_comp = sum(intensity_q_curr_comp * t_unit)
-        center_intensity_array_extend[id_clus, id_component, ] = intensity_q_curr_comp
-        center_Nspks_mat_extend[id_clus, id_component] = N_spks_q_curr_comp
-      }
-      for (id_component in 1:N_component) {
-        intensity_q_curr_comp = center_intensity_array_extend[id_clus, id_component, ]
-        N_spks_q_all_comp = sum(center_Nspks_mat_extend[id_clus, ])
-        center_density_array_extend[id_clus, id_component, ] = intensity_q_curr_comp / (N_spks_q_all_comp + .Machine$double.eps)
-      }
-    }
-    center_intensity_array = center_intensity_array_extend
-    center_Nspks_mat = center_Nspks_mat_extend
-    center_density_array = center_density_array_extend
-  }
   
   
   return(list(clusters_list = clusters_list, 
@@ -268,7 +243,6 @@ do_cluster_pdf = function(# Observables
               v_subjwise_vec_list = v_subjwise_vec_list,
               v_subjwise_vec_list_history = v_subjwise_vec_list_history,
               t_vec = t_vec,
-              t_vec_extend = t_vec_extend,
               N_iteration = N_iteration))
   
 }
