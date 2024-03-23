@@ -9,7 +9,6 @@ sapply(file.sources, source)
 library(Matrix)
 library(mclust)
 library(combinat)
-library(fdapace)
 
 args <- commandArgs(trailingOnly = TRUE)
 gamma <- as.numeric(args[1])
@@ -31,38 +30,16 @@ for (id_session in c(13)) {
     id_neuron_selected = sample(id_neuron_selected, 30)
   }
   
-  if (FALSE) {
-    trial_length = max(dat$trial_intervals[id_trial_selected,2] - dat$stim_onset[id_trial_selected]) + 0.2
-  } else {
-    trial_length = 3.5
-  }
-  if (identical(feedback_type, 1)) {
-    t_vec = seq(0, trial_length, length.out=200)
-  } else {
-    t_vec = seq(-2, 3,length.out=200)
-  }
+  trial_length = 3.5
+  t_vec = seq(0, trial_length, length.out=200)
+  
 
   ### Select neuron-trial pairs
-  if (FALSE) {
-    trial_start_vec = dat$stim_onset - 0.4
-  } else if (TRUE) {
-    trial_start_vec = ((dat$stim_onset-0.1)+(dat$feedback_time+2))/2 - trial_length/2
-  } else {
-    trial_start_vec = dat$trial_intervals[,2] - trial_length
-  }
-  
-  # Remove trials which cannot cover desired trial length
-  if (FALSE) {
-    id_trial_drop_1 = which(trial_start_vec[id_trial_selected]-dat$trial_intervals[id_trial_selected,1] <= 0)
-    id_trial_drop_2 = which(dat$stim_onset[id_trial_selected+1]-(trial_start_vec[id_trial_selected]+trial_length) <= 0)
-    id_trial_selected = id_trial_selected[-c(id_trial_drop_1, id_trial_drop_2)]
-  } 
-  
+  trial_start_vec = ((dat$stim_onset-0.1)+(dat$feedback_time+2))/2 - trial_length/2
   stim_onset_time_vec = (dat$stim_onset - trial_start_vec)[id_trial_selected]
   gocue_time_vec = (dat$gocue - trial_start_vec)[id_trial_selected]
   reaction_time_vec = (dat$reaction_time - trial_start_vec)[id_trial_selected]
   feedback_time_vec = (dat$feedback_time - trial_start_vec)[id_trial_selected]
-  
   
   spks_time_mlist = matrix(list(), nrow = length(id_neuron_selected), ncol = length(id_trial_selected))
   for (i in 1:length(id_neuron_selected)) {
@@ -124,14 +101,10 @@ for (id_session in c(13)) {
   
   # Fit model for various cluster number ------------------------------------
   N_clus_min = 2
-  N_clus_max = 8
+  N_clus_max = 5
   cand_N_clus_vec = N_clus_min:N_clus_max
   N_component = 2
-  if (identical(feedback_type, 1)) {
-    key_times_vec = c(min(stim_onset_time_vec), min(gocue_time_vec), trial_length)
-  } else {
-    key_times_vec = c(-1.7, 0, 2.5)
-  }
+  key_times_vec = c(min(stim_onset_time_vec), min(gocue_time_vec), trial_length)
   
   N_start_kmean = 5
   freq_trun = 10
@@ -143,10 +116,8 @@ for (id_session in c(13)) {
   N_restart = 1
   MaxIter = 10 
   conv_thres = 5e-3
-  # gamma = 0.007
   
   set.seed(1)
-  # for (gamma in 10^c(-4.5,-5,-5.5,-6)) {
   res_list = list()
   compl_log_lik_vec = c()
   log_lik_vec = c()
@@ -270,7 +241,6 @@ for (id_session in c(13)) {
   now_replicate = format(Sys.time(), "%Y%m%d_%H%M%S")
   save(results, file = paste0(folder_path, '/', 'res', '_', now_replicate, '.Rdata'))
   
-  # }
 }
 
 
