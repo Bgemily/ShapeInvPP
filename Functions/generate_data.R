@@ -213,7 +213,7 @@ generate_data = function(SEED=NULL,
   ### Add baseline intensity for all components
   for (id_clus in 1:N_clus){
     if (N_clus==4) {
-      intensity_baseline = 20
+      intensity_baseline = 20*(N_spks_total/150)
     } else if (N_clus==1){
       intensity_baseline = 20
     }
