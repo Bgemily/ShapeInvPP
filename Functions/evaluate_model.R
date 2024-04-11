@@ -2,10 +2,10 @@
 # and evaluate metrics including: log likelihood, l2 loss of distribution, l2 loss of N_spks, etc.
 evaluate_model = function(spks_time_mlist, 
                           v_trialwise_vec_list,
-                        N_component,
-                        key_times_vec,
-                        model_fitted_list,
-                        freq_trun = 10)
+                          key_times_vec,
+                          N_component,
+                          model_fitted_list,
+                          freq_trun = 10)
 {
   N_subj = nrow(spks_time_mlist)
   N_trial = ncol(spks_time_mlist)
@@ -35,7 +35,7 @@ evaluate_model = function(spks_time_mlist,
       tau_mat[id_subj_vec_tmp, q] = 1
     }
   } 
-  t_vec = model_fitted_list$t_vec_extend
+  t_vec = model_fitted_list$t_vec
   t_unit = t_vec[2]-t_vec[1]
   
   # First term of log likelihood: \sum_{i,r} ( -\sum_{q} (Lambda_{q}(T))*tau_{i,r,q} )

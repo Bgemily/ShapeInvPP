@@ -1,27 +1,23 @@
-### Input: spks_time_mlist: N_subj * N_trial with each element being a list of spike times
-### Perform algorithm based on intensities 
-do_cluster_pdf = function(spks_time_mlist, 
+### Implement algorithm 
+apply_asimm = function(# Observables
+                          spks_time_mlist, 
                           v_trialwise_vec_list = NULL,
+                          key_times_vec = c(min(t_vec), 0, max(t_vec)),
+                          N_component=1,
                           # Initial values
                           clusters_list_init,
-                          v_vec_init=NULL,
                           v_mat_list_init=NULL,
                           # Tuning parameter
                           N_clus=length(clusters_list_init), 
-                          N_component=1,
                           freq_trun=5, 
                           bw = 0,
                           t_vec=seq(0, 1, length.out=200),
-                          t_vec_extend=t_vec,
                           v_subjwise_max=NULL,
-                          key_times_vec = c(min(t_vec), 0, max(t_vec)),
                           MaxIter=10, conv_thres=5e-3, 
                           fix_timeshift=FALSE,
                           rand_init = FALSE,
-                          fix_comp1_timeshift_only=FALSE,
                           gamma=0.06,
-                          alpha=0,
-                          ...)
+                          alpha=0 )
 {
   
   t_unit = t_vec[2] - t_vec[1]
@@ -158,7 +154,6 @@ do_cluster_pdf = function(spks_time_mlist,
                                      v_subjwise_max = v_subjwise_max,
                                      key_times_vec = key_times_vec,
                                      fix_timeshift = fix_timeshift,
-                                     fix_comp1_timeshift_only = fix_comp1_timeshift_only,
                                      rand_init = FALSE,
                                      gamma = gamma)
     clusters_list_update = tmp$clusters_list
@@ -188,7 +183,7 @@ do_cluster_pdf = function(spks_time_mlist,
   }
   
   if (n_iter>MaxIter) {
-    message("[do_cluster_pdf]: Reached maximum iteration number.")
+    message("Reached maximum iteration number.")
   }
   N_iteration = n_iter
   
@@ -229,37 +224,12 @@ do_cluster_pdf = function(spks_time_mlist,
     v_subjwise_vec_list[[id_component]] = v_mat_list[[id_component]][ ,id_trial_tmp] - v_trialwise_vec_list[[id_component]][id_trial_tmp]
   }
   
-  ### Extend estimated densities and intensities to t_vec_extend
-  if (length(t_vec)<length(t_vec_extend)){
-    center_intensity_array_extend = array(dim=c(N_clus, N_component, length(t_vec_extend)))
-    center_density_array_extend = array(dim=c(N_clus, N_component, length(t_vec_extend)))
-    center_Nspks_mat_extend = matrix(nrow=N_clus, ncol=N_component)
-    for (id_clus in 1:N_clus) {
-      for (id_component in 1:N_component) {
-        intensity_q_curr_comp = center_intensity_array[id_clus, id_component, ]
-        intensity_q_curr_comp = c(rep(0, length(t_vec_extend) - length(t_vec)),
-                                  intensity_q_curr_comp )
-        N_spks_q_curr_comp = sum(intensity_q_curr_comp * t_unit)
-        center_intensity_array_extend[id_clus, id_component, ] = intensity_q_curr_comp
-        center_Nspks_mat_extend[id_clus, id_component] = N_spks_q_curr_comp
-      }
-      for (id_component in 1:N_component) {
-        intensity_q_curr_comp = center_intensity_array_extend[id_clus, id_component, ]
-        N_spks_q_all_comp = sum(center_Nspks_mat_extend[id_clus, ])
-        center_density_array_extend[id_clus, id_component, ] = intensity_q_curr_comp / (N_spks_q_all_comp + .Machine$double.eps)
-      }
-    }
-    center_intensity_array = center_intensity_array_extend
-    center_Nspks_mat = center_Nspks_mat_extend
-    center_density_array = center_density_array_extend
-  }
   
   
   return(list(clusters_list = clusters_list, 
               loss_history = loss_history,
               l2_loss_part_1 = l2_loss_part_1,
               l2_loss_part_2 = l2_loss_part_2,
-              dist_to_centr_vec = dist_to_centr_vec,
               clusters_history = clusters_history, 
               center_density_array_history = center_density_array_history,
               center_density_array = center_density_array,
@@ -270,7 +240,6 @@ do_cluster_pdf = function(spks_time_mlist,
               v_subjwise_vec_list = v_subjwise_vec_list,
               v_subjwise_vec_list_history = v_subjwise_vec_list_history,
               t_vec = t_vec,
-              t_vec_extend = t_vec_extend,
               N_iteration = N_iteration))
   
 }

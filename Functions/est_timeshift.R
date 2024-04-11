@@ -13,7 +13,6 @@ est_timeshift = function(subjtrial_density_smooth_array,
                          key_times_vec = c(min(t_vec), 0, max(t_vec)),
                          fix_timeshift=FALSE,
                          rand_init = FALSE,
-                         fix_comp1_timeshift_only=FALSE,
                          bw=0)
 {
   t_unit = t_vec[2]-t_vec[1]
@@ -79,9 +78,7 @@ est_timeshift = function(subjtrial_density_smooth_array,
         v_trialwise_vec = v_trialwise_vec_list[[id_component]]
         v_array_list[[id_component]][1:N_subj,1:N_trial,id_clus] = outer(v_subjwise_vec, v_trialwise_vec, "+")
       }
-      if (fix_comp1_timeshift_only) {
-        v_array_list[[1]][1:N_subj,1:N_trial,id_clus] = v_mat_list[[1]][1:N_subj,1:N_trial]
-      }
+      
     }
     
     # Get un-smoothed center densities ----

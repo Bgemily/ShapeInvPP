@@ -13,7 +13,6 @@ get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
                                       key_times_vec,
                                       fix_timeshift,
                                       rand_init,
-                                      fix_comp1_timeshift_only,
                                       gamma,
                                       v_subjwise_max=NULL)
 {
@@ -46,8 +45,7 @@ get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
                       v_subjwise_max = v_subjwise_max,
                       key_times_vec = key_times_vec,
                       fix_timeshift = fix_timeshift,
-                      rand_init = rand_init,
-                      fix_comp1_timeshift_only = fix_comp1_timeshift_only )
+                      rand_init = rand_init )
   v_array_list_tmp = tmp$v_array_list
   dist_mat_tmp = tmp$dist_mat
   
@@ -100,7 +98,7 @@ get_timeshift_and_clusters = function(subjtrial_density_smooth_array,
     }
   }
   ### For Component 1, force the minimum subj-wise time shifts to be zero
-  if ( (!fix_timeshift) & (!fix_comp1_timeshift_only) ) {
+  if ( (!fix_timeshift)  ) {
     id_component = 1
     for (id_clus in 1:N_clus) {
       if (length(clusters_list[[id_clus]])>0) {
