@@ -1,6 +1,6 @@
 ### Generate data, run our algorithm, and output measurements of errors.
 
-main_shapeinvpp = function(### Parameters for generative model
+main_shapeinvpp_jitter_v_trialwise = function(### Parameters for generative model
     SEED, 
     N_subj = 100,
     N_trial = 1,
@@ -12,6 +12,8 @@ main_shapeinvpp = function(### Parameters for generative model
     timeshift_trial_max = 1/8,
     ### params when N_clus==4:
     clus_sep = 2,
+    #%% parameter for jittering time shift:
+    jitter_sd = 0.1,
     ### Parameters for algorithms
     freq_trun = 5,
     bw = 0,
@@ -55,6 +57,16 @@ main_shapeinvpp = function(### Parameters for generative model
     clus_true_list = data_generated$clus_true_list
     v_true_mat_list = data_generated$v_mat_list
     v_trialwise_vec_list = data_generated$v_trialwise_vec_list
+    
+    # Add small jitter to each component in v_trialwise_vec_list
+    for (id_component in seq_along(v_trialwise_vec_list)) {
+        n <- length(v_trialwise_vec_list[[id_component]])
+        jitter <- rnorm(n, mean = 0, sd = jitter_sd)
+        v_trialwise_vec_list[[id_component]] <- v_trialwise_vec_list[[id_component]] + jitter
+        # Avoid negative time shift
+        v_trialwise_vec_list[[id_component]] = abs(v_trialwise_vec_list[[id_component]])
+    }
+    
     
     # Calculate non-identifiability level --------
     if (N_component >= 2) {
