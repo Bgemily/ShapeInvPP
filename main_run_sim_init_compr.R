@@ -7,7 +7,6 @@ file_path = "./Functions"
 file.sources = list.files(path = file_path, pattern = "*.R$", full.names = TRUE)
 sapply(file.sources, source)
 library(Matrix)
-library(fdapace)
 
 # Load libraries ----------------------------------------------------------
 
@@ -34,7 +33,7 @@ save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
 setup = 'Init_compr_v5.0'
-default_setting = 'timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2'
+default_setting = 'timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.7,key_time_comp2=-0.2'
 
 ### Parameters' possible values:
 N_restart_algo_list = list(0+1, 3+1, 5+1)
@@ -68,7 +67,7 @@ if (TRUE) {
                                  timeshift_trial_max = 0.3,
                                  t_vec = seq(-1,1.5,0.01)+1,
                                  ### params when N_clus==4:
-                                 clus_sep = 0.5,
+                                 clus_sep = 0.7,
                                  ### Parameters for algorithms
                                  rand_init = FALSE,
                                  N_restart = N_restart,
@@ -125,7 +124,7 @@ if (TRUE) {
                                    timeshift_trial_max = 0.3,
                                    t_vec = seq(-1,1.5,0.01)+1,
                                    ### params when N_clus==4:
-                                   clus_sep = 0.5,
+                                   clus_sep = 0.7,
                                    ### Parameters for algorithms
                                    rand_init = TRUE,
                                    N_restart = N_restart,
