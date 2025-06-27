@@ -12,6 +12,9 @@ main_shapeinvpp_timevarying_baseline = function(### Parameters for generative mo
                         timeshift_trial_max = 1/8,
                         ### params when N_clus==4:
                         clus_sep = 2,
+                        ### params for time-varying baseline:
+                        gp_sigma = 10,
+                        gp_lengthscale = 0.1,
                         ### Parameters for algorithms
                         freq_trun = 5,
                         bw = 0,
@@ -43,7 +46,9 @@ main_shapeinvpp_timevarying_baseline = function(### Parameters for generative mo
                     N_spks_total = N_spks_total,
                     timeshift_subj_max_vec = timeshift_subj_max_vec,
                     timeshift_trial_max = timeshift_trial_max,
-                    clus_sep = clus_sep )
+                    clus_sep = clus_sep,
+                    gp_sigma = gp_sigma,
+                    gp_lengthscale = gp_lengthscale )
   data_generated = do.call(what = generate_data_timevarying_baseline, args = data_param)
   
   

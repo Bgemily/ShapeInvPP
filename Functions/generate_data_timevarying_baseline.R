@@ -12,8 +12,8 @@ generate_data_timevarying_baseline = function(SEED=NULL,
                          ### params when N_clus==4:
                          clus_sep = 1,
                          ### variance of timevarying baseline:
-                         gp_sigma = 1,
-                         gp_lengthscale = 0.3 
+                         gp_sigma = 10,
+                         gp_lengthscale = 0.1 
                          )
 {
   if(!is.null(SEED)) set.seed(SEED)
