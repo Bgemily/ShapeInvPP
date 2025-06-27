@@ -10,7 +10,11 @@ generate_data_timevarying_baseline = function(SEED=NULL,
                          timeshift_subj_max_vec = c(1/8, 1/32),
                          timeshift_trial_max = 1/8,
                          ### params when N_clus==4:
-                         clus_sep = 1)
+                         clus_sep = 1,
+                         ### variance of timevarying baseline:
+                         gp_sigma = 1,
+                         gp_lengthscale = 0.3 
+                         )
 {
   if(!is.null(SEED)) set.seed(SEED)
   t_unit = t_vec[2]-t_vec[1]
@@ -219,20 +223,16 @@ generate_data_timevarying_baseline = function(SEED=NULL,
     }
     
     # Generate a time-varying Gaussian process baseline
-    # Parameters for the GP
-    gp_sigma <- 1      # Standard deviation of the GP
-    gp_lengthscale <- 0.3  # Lengthscale for the RBF kernel
-
     # Compute the covariance matrix for the RBF kernel
     t_grid <- as.numeric(t_vec)
     dist_mat <- as.matrix(dist(t_grid))
     cov_mat <- gp_sigma^2 * exp(-0.5 * (dist_mat/gp_lengthscale)^2)
 
     # Sample from the GP
-    gp_baseline <- as.numeric(MASS::mvrnorm(1, mu=rep(0, length(t_grid)), Sigma=cov_mat))
+    gp_baseline <- as.numeric(MASS::mvrnorm(1, mu=rep(intensity_baseline, length(t_grid)), Sigma=cov_mat))
 
     # Shift and scale so that the GP is positive and integrates to intensity_baseline * total time
-    gp_baseline <- gp_baseline - min(gp_baseline) # make non-negative
+    gp_baseline[gp_baseline<0] <- 0 # make non-negative
     gp_baseline <- gp_baseline / sum(gp_baseline * t_unit) # normalize to integrate to 1
     gp_baseline <- gp_baseline * intensity_baseline * (max(t_vec) - min(t_vec)) # scale to desired integral
 
