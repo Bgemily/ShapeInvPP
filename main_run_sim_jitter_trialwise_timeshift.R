@@ -34,7 +34,7 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Model_misspecification/Jitter_true_trialwise_timeshift'
+setup = 'Model_misspecification/Jitter_true_trialwise_timeshift_v2'
 method = 'shape_inv_pp_update_obj_func'
 
 ### Parameters' possible values:
@@ -45,12 +45,13 @@ N_subj_list = list(40, 60, 80, 100, 120, 140)
 key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.04-0.2,1.5), c(-1,0.08-0.2,1.5),
                           c(-1,0.12-0.2,1.5), c(-1,0.16-0.2,1.5), c(-1,0.2-0.2,1.5))
 clus_sep_list = list(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9)
+jitter_sd_list = list(0, 0.05, 0.1, 0.15, 0.2)
 
 if (TRUE) {
   # ARI vs tau vs R
-  for (timeshift_trial_max in timeshift_trial_max_list) {
-    default_setting = paste0("timeshift_trial_max=",timeshift_trial_max,",", 
-                             'N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
+  for (jitter_sd in jitter_sd_list) {
+    default_setting = paste0("jitter_sd=",jitter_sd,",", 
+                             'timeshift_trial_max=0.3,N_spks_total=150,N_subj=40,N_clus=4,clus_sep=0.5,key_time_comp2=-0.2')
     for (id_N_split in 1:N_split){
       if (save_res_details & (id_N_split == 1)) {
         save_center_pdf_array = TRUE
@@ -68,12 +69,12 @@ if (TRUE) {
                                    N_component_true = 2,
                                    N_spks_total = 150,
                                    timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
-                                   timeshift_trial_max = timeshift_trial_max,
+                                   timeshift_trial_max = 0.3,
                                    t_vec = seq(-1,1.5,0.01)+1,
                                    ### params when N_clus==4:
                                    clus_sep = 0.5,
                                    #%% parameter for jittering time shift:
-                                   jitter_sd = 0.05,
+                                   jitter_sd = jitter_sd,
                                    ### Parameters for algorithms
                                    freq_trun = 10,
                                    gamma = 1/100,
