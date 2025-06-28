@@ -214,28 +214,25 @@ generate_data_timevarying_baseline = function(SEED=NULL,
     center_intensity_array_true[id_clus,2, ] = center_density_array_true[id_clus,2,]*sum(center_N_spks_mat[id_clus,1:2])    
   }
   
+  # Generate a time-varying Gaussian process baseline
+  # Compute the covariance matrix for the RBF kernel
+  t_grid <- as.numeric(t_vec)
+  dist_mat <- as.matrix(dist(t_grid))
+  cov_mat <- gp_sigma^2 * exp(-0.5 * (dist_mat/gp_lengthscale)^2)
+  # Sample from the GP
+  if (N_clus==4) {
+    intensity_baseline = 20*(N_spks_total/150)
+  } else if (N_clus==1){
+    intensity_baseline = 20
+  }
+  gp_baseline <- as.numeric(MASS::mvrnorm(1, mu=rep(intensity_baseline, length(t_grid)), Sigma=cov_mat))
+  # Shift and scale so that the GP is positive and integrates to intensity_baseline * total time
+  gp_baseline[gp_baseline<0] <- 0 # make non-negative
+  gp_baseline <- gp_baseline / sum(gp_baseline * t_unit) # normalize to integrate to 1
+  gp_baseline <- gp_baseline * intensity_baseline * (max(t_vec) - min(t_vec)) # scale to desired integral
+  
   ### Add baseline intensity for all components
   for (id_clus in 1:N_clus){
-    if (N_clus==4) {
-      intensity_baseline = 20*(N_spks_total/150)
-    } else if (N_clus==1){
-      intensity_baseline = 20
-    }
-    
-    # Generate a time-varying Gaussian process baseline
-    # Compute the covariance matrix for the RBF kernel
-    t_grid <- as.numeric(t_vec)
-    dist_mat <- as.matrix(dist(t_grid))
-    cov_mat <- gp_sigma^2 * exp(-0.5 * (dist_mat/gp_lengthscale)^2)
-
-    # Sample from the GP
-    gp_baseline <- as.numeric(MASS::mvrnorm(1, mu=rep(intensity_baseline, length(t_grid)), Sigma=cov_mat))
-
-    # Shift and scale so that the GP is positive and integrates to intensity_baseline * total time
-    gp_baseline[gp_baseline<0] <- 0 # make non-negative
-    gp_baseline <- gp_baseline / sum(gp_baseline * t_unit) # normalize to integrate to 1
-    gp_baseline <- gp_baseline * intensity_baseline * (max(t_vec) - min(t_vec)) # scale to desired integral
-
     center_intensity_array_true[id_clus,1, ] = gp_baseline + center_intensity_array_true[id_clus,1, ]
     center_N_spks_mat[id_clus,1] = sum(center_intensity_array_true[id_clus,1, ]*t_unit)
     
