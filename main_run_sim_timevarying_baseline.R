@@ -86,8 +86,8 @@ if (TRUE) {
                                    save_center_pdf_array = save_center_pdf_array),
                    error = function(e) print(paste0("SEED = ", SEED, " : ", e)) )
         }
-        param_name = "gp_sigma"
-        param_value = gp_sigma
+        param_name = "N_trial"
+        param_value = N_trial
         folder_path = paste0(top_level_folder,
                              '/', setup,
                              '/', method, 
