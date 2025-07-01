@@ -68,8 +68,8 @@ if (TRUE) {
                                    N_clus = 4, 
                                    N_component_true = 2,
                                    N_spks_total = 150,
-                                   timeshift_subj_max_vec = 0.3,
-                                   timeshift_trial_max = timeshift_trial_max_list[[1]],
+                                   timeshift_subj_max_vec = timeshift_subj_max_vec_list[[1]],
+                                   timeshift_trial_max = 0.3,
                                    t_vec = seq(-1,1.5,0.01)+1,
                                    ### params when N_clus==4:
                                    clus_sep = 0.5,
