@@ -34,7 +34,7 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Model_misspecification/Use_timevarying_baseline_v3.2'
+setup = 'Model_misspecification/Use_timevarying_baseline_v3.3'
 method = 'shape_inv_pp_update_obj_func'
 
 ### Parameters' possible values:
