@@ -225,7 +225,12 @@ generate_data_timevarying_baseline = function(SEED=NULL,
   } else if (N_clus==1){
     intensity_baseline = 20
   }
-  gp_baseline <- as.numeric(MASS::mvrnorm(1, mu=rep(0, length(t_grid)), Sigma=cov_mat))
+  if (gp_sigma==0){
+    gp_baseline <- as.numeric(MASS::mvrnorm(1, mu=rep(intensity_baseline, length(t_grid)), Sigma=cov_mat))
+  } else{
+    gp_baseline <- as.numeric(MASS::mvrnorm(1, mu=rep(0, length(t_grid)), Sigma=cov_mat))
+  }
+  
   # Shift and scale so that the GP is positive and integrates to intensity_baseline * total time
   gp_baseline[gp_baseline<0] <- 0 # make non-negative
   gp_baseline <- gp_baseline / sum(gp_baseline * t_unit) # normalize to integrate to 1
