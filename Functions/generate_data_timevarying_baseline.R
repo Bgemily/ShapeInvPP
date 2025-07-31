@@ -228,7 +228,7 @@ generate_data_timevarying_baseline = function(SEED=NULL,
   if (gp_sigma==0){
     gp_baseline <- as.numeric(MASS::mvrnorm(1, mu=rep(intensity_baseline, length(t_grid)), Sigma=cov_mat))
   } else{
-    gp_baseline <- as.numeric(MASS::mvrnorm(1, mu=rep(0, length(t_grid)), Sigma=cov_mat))
+    gp_baseline <- as.numeric(MASS::mvrnorm(1, mu=rep(0, length(t_grid)), Sigma=cov_mat)) + intensity_baseline
   }
   
   # Shift and scale so that the GP is positive and integrates to intensity_baseline * total time
