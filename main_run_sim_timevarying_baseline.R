@@ -34,7 +34,7 @@ test_N_component_2 = TRUE
 save_res_details = FALSE
 
 top_level_folder = "../Results/Rdata"
-setup = 'Model_misspecification/Use_timevarying_baseline_v3.6'
+setup = 'Model_misspecification/Use_timevarying_baseline_v3.7'
 method = 'shape_inv_pp_update_obj_func'
 
 ### Parameters' possible values:
@@ -45,7 +45,7 @@ N_subj_list = list(40, 60, 80, 100, 120, 140)
 key_times_vec_list = list(c(-1,0-0.2,1.5), c(-1,0.04-0.2,1.5), c(-1,0.08-0.2,1.5),
                           c(-1,0.12-0.2,1.5), c(-1,0.16-0.2,1.5), c(-1,0.2-0.2,1.5))
 clus_sep_list = list(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9)
-gp_sigma_list = list(0,10,20,30,40,50)
+gp_sigma_list = list(0, 0.01, 0.03, 0.05)
 
 if (TRUE) {
   # ARI vs tau vs R
