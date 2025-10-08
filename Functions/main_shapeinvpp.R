@@ -427,6 +427,7 @@ main_shapeinvpp = function(### Parameters for generative model
               clus_entropy = clus_entropy,
               L2_loss_part_1 = L2_loss_part_1,
               L2_loss_part_2 = L2_loss_part_2,
+              L2_loss_total = L2_loss_part_1 + gamma*L2_loss_part_2,
               L2_loss_part_1_smoothdensity = L2_loss_part_1_smoothdensity,
               compl_log_lik = compl_log_lik,
               # other
